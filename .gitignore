@@ -1,0 +1,14 @@
+# Local MCP configuration
+.mcp.json
+mcp-servers/
+
+# Reference documentation (not part of website)
+resources/
+
+# Build outputs (future)
+target/
+dist/
+
+# OS files
+.DS_Store
+Thumbs.db
