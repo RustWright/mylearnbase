@@ -2,7 +2,7 @@
 
 **Status:** Active
 **Started:** 2026-01-31
-**Current Phase:** Session 2 Complete - Architecture
+**Current Phase:** Ready for Session 3 - Planning (Cycle 1)
 **Domain:** mylearnbase.com
 
 ---
@@ -83,6 +83,8 @@
 
 - [x] Session 1: Initiation (2026-01-31)
 - [x] Session 2: Architecture (2026-02-01)
+- [x] Session 3: Planning - FAILED (2026-02-01) - PoC revealed Dioxus SSG broken
+- [x] Session 2b: Architecture Revision (2026-02-02)
 - [ ] Session 3: Planning (Cycle 1)
 - [ ] Session 4: Implementation (Cycle 1)
 - [ ] Session 5: Testing/Catchup (Cycle 1)
@@ -121,3 +123,53 @@
 **Proof-of-concept required:** Validate Dioxus + markdown + SSG + Cloudflare Pages works before full build.
 
 **Standing review item:** Evaluate code structure refactoring needs each cycle.
+
+### Session 3 - Planning (FAILED) (2026-02-01)
+
+**Intended:** Begin cycle 1 planning with task breakdown.
+
+**Actual:** User correctly insisted on PoC validation before planning. This revealed a critical blocker.
+
+**PoC Results:**
+
+| Component | Status | Finding |
+|-----------|--------|---------|
+| Dioxus dev server | WORKS | Serves app correctly |
+| Dioxus fullstack/router | WORKS | Server functions execute |
+| Dioxus SSG (`dx bundle --ssg`) | **BROKEN** | Outputs empty shell, no pre-rendered content despite `/static_routes` endpoint working |
+| Zola SSG | WORKS | 195ms build, full pre-rendered HTML with markdown + syntax highlighting |
+
+**Root Cause:** Dioxus 0.7 SSG feature appears non-functional or undocumented requirements exist. The `--ssg` flag doesn't trigger pre-rendering despite correct setup per documentation.
+
+**Impact:** Dioxus cannot fulfill the SSG requirement for zero-cost hosting on Cloudflare Pages. Architecture revision required.
+
+**Options Identified:**
+1. **Zola (pure SSG)** - Mature, fast, native Cloudflare support
+2. **Leptos SSG** - Experimental, not fully tested
+3. **Hybrid (Zola + Rust WASM)** - Static content via Zola, interactive features via Dioxus/Leptos islands
+
+**Decision:** Return to Session 2 for architecture revision before proceeding with planning.
+
+**Artifacts:**
+- `poc/` - Failed Dioxus SSG attempt (can be deleted)
+- `poc-zola/` - Successful Zola SSG validation
+
+### Session 2b - Architecture Revision (2026-02-02)
+
+**Trigger:** Dioxus SSG PoC failed — framework decision invalidated.
+
+**Key Decisions:**
+
+| Decision | Original | Revised | Rationale |
+|----------|----------|---------|-----------|
+| Framework | Dioxus 0.7 | Zola | Dioxus SSG broken; Zola validated, mature |
+| Backend | Fly.io (future) | Deferred entirely | Not needed for static site or client-side WASM |
+| Future interactivity | Not defined | WASM islands (additive) | Self-contained demos embed into static pages |
+| Testing | Rust compiler + validation script | `zola check` + manual + LLM screenshots | Simpler toolchain |
+
+**Clarifications:**
+- WASM islands are static files served by Cloudflare — no backend required
+- Future interactivity is additive, not a rewrite
+- Design paralysis identified as key risk — mitigate via theme selection in planning
+
+**Note for Session 3:** Include theme selection as early task to unblock UI work.

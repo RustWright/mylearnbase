@@ -1,6 +1,8 @@
 # Architecture - mylearnbase.com
 
 **Created:** 2026-02-01 (Session 2)
+**Revised:** 2026-02-02 (Session 2b)
+**Status:** Active
 
 ---
 
@@ -14,67 +16,76 @@ Personal website for documenting learning journeys, showcasing projects, and hos
 
 | Layer | Choice | Rationale |
 |-------|--------|-----------|
-| **Framework** | Dioxus 0.7 (Rust) | Learning goal, cross-platform potential, SSG support |
-| **Styling** | TailwindCSS | Built-in Dioxus support, utility-first approach |
-| **Content** | Markdown + YAML frontmatter | Flexible, editor-friendly, standard pattern |
-| **Markdown Processing** | `gray-matter` + `dioxus-markdown` or `dangerous_inner_html` | Documented approach, used by Dioxus homepage |
-| **Static Hosting** | Cloudflare Pages | Free, global CDN, custom domain support, no vendor lock-in for static files |
-| **Backend (future)** | Fly.io | For interactive demos when needed, Dioxus-recommended |
+| **Framework** | Zola | Mature SSG, fast builds (195ms), excellent docs, battle-tested |
+| **Templating** | Tera (built into Zola) | Jinja2-like syntax, sufficient for static site needs |
+| **Styling** | TBD (theme selection in planning) | Will select minimal theme or base to reduce design friction |
+| **Content** | Markdown + TOML frontmatter | Zola native format, editor-friendly, portable |
+| **Static Hosting** | Cloudflare Pages | Free, global CDN, custom domain support, native Zola support |
+| **Future Interactivity** | WASM islands (Dioxus/Leptos) | Self-contained demos embedded in static pages when needed |
+| **Backend** | Deferred | Not needed for static site or client-side WASM demos |
 | **Domain** | mylearnbase.com | Broad scope, flexibility for future topics beyond code |
 
 ---
 
 ## Content Organization
 
-**Approach:** Flat files with frontmatter metadata (not folder-based hierarchy)
+**Approach:** Zola's standard content structure with frontmatter metadata
 
 ```
-/content/posts/
-  building-my-website-part-1.md
-  building-my-website-part-2.md
-  some-other-post.md
+content/
+├── _index.md              # Homepage content
+└── blog/
+    ├── _index.md          # Blog section index
+    ├── building-my-website-part-1.md
+    ├── building-my-website-part-2.md
+    └── some-other-post.md
 ```
 
-**Frontmatter schema:**
-```yaml
----
-title: "Post Title"
-slug: "post-title"           # REQUIRED - determines URL, never change once published
-date: 2026-02-01
-tags: ["rust", "dioxus", "web"]
-series: "series-name"        # optional
-series_order: 1              # optional, position in series
-draft: false
----
+**Frontmatter schema (TOML):**
+```toml
++++
+title = "Post Title"
+slug = "post-title"           # Determines URL, never change once published
+date = 2026-02-01
+tags = ["rust", "zola", "web"]
+draft = false
+
+[taxonomies]
+series = ["building-my-website"]  # Optional, for multi-part content
+
+[extra]
+series_order = 1                  # Optional, position in series
++++
 ```
 
 **Why this approach:**
 - `slug` decouples URL from filename and title — rename files or update titles without breaking links
-- Files can be renamed/reorganized without breaking relationships
-- Series defined by metadata, not folders
-- Maximum flexibility for future changes
+- Series via taxonomies gives automatic series pages
+- Standard Zola patterns = better docs and community support
 
 ---
 
 ## Project Structure
 
-**Approach:** Start minimal, refactor as patterns emerge
+**Approach:** Standard Zola structure, minimal customization
 
 ```
 mylearnbase/
-├── src/
-│   └── main.rs           # Start here, split files as needed
 ├── content/
-│   └── posts/            # Markdown files
-├── assets/
-│   ├── styles/
-│   └── images/
-├── Cargo.toml
-├── Dioxus.toml
+│   ├── _index.md
+│   └── blog/
+├── templates/
+│   ├── base.html
+│   ├── index.html
+│   ├── blog.html
+│   └── blog-page.html
+├── sass/                  # Or static/css/ depending on theme
+├── static/
+│   └── wasm/              # Future: compiled WASM demos
+├── themes/                # If using external theme
+├── config.toml
 └── README.md
 ```
-
-**Standing review item:** Evaluate need for `components/` and `pages/` directories each cycle as codebase grows.
 
 ---
 
@@ -85,18 +96,18 @@ mylearnbase/
 - Blog list page
 - Individual post pages
 - Series grouping
-- Basic styling
-- RSS feed
+- Basic styling (via theme selection)
+- RSS feed (built into Zola)
 - Deploy pipeline to Cloudflare Pages
 
 **Deferred:**
 - Portfolio section
-- Interactive demos
+- Interactive demos (WASM islands)
 - Monetization
 - Comments
-- Search
+- Search (Zola has built-in, but defer setup)
 - Analytics
-- Tag pages
+- Tag pages (Zola generates automatically, but defer styling)
 
 ---
 
@@ -104,54 +115,81 @@ mylearnbase/
 
 | Type | Approach |
 |------|----------|
-| **Type safety** | Rust compiler + `dx build` |
+| **Build validation** | `zola check` (links, references, config) |
 | **Manual** | Click-through before deploys |
-| **Content validation** | Script to validate frontmatter (fields exist, dates valid) |
-| **E2E (Playwright)** | Deferred until stable features exist |
+| **UI feedback** | Screenshots shared with LLM for design iteration |
+| **Content validation** | `zola build` fails on invalid frontmatter |
 
 ---
 
 ## Deployment
 
-**Static site (MVP):**
-- Build: `dx build --release --ssg`
-- Host: Cloudflare Pages
-- Custom build command handles Rust/Dioxus CLI installation
+**Build command:** `zola build`
+**Output directory:** `public/`
+**Host:** Cloudflare Pages (native Zola support, zero config)
 
-**Backend (future):**
-- Fly.io with Docker
-- Only when interactive demos require server-side functionality
+Cloudflare Pages auto-detects Zola projects. No custom build commands needed.
+
+---
+
+## Future: WASM Interactivity
+
+When interactive demos are needed (Cycle 2+), the approach is **additive, not a rewrite**.
+
+**How it works:**
+1. Create a separate Rust crate for demos (e.g., `demos/sorting-viz/`)
+2. Compile to WASM using `wasm-pack` or `trunk`
+3. Output `.wasm` + `.js` files to `static/wasm/`
+4. Embed in specific posts via `<div>` + `<script>` tags
+5. Zola serves these as static files — no backend needed
+
+**Example embed in markdown:**
+```markdown
+Here's an interactive visualization:
+
+<div id="sorting-demo"></div>
+<script type="module">
+  import init from '/wasm/sorting-demo.js';
+  init();
+</script>
+```
+
+**What stays unchanged:** Content, templates, URLs, hosting, build process (just adds WASM compilation step).
 
 ---
 
 ## Risk Register
 
-| Risk | Likelihood | Impact | Mitigation |
-|------|------------|--------|------------|
-| Dioxus SSG edge cases | Low-Medium | Medium | Build in release mode, join Discord for support, proof-of-concept validates early |
-| Markdown processing | Low | Low | Clear path: `gray-matter` + `dioxus-markdown` / `dangerous_inner_html` |
-| Cloudflare Pages compatibility | Low | Low | Confirmed working, custom build command documented |
-| Content workflow friction | Low | Medium | Monitor during first posts, adjust if needed |
-| Scope creep | Medium | Medium | Stick to MVP, defer features aggressively |
+| Risk | Likelihood | Impact | Mitigation | Status |
+|------|------------|--------|------------|--------|
+| Dioxus SSG edge cases | - | - | - | **Realized & Resolved** — Pivoted to Zola |
+| Design paralysis | High | Medium | Select theme in planning session; iterate with LLM feedback | Open |
+| Zola learning curve | Medium | Low | Excellent docs, simpler than Dioxus; Tera is straightforward | Open |
+| WASM integration complexity | Low | Medium | Defer until needed; well-documented when required | Open |
+| Zola limitations | Low | Low | Very flexible for static sites; escape hatch is WASM or raw HTML | Open |
+| Content workflow friction | Low | Medium | Monitor during first posts, adjust if needed | Open |
+| Scope creep | Medium | Medium | Stick to MVP, defer features aggressively | Open |
 
 ---
 
-## Proof-of-Concept (Start of Cycle 1)
+## Architecture Revision History
 
-Before building full site, validate:
-1. Create minimal Dioxus project
-2. Parse markdown file with frontmatter using `gray-matter`
-3. Render content with `dioxus-markdown` or `dangerous_inner_html`
-4. Build with `dx build --release --ssg`
-5. Deploy to Cloudflare Pages
+### Session 2b (2026-02-02)
 
-Success = proceed with full MVP. Failure = reassess before investing more time.
+**Trigger:** PoC revealed Dioxus 0.7 SSG produces empty HTML shell, not pre-rendered content.
+
+**Changes:**
+| Aspect | Before | After | Rationale |
+|--------|--------|-------|-----------|
+| Framework | Dioxus 0.7 | Zola | Dioxus SSG broken; Zola validated, mature |
+| Backend | Fly.io (future) | Deferred entirely | Not needed for static or client-side WASM |
+| Future interactivity | Not defined | WASM islands | Self-contained demos, additive approach |
+| Testing | Rust compiler + validation script | `zola check` + manual + LLM screenshots | Simpler toolchain |
+
+**Validation:** `poc-zola/` demonstrates working Zola build with markdown + syntax highlighting in 195ms.
 
 ---
 
-## Future Considerations
+## Planning Notes
 
-- Portfolio section with interactive demos (Cycle 2+)
-- Fly.io backend when demos need server functionality
-- Consider `components/` and `pages/` structure as codebase grows
-- Monetization strategy (intentionally deferred, low priority)
+- **Theme selection** required early in Session 3 to unblock UI work and mitigate design paralysis risk
