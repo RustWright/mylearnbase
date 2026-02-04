@@ -18,7 +18,7 @@ Personal website for documenting learning journeys, showcasing projects, and hos
 |-------|--------|-----------|
 | **Framework** | Zola | Mature SSG, fast builds (195ms), excellent docs, battle-tested |
 | **Templating** | Tera (built into Zola) | Jinja2-like syntax, sufficient for static site needs |
-| **Styling** | TBD (theme selection in planning) | Will select minimal theme or base to reduce design friction |
+| **Styling** | Serene theme | Minimal, dark mode, blog-focused; will cherry-pick features from Tabi/Abridge later |
 | **Content** | Markdown + TOML frontmatter | Zola native format, editor-friendly, portable |
 | **Static Hosting** | Cloudflare Pages | Free, global CDN, custom domain support, native Zola support |
 | **Future Interactivity** | WASM islands (Dioxus/Leptos) | Self-contained demos embedded in static pages when needed |
@@ -192,4 +192,5 @@ Here's an interactive visualization:
 
 ## Planning Notes
 
-- **Theme selection** required early in Session 3 to unblock UI work and mitigate design paralysis risk
+- ~~**Theme selection** required early in Session 3 to unblock UI work and mitigate design paralysis risk~~ ✓ Resolved: Serene
+- **Theme evolution strategy:** Start with Serene to establish content workflow, then incrementally add features from Tabi and Abridge as needed (avoids decision paralysis)
