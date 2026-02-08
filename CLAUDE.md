@@ -11,7 +11,7 @@ This project follows the structured process defined in `PROJECT_PROCESS.md`.
 4. If resuming mid-session, read relevant files (`tasks.md`, `architecture.md`) for context
 
 ### At Session End
-When the user indicates they want to end the session or take a break:
+When the user indicates they want to end the session or take a break or the session comes to it's natural conclusion:
 
 1. **Remind user to export:** Ask them to run `/export` command
 2. **Provide filename:** `session-0X-[type]-cycle-Y.txt`

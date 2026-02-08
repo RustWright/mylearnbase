@@ -5,9 +5,19 @@ mcp-servers/
 # Reference documentation (not part of website)
 resources/
 
+# Zola build output
+public/
+static/giallo-*.css
+
 # Build outputs (future)
 target/
 dist/
+
+# aipack (personal workflow tooling)
+.aipack/
+
+# Session conversation logs
+.log/
 
 # OS files
 .DS_Store

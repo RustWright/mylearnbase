@@ -47,10 +47,10 @@ content/
 title = "Post Title"
 slug = "post-title"           # Determines URL, never change once published
 date = 2026-02-01
-tags = ["rust", "zola", "web"]
 draft = false
 
 [taxonomies]
+tags = ["rust", "zola", "web"]
 series = ["building-my-website"]  # Optional, for multi-part content
 
 [extra]
