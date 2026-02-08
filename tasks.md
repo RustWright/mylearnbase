@@ -10,17 +10,9 @@
 ### 5. Write first post content — DEFERRED
 Deferred to post-Session 5. Placeholder post created for pipeline verification.
 
-### 7. Deploy to Cloudflare Pages
-- [ ] Push repo to GitHub (if not already)
-- [ ] Connect repo to Cloudflare Pages
-- [ ] Verify build succeeds
-- [ ] Verify site accessible at Cloudflare preview URL
+### 7. Deploy to Cloudflare Pages — DONE (moved to completed)
 
-### 8. Connect custom domain
-- [ ] Configure mylearnbase.com DNS in Cloudflare
-- [ ] Add custom domain in Cloudflare Pages
-- [ ] Verify HTTPS works
-- [ ] Verify site accessible at https://mylearnbase.com
+### 8. Connect custom domain — DONE (moved to completed)
 
 ---
 
@@ -64,6 +56,18 @@ Deferred to post-Session 5. Placeholder post created for pipeline verification.
 - [x] Verify outdate alert works (tested with old date)
 - [x] Verify 404 page works
 - [x] Fixed: series link on posts, series page formatting, descriptive back buttons
+
+### 7. Deploy to Cloudflare Pages ✓
+- [x] Push repo to GitHub (RustWright/mylearnbase, public, HTTPS)
+- [x] Connect repo to Cloudflare Pages
+- [x] Build command: `curl -sL https://github.com/getzola/zola/releases/download/v0.22.1/zola-v0.22.1-x86_64-unknown-linux-gnu.tar.gz | tar xz && ./zola build`
+- [x] Verify build succeeds and site accessible
+
+### 8. Connect custom domain ✓
+- [x] Onboarded domain to Cloudflare (migrated nameservers from Porkbun)
+- [x] Added custom domain in Cloudflare Pages
+- [x] Verified HTTPS works
+- [x] Site live at https://mylearnbase.com
 
 ---
 
