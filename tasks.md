@@ -1,24 +1,8 @@
 # Tasks - Cycle 1 (MVP)
 
 **Created:** 2026-02-03 (Session 3)
+**Completed:** 2026-02-11 (Session 5)
 **Objective:** Launch minimal viable blog with one post on mylearnbase.com
-
----
-
-## Pending
-
-### 5. Write first post content — DEFERRED
-Deferred to post-Session 5. Placeholder post created for pipeline verification.
-
-### 7. Deploy to Cloudflare Pages — DONE (moved to completed)
-
-### 8. Connect custom domain — DONE (moved to completed)
-
----
-
-## In Progress
-
-(none)
 
 ---
 
@@ -47,6 +31,13 @@ Deferred to post-Session 5. Placeholder post created for pipeline verification.
 - [x] Run write (`write_mode: true`) — file created successfully
 - [x] No issues encountered; workflow validated
 
+### 5. Write first post content ✓
+- [x] "Building My Learn Base - MVP" (series order 1)
+- [x] 12-step tutorial covering full project recreation
+- [x] Reflections section written by human author
+- [x] Established post format: reflections + reproducible tutorial
+- [x] File naming convention: `YYYY-MM-DD-post-slug.md`
+
 ### 6. Local verification ✓
 - [x] Run `zola check` — no errors
 - [x] Verify dark mode toggle works
@@ -71,9 +62,28 @@ Deferred to post-Session 5. Placeholder post created for pipeline verification.
 
 ---
 
+## Session 5 Additions (not in original plan)
+
+### 9. Codebase walkthrough ✓
+- [x] Reviewed all project files with human author
+- [x] Explained template override system, content structure, config
+
+### 10. Project documentation (mdBook) ✓
+- [x] Created mdBook documentation (12 pages, 4 sections)
+- [x] GitHub Actions workflow for auto-deploy to GitHub Pages
+- [x] Updated PROJECT_PROCESS.md with documentation phase
+
+### 11. Polish & cleanup ✓
+- [x] Enabled GitHub-style alerts (Serene v5.6.0+ feature)
+- [x] Removed placeholder test post
+- [x] Documented Zola template escaping gotcha
+
+---
+
 ## Notes
 
 - **Theme strategy:** Start with Serene, cherry-pick features from Tabi/Abridge later
-- **Content format (draft):** Reflections/commentary section at top, then tutorial steps — will formalize after testing with first post
+- **Content format established:** Reflections/commentary (human-only) at top, then tutorial steps
 - **aipack role:** Testing workflow this cycle; heavier use planned for Cycle 2+ (WASM demos, repetitive generation)
-- **aipack workflow validated:** `pro@coder` with knowledge_globs pointing to frontmatter template works well for generating posts (~$0.03/generation with gemini-pro)
+- **aipack workflow validated:** `pro@coder` with knowledge_globs pointing to frontmatter template works well (~$0.03/generation with gemini-pro)
+- **Documentation:** mdBook at docs/, deployed to GitHub Pages (requires one-time Pages enablement in repo settings)

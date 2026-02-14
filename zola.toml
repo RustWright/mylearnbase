@@ -5,7 +5,7 @@ description = "A personal learning journal and portfolio"
 default_language = "en"
 theme = "serene"
 compile_sass = true
-minify_html = false
+minify_html = true
 build_search_index = false
 generate_feeds = true
 feed_filenames = ["rss.xml"]
@@ -16,6 +16,7 @@ external_links_target_blank = false
 external_links_no_follow = true
 external_links_no_referrer = true
 smart_punctuation = false
+github_alerts = true
 
 [markdown.highlighting]
 style = "class"
@@ -37,7 +38,7 @@ back_link_text = "Back"
 force_theme = false
 
 footer_copyright = "© 2026"
-footer_credits = true
+footer_credits = false
 
 not_found_error_text = "404 Not Found"
 not_found_recover_text = "« back to home »"

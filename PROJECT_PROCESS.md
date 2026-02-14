@@ -48,10 +48,12 @@ AI (Claude Code) serves as collaborative partner throughout all sessions:
 - No stopping to explain patterns (covered in Session 5)
 
 ### Session 5 (Testing/User Catchup)
+- Walk through codebase to build user's understanding of AI-generated code
 - Provide minimal scaffolding to start test writing
 - Hands-off while user writes tests independently
 - Assist only when user is truly blocked
 - Collaborate on test review and gap identification
+- Create or update project documentation (Phase C)
 
 ## Session Details
 
@@ -148,9 +150,10 @@ AI (Claude Code) serves as collaborative partner throughout all sessions:
 
 **Purpose:** Understand implementation through test writing, ensure quality
 
-**Phase A - User Test Writing (Learning Focus):**
-- AI provides minimal scaffolding (test file structure, areas to focus)
-- User writes tests independently
+**Phase A - Code Review & Testing (Learning Focus):**
+- AI walks through the codebase, explaining how components connect
+- AI provides minimal scaffolding for test writing (test file structure, areas to focus)
+- User writes tests independently where applicable
 - Struggle is part of learning process
 - Ask for help only when truly blocked
 - AI gives targeted assistance when requested
@@ -161,14 +164,24 @@ AI (Claude Code) serves as collaborative partner throughout all sessions:
 - Discuss what additional tests are needed
 - Write additional tests as needed (with AI assistance if desired)
 
-**Phase C - Cycle Closure:**
+**Phase C - Documentation (Knowledge Capture):**
+- **First cycle:** Create project documentation using an appropriate tool
+  - Software projects: mdBook (Rust ecosystem), MkDocs (Python ecosystem), or similar
+  - Choose based on project's tech stack to minimize dependency friction
+  - Document architecture, content structure, guides, and reference material
+  - Set up automated deployment (e.g., GitHub Pages) if applicable
+- **Subsequent cycles:** Update documentation to reflect new features, changes, or corrections from the current cycle
+- Documentation should capture knowledge that would otherwise only live in conversation logs
+
+**Phase D - Cycle Closure:**
 - Create milestone commit
 - Document tested areas and feedback for next cycle in `project.md`
 - Determine next iteration's focus
 
 **Output:**
-- Tests written and committed
-- Session 5 summary in `project.md` (areas tested, feedback for next planning cycle)
+- Tests written and committed (where applicable)
+- Documentation created or updated
+- Session 5 summary in `project.md` (areas tested/reviewed, feedback for next planning cycle)
 
 ---
 

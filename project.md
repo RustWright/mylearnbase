@@ -2,7 +2,7 @@
 
 **Status:** Active
 **Started:** 2026-01-31
-**Current Phase:** Ready for Session 5 - Testing/Catchup (Cycle 1)
+**Current Phase:** Cycle 1 Complete — Ready for Session 3 (Cycle 2)
 **Domain:** mylearnbase.com
 
 ---
@@ -87,7 +87,7 @@
 - [x] Session 2b: Architecture Revision (2026-02-02)
 - [x] Session 3: Planning (Cycle 1) (2026-02-03)
 - [x] Session 4: Implementation (Cycle 1) (2026-02-04 to 2026-02-08)
-- [ ] Session 5: Testing/Catchup (Cycle 1)
+- [x] Session 5: Testing/Catchup (Cycle 1) (2026-02-11)
 
 ---
 
@@ -223,3 +223,37 @@
 - CSS missing on preview URL due to base_url mismatch (resolved by custom domain)
 
 **Site live at:** https://mylearnbase.com
+
+### Session 5 - Testing/Catchup (Cycle 1) (2026-02-11)
+
+**Four phases completed:**
+
+**Phase A — Codebase Walkthrough:**
+- Walked through every file in the project: zola.toml, content structure, all 6 template overrides, static assets, theme submodule
+- Identified how Serene's override system works and where each customization lives
+
+**Phase B — Documentation (mdBook):**
+- Chose mdBook over plain markdown, MkDocs, or Docusaurus for Rust ecosystem alignment and simplicity
+- Created full documentation site: 12 pages across 4 sections (Getting Started, Architecture, Guides, Reference)
+- Set up GitHub Actions workflow for auto-deployment to GitHub Pages
+- Updated PROJECT_PROCESS.md to include documentation as formal Phase C in Session 5
+
+**Phase C — First Post Written:**
+- "Building My Learn Base - MVP" — series order 1 of "Building My Learn Base"
+- 12-step tutorial detailed enough for human or AI to recreate the entire project from scratch
+- Captures exact versions: Zola 0.22.1, Serene v5.6.1, mdBook 0.5.2, Rust 1.91.0
+- Reflections section written by human author
+- Established post format convention: reflections (human-only) + tutorial (reproducible steps)
+- File naming convention adopted: `YYYY-MM-DD-post-slug.md`
+
+**Phase D — Cleanup & Polish:**
+- Enabled GitHub-style alerts (`> [!NOTE]`, `> [!IMPORTANT]`) via Serene v5.6.0+ support
+- Removed placeholder test post
+- Documented Zola template escaping gotcha in docs and project memory
+
+**Key learnings captured:**
+- Zola processes `{{ }}` / `{% %}` even inside code blocks — escape with `{{/*` `*/}}` syntax
+- `{% raw %}` does NOT work (shortcode detection runs before Tera)
+- For template-heavy posts, describe changes + link to repo rather than inline full templates
+
+**Cycle 1 Status:** All 8 tasks complete. MVP live at https://mylearnbase.com

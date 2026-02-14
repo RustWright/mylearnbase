@@ -9,6 +9,9 @@ resources/
 public/
 static/giallo-*.css
 
+# mdBook build output
+docs/book/
+
 # Build outputs (future)
 target/
 dist/

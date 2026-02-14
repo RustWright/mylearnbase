@@ -1,0 +1,8 @@
+[book]
+title = "My Learn Base Documentation"
+authors = ["Efe"]
+language = "en"
+src = "src"
+
+[build]
+build-dir = "book"
