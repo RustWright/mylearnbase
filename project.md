@@ -88,6 +88,7 @@
 - [x] Session 3: Planning (Cycle 1) (2026-02-03)
 - [x] Session 4: Implementation (Cycle 1) (2026-02-04 to 2026-02-08)
 - [x] Session 5: Testing/Catchup (Cycle 1) (2026-02-11)
+- [x] Session 6: Tooling (out-of-cycle) (2026-02-18)
 
 ---
 
@@ -257,3 +258,24 @@
 - For template-heavy posts, describe changes + link to repo rather than inline full templates
 
 **Cycle 1 Status:** All 8 tasks complete. MVP live at https://mylearnbase.com
+
+### Session 6 - Tooling (2026-02-18)
+
+**Out-of-cycle session** — not part of the standard cycle flow.
+
+**Goal:** Reduce friction for creating new blog posts from any Claude Code session, regardless of which project is active.
+
+**What was built:**
+- Global Claude Code slash command: `~/.claude/commands/create-post.md`
+- Invoked as `/create-post [topic]` from any project, any session
+- Uses a 3-phase pattern:
+  1. **Phase 1 (interactive):** Gathers topic, checks `.log/` for session history, asks which logs to reference
+  2. **Phase 2 (subagent):** Delegates writing to a clean-context Task subagent — no context bleed from current project
+  3. **Phase 3 (summary):** Reports created file path, metadata, and next steps
+- Posts created as `draft = true` with human-only Reflections placeholder
+- Gracefully handles missing project files (no `project.md`, `tasks.md`, or `.log/` required)
+
+**Design decisions:**
+- Chose global slash command over MCP server (simpler, sufficient)
+- Subagent delegation over inline execution (clean context for writing)
+- Interactive gathering stays in main conversation (subagents can't ask questions mid-run)
