@@ -457,7 +457,7 @@ git push -u origin main
 
 ### Step 8: Deploy to Cloudflare Pages
 
-1. Log into the [Cloudflare dashboard](https://dash.cloudflare.com/)
+1. Log into the [Cloudflare dashboard](https://dash.cloudflare.com/login)
 2. Go to **Workers & Pages** → **Create** → **Pages** → **Connect to Git**
 3. Select your GitHub repository
 4. Configure the build:
