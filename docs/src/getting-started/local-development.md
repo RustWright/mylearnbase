@@ -15,13 +15,23 @@ git submodule update --init
 
 ## Set Up Git Hooks
 
-The repo includes a pre-commit hook that automatically sets the `updated` frontmatter field on any modified post. To enable it, configure git to use the tracked `.githooks/` directory:
+The repo includes a pre-commit hook at `.githooks/pre-commit` that automatically sets the `updated` frontmatter field on any modified post. The hook runs on every commit and does the following:
+
+1. Finds staged `.md` files in `content/posts/` that were modified (ignores `_index.md`)
+2. Reads each file's last-modified date from the filesystem
+3. Skips the file if that date matches the original `date` field (i.e. no update needed)
+4. Inserts an `updated` field after `date` if one doesn't exist, or updates it if it does
+5. Re-stages the file so the new frontmatter is included in the commit
+
+The template already handles the display — if `updated` exists and differs from `date`, it renders "Updated on [date]" next to the publish date.
+
+To enable the hook, configure git to use the tracked `.githooks/` directory:
 
 ```bash
 git config core.hooksPath .githooks
 ```
 
-This only needs to be run once per clone. After that, any time you commit a change to a post in `content/posts/`, the hook will insert or update the `updated` date in the frontmatter based on the file's last modified time. The template displays this as "Updated on [date]" next to the publish date.
+This only needs to be run once per clone.
 
 ## Run the Dev Server
 
