@@ -35,31 +35,33 @@ This tutorial documents the exact steps to reproduce my personal development env
 
 ### Assumptions
 
-Before starting, make sure you have Git and Node.js (v18 or later) installed.
+Before starting, make sure you have Git and Node.js (v20 or later) installed. Node 20+ is required because the Gemini CLI (Step 4) does not support older versions — see [gemini-cli#13427](https://github.com/google-gemini/gemini-cli/issues/13427). If your distro ships an older default, use [nvm](https://github.com/nvm-sh/nvm) to install a current version.
 
 **macOS:** The easiest path is [Homebrew](https://brew.sh/). Install it first if you do not have it, then run `brew install node git`.
 
-**Linux:** Use your distro's package manager. On Debian/Ubuntu: `sudo apt install git nodejs npm`. On Arch: `sudo pacman -S git nodejs npm`.
+**Linux:** Use your distro's package manager. On Debian/Ubuntu: `sudo apt install git nodejs npm`. On Arch: `sudo pacman -S git nodejs npm`. Check the installed version with `node --version` — if it is below v20, install [nvm](https://github.com/nvm-sh/nvm) and run `nvm install --lts`.
 
 **Windows:** Use [winget](https://learn.microsoft.com/en-us/windows/package-manager/winget/) (`winget install OpenJS.NodeJS Git.Git`) or [Scoop](https://scoop.sh/) (`scoop install nodejs git`). Note that some of the shell scripts used in this setup are written for bash. On Windows you will need [Git Bash](https://gitforwindows.org/) or WSL2 to run them. Path conventions also differ — adjust `~` to your user home directory accordingly.
+
+**Recommended:** Install the [GitHub CLI](https://cli.github.com/) (`gh`). It simplifies authentication for pushing and pulling from GitHub repos. On Debian/Ubuntu, follow the [official install instructions](https://github.com/cli/cli/blob/trunk/docs/install_linux.md#debian). Once installed, run `gh auth login` to authenticate.
 
 ---
 
 ### Step 1 — Install Claude Code
 
-Claude Code is an AI coding assistant that runs in the terminal. It is distributed as an npm package.
+Claude Code is an AI coding assistant that runs in the terminal. Install it with the standalone installer, which works on macOS, Linux, and Windows (via WSL):
 
 ```bash
-npm install -g @anthropic-ai/claude-code
+curl -fsSL https://claude.ai/install.sh | bash
 ```
 
-On macOS you can also install via Homebrew:
+If `~/.local/bin/` is not already on your PATH, add it:
 
 ```bash
-brew install claude-code
+echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc && source ~/.bashrc
 ```
 
-Or download the Mac app directly from [claude.ai](https://claude.com/product/claude-code). The npm install is the most portable option and works identically across platforms.
+For the most up-to-date installation instructions, see the [official docs](https://code.claude.com/docs/en/overview#get-started).
 
 After installation, run `claude --version` to confirm it is on your PATH.
 
@@ -155,6 +157,8 @@ Each submodule is a full independent Git repository. You can `cd` into one and c
 The workspace repo includes a local MCP server that lets Claude delegate research tasks to Gemini — web searches, documentation lookups, anything that benefits from Gemini's real-time access. Since the MCP server code lives inside `~/productive_learning/mcp-servers/gemini-research/`, it was already cloned in Step 3. What still needs doing: installing the Gemini CLI, authenticating, installing the server's dependencies, and pointing `.mcp.json` at it.
 
 #### Install and authenticate the Gemini CLI
+
+> **Note:** The Gemini CLI requires Node.js v20 or later. If you skipped the nvm step in Assumptions and are still on v18, you will hit errors here — see [gemini-cli#13427](https://github.com/google-gemini/gemini-cli/issues/13427).
 
 ```bash
 npm install -g @google/gemini-cli
@@ -340,7 +344,8 @@ For reference, here are all the steps in order with nothing omitted:
 
 ```bash
 # 1. Install Claude Code
-npm install -g @anthropic-ai/claude-code
+curl -fsSL https://claude.ai/install.sh | bash
+echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc && source ~/.bashrc
 
 # 2. Clone dotfiles and symlink Claude config
 git clone https://github.com/RustWright/dotfiles ~/.dotfiles
