@@ -13,6 +13,16 @@ If you already cloned without `--recurse-submodules`:
 git submodule update --init
 ```
 
+## Set Up Git Hooks
+
+The repo includes a pre-commit hook that automatically sets the `updated` frontmatter field on any modified post. To enable it, configure git to use the tracked `.githooks/` directory:
+
+```bash
+git config core.hooksPath .githooks
+```
+
+This only needs to be run once per clone. After that, any time you commit a change to a post in `content/posts/`, the hook will insert or update the `updated` date in the frontmatter based on the file's last modified time. The template displays this as "Updated on [date]" next to the publish date.
+
 ## Run the Dev Server
 
 ```bash

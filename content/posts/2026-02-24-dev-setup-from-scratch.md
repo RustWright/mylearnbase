@@ -2,6 +2,7 @@
 title = "Dev Setup From Scratch: Claude Code, Dotfiles & Git Submodules"
 slug = "dev-setup-from-scratch"
 date = 2026-02-24
+updated = 2026-03-12
 draft = false
 
 [taxonomies]
@@ -170,6 +171,16 @@ gemini auth login
 ```bash
 gemini "Hello" --output-format json -y
 ```
+
+#### Create `.env`
+
+The Gemini MCP server inherits environment variables from its parent process, so it needs `GEMINI_API_KEY` set in the environment. Create a `.env` file at the workspace root:
+
+```bash
+echo 'GEMINI_API_KEY=your-api-key-here' > ~/productive_learning/.env
+```
+
+Replace `your-api-key-here` with your actual key from [Google AI Studio](https://aistudio.google.com/apikey). This file is gitignored — you will need to recreate it on each machine.
 
 #### Install MCP server dependencies
 
