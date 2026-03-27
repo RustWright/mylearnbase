@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+# Pre-commit hook: auto-set the "updated" frontmatter field on modified posts.
+# Adapted from https://osc.garden/blog/zola-date-git-hook/
+
+set -euo pipefail
+
+function extract_date() {
+    local file="$1"
+    local field="$2"
+    grep -m 1 "^$field =" "$file" | sed -e "s/$field = //" -e 's/ *$//'
+}
+
+# Only look at staged, modified .md files under content/posts/, ignoring _index.md.
+mapfile -t modified_posts < <(
+    git diff --cached --name-only --diff-filter=M \
+    | grep -E '^content/posts/.*\.md$' \
+    | grep -v '_index.md$'
+)
+
+for file in "${modified_posts[@]}"; do
+    # Get last modified date from filesystem (works on both Linux and macOS).
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        last_modified=$(stat -f '%Sm' -t '%Y-%m-%d' "$file")
+    else
+        last_modified=$(date -r "$file" +'%Y-%m-%d')
+    fi
+
+    # Skip if the modified date matches the original publish date.
+    date_value=$(extract_date "$file" "date")
+    if [[ "$last_modified" == "$date_value" ]]; then
+        continue
+    fi
+
+    # Insert or update the "updated" field right after "date".
+    awk -v date_line="$last_modified" '
+    BEGIN { FS = OFS = " = "; found_date = 0 }
+    {
+        if (/^date =/ && !found_date) {
+            print
+            found_date = 1
+            getline
+            if (/^updated =/) {
+                $2 = date_line
+            } else {
+                print "updated" OFS date_line
+            }
+        }
+        if (/^updated =/ && found_date) {
+            $2 = date_line
+        }
+        print
+    }' "$file" > "${file}.tmp" && mv "${file}.tmp" "$file"
+
+    git add "$file"
+done
