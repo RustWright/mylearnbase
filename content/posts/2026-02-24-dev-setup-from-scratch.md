@@ -44,7 +44,7 @@ Before starting, make sure you have Git and Node.js (v20 or later) installed. No
 
 **Windows:** Use [winget](https://learn.microsoft.com/en-us/windows/package-manager/winget/) (`winget install OpenJS.NodeJS Git.Git`) or [Scoop](https://scoop.sh/) (`scoop install nodejs git`). Note that some of the shell scripts used in this setup are written for bash. On Windows you will need [Git Bash](https://gitforwindows.org/) or WSL2 to run them. Path conventions also differ — adjust `~` to your user home directory accordingly.
 
-**Recommended:** Install the [GitHub CLI](https://cli.github.com/) (`gh`). It simplifies authentication for pushing and pulling from GitHub repos. On Debian/Ubuntu, follow the [official install instructions](https://github.com/cli/cli/blob/trunk/docs/install_linux.md#debian). Once installed, run `gh auth login` to authenticate.
+**Recommended:** Install the [GitHub CLI](https://cli.github.com/) (`gh`). It simplifies authentication for pushing and pulling from GitHub repos. On Debian/Ubuntu, follow the [official install instructions](https://github.com/cli/cli/blob/trunk/docs/install_linux.md). Once installed, run `gh auth login` to authenticate.
 
 ---
 
