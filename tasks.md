@@ -1,89 +1,122 @@
-# Tasks - Cycle 1 (MVP)
+# Tasks - Cycle 2 (Post-System Reset)
 
-**Created:** 2026-02-03 (Session 3)
-**Completed:** 2026-02-11 (Session 5)
-**Objective:** Launch minimal viable blog with one post on mylearnbase.com
+**Created:** 2026-05-09 (Session 3)
+**Objective:** Implement the five-form post system and supporting tools per `POST_SYSTEM_PLAN.md`.
+**Source of truth:** `POST_SYSTEM_PLAN.md` — every task below points to a section there for detailed spec; if a task feels under-specified, the answer is in the plan.
 
----
-
-## Completed
-
-### 1. Initialize Zola project with Serene theme ✓
-- [x] Create new Zola project in project root
-- [x] Install Serene theme (git submodule)
-- [x] Verify `zola serve` works
-
-### 2. Configure site settings ✓
-- [x] Set site title, base URL (mylearnbase.com)
-- [x] Configure dark mode (toggle, respects system preference)
-- [x] Set up series taxonomy for multi-part posts
-- [x] Configure RSS feed settings
-
-### 3. Set up content structure ✓
-- [x] Create homepage content (`content/_index.md`)
-- [x] Create blog section (`content/posts/_index.md`)
-- [x] Document frontmatter template for posts (`.frontmatter-template.md`)
-
-### 4. Test aipack workflow ✓
-- [x] Initialize aipack in project (`aip init`)
-- [x] Create prompt to generate blog post file with frontmatter
-- [x] Run preview (`write_mode: false`) — worked correctly
-- [x] Run write (`write_mode: true`) — file created successfully
-- [x] No issues encountered; workflow validated
-
-### 5. Write first post content ✓
-- [x] "Building My Learn Base - MVP" (series order 1)
-- [x] 12-step tutorial covering full project recreation
-- [x] Reflections section written by human author
-- [x] Established post format: reflections + reproducible tutorial
-- [x] File naming convention: `YYYY-MM-DD-post-slug.md`
-
-### 6. Local verification ✓
-- [x] Run `zola check` — no errors
-- [x] Verify dark mode toggle works
-- [x] Verify blog list page shows post
-- [x] Verify series page works (with proper display name)
-- [x] Verify RSS feed generates (`public/posts/rss.xml`)
-- [x] Verify outdate alert works (tested with old date)
-- [x] Verify 404 page works
-- [x] Fixed: series link on posts, series page formatting, descriptive back buttons
-
-### 7. Deploy to Cloudflare Pages ✓
-- [x] Push repo to GitHub (RustWright/mylearnbase, public, HTTPS)
-- [x] Connect repo to Cloudflare Pages
-- [x] Build command: `curl -sL https://github.com/getzola/zola/releases/download/v0.22.1/zola-v0.22.1-x86_64-unknown-linux-gnu.tar.gz | tar xz && ./zola build`
-- [x] Verify build succeeds and site accessible
-
-### 8. Connect custom domain ✓
-- [x] Onboarded domain to Cloudflare (migrated nameservers from Porkbun)
-- [x] Added custom domain in Cloudflare Pages
-- [x] Verified HTTPS works
-- [x] Site live at https://mylearnbase.com
+Sequencing follows the natural dependency chain (later phases assume earlier phases have landed); deviations are fine where the dependency is genuinely absent. Open implementation knobs from the plan get resolved at task-execution time — not before.
 
 ---
 
-## Session 5 Additions (not in original plan)
+## Phase 1 — Migration & directory setup
 
-### 9. Codebase walkthrough ✓
-- [x] Reviewed all project files with human author
-- [x] Explained template override system, content structure, config
+### 1. Delete superseded drafts
+- [ ] Remove `content/posts/2026-04-26-cycle-2-four-perspective-review.md`
+- [ ] Remove `content/posts/2026-04-26-cycle-2-implementation-calendar-obsidian-sync-and-auto-save.md`
+- [ ] Remove `content/posts/2026-04-26-omni-me-cycle-2-closing-sitting.md`
+- [ ] Confirm `grep -rn '@/posts/' content/` returns 11 lines (down from 13 baseline)
 
-### 10. Project documentation (mdBook) ✓
-- [x] Created mdBook documentation (12 pages, 4 sections)
-- [x] GitHub Actions workflow for auto-deploy to GitHub Pages
-- [x] Updated PROJECT_PROCESS.md with documentation phase
+### 2. Create new section structure
+- [ ] `content/posts/logbook/_index.md` and `content/posts/logbook/omni-me/_index.md`
+- [ ] `content/posts/cookbook/_index.md`
+- [ ] `content/posts/workflows/_index.md`
+- [ ] `content/posts/opinions/_index.md`
+- [ ] `content/posts/resources/_index.md`
+- [ ] Each `_index.md` sets `outdate_alert` + `outdate_alert_days` per cross-form starting candidates (logbook 120, cookbook 365, workflows 180 / 365, opinions unset, resources 180)
+- [ ] `zola serve --drafts` renders the new (empty) sections and the original 9 posts still resolve
 
-### 11. Polish & cleanup ✓
-- [x] Enabled GitHub-style alerts (Serene v5.6.0+ feature)
-- [x] Removed placeholder test post
-- [x] Documented Zola template escaping gotcha
+## Phase 2 — Theme template additions
+
+### 3. Superseded-by banner
+- [ ] Add render block to `themes/serene/templates/post.html` for `extra.superseded_by` (banner at top of post, link to replacement)
+- [ ] Smoke-test with a temporary draft that sets the field
+
+### 4. Demo shortcode
+- [ ] Create `templates/shortcodes/demo.html` — iframe wrapper + `<figcaption>` + standalone-link
+- [ ] Decide default iframe height when caller omits it (plan open knob)
+- [ ] Test render against a placeholder asset under `static/demos/test/`
+
+## Phase 3 — Tools package scaffold
+
+### 5. `mylearnbase/tools/` Python package
+- [ ] `tools/pyproject.toml` with `[project.scripts]` entries for `cite`, `logbook`, `cookbook`, `workflows`, conversion-tool name
+- [ ] `src/mylearnbase_tools/` skeleton: `__init__.py`, one stub module per entry point
+- [ ] Install: `uv tool install --editable /full/path/to/mylearnbase/tools`
+- [ ] Each entry point responds to `--help` (stubbed bodies are fine)
+
+### 6. Shared frontmatter helper (`_frontmatter.py`)
+- [ ] `read_keys(path, keys)` — line-based extraction of specific keys (date, updated, slug, etc.) from existing post frontmatter
+- [ ] `write(path, fields_dict)` — render fresh frontmatter using string templates per cross-form spec
+- [ ] Round-trip sanity check on a sample post
+
+## Phase 4 — Core capture tools
+
+### 7. `cite` (cross-form, used everywhere)
+- [ ] Discover project context from `os.getcwd()` and `git remote get-url origin` — must work from any project repo
+- [ ] Capture `file:line` + line content + HEAD SHA + GitHub permalink
+- [ ] Append to capture file (location passed via flag or env)
+- [ ] Decide working-tree-dirty policy (hard reject vs warning) — open knob
+
+### 8. `logbook` thin wrapper
+- [ ] `logbook init <project> <feature-name>` — template a fresh capture with the 7-section structure
+- [ ] `logbook what <file> <text>` — fill section 3
+- [ ] `logbook why <file> <text>` — fill section 4
+- [ ] `logbook scope <file> <text>` — fill section 5 (optional)
+- [ ] `logbook note <file> <text>` — fill section 7
+
+### 9. Conversion tool (logbook capture → Zola post)
+- [ ] Read capture, write frontmatter, optionally generate one-line summary
+- [ ] Copy capture body + referenced images to `mylearnbase/content/posts/logbook/<project>/<slug>.md`
+- [ ] Run `zola check` and `showboat verify` (when exec blocks present) before declaring success
+
+## Phase 5 — End-to-end smoke test
+
+### 10. Author one real logbook entry
+- [ ] Pick whatever omni-me work is current at the time (NOT a Cycle 2 retrospective)
+- [ ] Run the full cycle: `logbook init` → capture during work → conversion → `zola check` → flip `draft = false`
+- [ ] Confirm published post renders correctly, links resolve, permalinks valid
+
+This is also the validation that capture commands meet the <10 second friction budget. If they don't, that's a blocker for the cadence and gets fixed before Phase 6.
+
+## Phase 6 — Remaining per-form tools
+
+### 11. `cookbook init <slug>` and `cookbook publish <slug>`
+- [ ] `init` scaffolds `<project>/cookbook/_drafts/<slug>.md` with the 6-section structure (optional `--from-logbook <slug>` for path-(b) origins)
+- [ ] `publish` moves draft to `mylearnbase/content/cookbook/<slug>.md`, sets `date`, flips `draft = false`, runs `zola check` (+ `showboat verify` if exec blocks)
+- [ ] Argument shape: pick from plan's open-knob candidates
+
+### 12. `workflows publish <name>`
+- [ ] First publish: prepend frontmatter, write to `mylearnbase/content/posts/workflows/<slug>.md`
+- [ ] Republish: preserve `date`, set `updated = today`, replace body
+- [ ] Handle Zola shortcode escaping in source content (`{{/*` `*/}}` for `{{ }}`, `{%/*` `*/%}` for `{% %}`)
+
+## Phase 7 — Skill rewrite & final rules doc
+
+### 13. Rewrite `~/.claude/commands/create-post.md`
+- [ ] Prompt for form first (logbook / cookbook / workflows / opinions / resources)
+- [ ] Refuse LLM-drafted content for human-only sections per per-form rules
+- [ ] Route to the right per-form workflow
+
+### 14. Author `mylearnbase/POST_SYSTEM.md`
+- [ ] User-facing rules doc, mirrors the taxonomy
+- [ ] Per-form quick-reference cards
+
+## Phase 8 — Cycle close
+
+### 15. Final verification sweep
+- [ ] Every item in plan's "Execution surface > Verification criteria" passes
+- [ ] `zola build` zero warnings; `zola check` clean
+- [ ] All 9 originally-published posts resolve at original URLs
+- [ ] `/create-post` (no args) prompts for form selection
+
+### 16. Archive plan
+- [ ] Move `POST_SYSTEM_PLAN.md` → `.archive/post-system-reset/POST_SYSTEM_PLAN.md`
 
 ---
 
 ## Notes
 
-- **Theme strategy:** Start with Serene, cherry-pick features from Tabi/Abridge later
-- **Content format established:** Reflections/commentary (human-only) at top, then tutorial steps
-- **aipack role:** Testing workflow this cycle; heavier use planned for Cycle 2+ (WASM demos, repetitive generation)
-- **aipack workflow validated:** `pro@coder` with knowledge_globs pointing to frontmatter template works well (~$0.03/generation with gemini-pro)
-- **Documentation:** mdBook at docs/, deployed to GitHub Pages (requires one-time Pages enablement in repo settings)
+- **Where to start (open):** Phase 1 is the natural first move (cheap, unblocks everything else). Phase 2 and Phase 3 are independent; either can run before the other. Phase 4 depends on Phase 3.
+- **Open knobs:** treat them as decisions made when the task lands, not in advance. Each one is small enough to settle in-session.
+- **Smoke test gate:** Phase 5 is a real go/no-go on the friction budget. If capture is laborious, fix that before cookbook + workflows are built — same friction issue would only get worse.
+- **Cross-project tools:** `cite`, `logbook`, `cookbook`, `workflows` are designed to run from *any* project repo, not just mylearnbase. Test from inside `omni-me/` (or another project repo) before declaring done.
