@@ -101,10 +101,14 @@ This is also the validation that capture commands meet the <10 second friction b
 
 ## Phase 6 — Remaining per-form tools
 
-### 11. `cookbook init <slug>` and `cookbook publish <slug>`
-- [ ] `init` scaffolds `<project>/cookbook/_drafts/<slug>.md` with the 6-section structure (optional `--from-logbook <slug>` for path-(b) origins)
-- [ ] `publish` moves draft to `mylearnbase/content/cookbook/<slug>.md`, sets `date`, flips `draft = false`, runs `zola check` (+ `showboat verify` if exec blocks)
-- [ ] Argument shape: pick from plan's open-knob candidates
+### 11. `cookbook init` and `cookbook publish`
+- [x] `init <title> [--slug SLUG] [--from-logbook PROJECT/SLUG] [--force]` scaffolds `<repo-root>/cookbook/_drafts/<slug>.md` (knob settled: title-primary positional, slug auto-slugified, --slug override — per-form deviation from logbook's slug-primary shape, justified by cookbook titles being public-facing and higher-stakes). Wraps `showboat init` for the title block + showboat-id; appends metadata blockquote (Slug/Tags/optional From-logbook) + summary blockquote + 5 section headers (sections 2-6 of the 6-section structure; section 1 is the title+summary). `--from-logbook` pre-fills section 6 with a Zola-resolvable backlink if value contains `/`, else a TODO placeholder.
+- [x] `publish <capture> [--slug] [--tags] [--draft] [--force] [--full-check] [--skip-verify]` runs `showboat verify` (default on, mirrors logbook), splits metadata/title/body, writes to `<MYLEARNBASE_ROOT>/content/posts/cookbook/<slug>.md` (flat, no per-project subdir — unlike logbook). Default `draft = false` per plan (cookbook captures are polished by publish time); `--draft` opt-in for review. Copies referenced images, strips empty optional sections (5 + 6), runs `zola check`.
+- [x] Shared substrate extracted: `_shared.py` holds `run_showboat`, `repo_root`, `mylearnbase_root`, `zola_check`, `copy_referenced_images`, `strip_empty_sections`, `read_text_arg`. Logbook updated to import from `_shared` (no behavior change; round-trip help + module load verified).
+- [x] `cookbook tags <slug-or-path> "a,b,c"` for in-place tags edit (mirrors logbook).
+- [x] Smoke test end-to-end on a throwaway pattern ("Shared module for cross-form CLI helpers"): init → 4 manual section fills → tags update → publish round-trip in **181ms** (zola check internal-only). Full site build clean (10 → 9 after cleanup, 0 orphans, 519ms). `--draft` flag correctly flips to draft=true. Empty optional section ("When this breaks down") correctly pruned at publish.
+- [x] `.gitignore`: added `logbook/_drafts/` and `cookbook/_drafts/` (plan said "untracked by default" but never gitignored — session-end `git add -A` would otherwise track them; precedent set by Phase-3 `__pycache__` gitignore).
+- [x] Editorial signals collected — see "Editorial signals collected" section below.
 
 ### 12. `workflows publish <name>`
 - [ ] First publish: prepend frontmatter, write to `mylearnbase/content/posts/workflows/<slug>.md`
@@ -151,7 +155,7 @@ Sequencing decision (user 2026-05-10, corrected): **tooling → docs → real co
 
 Order:
 
-1. **Phase 6 — cookbook init/publish + workflows publish.** Mirror the showboat-backed logbook patterns. Substrate is fixed; this is mechanical extension. Smoke-test each tool with throwaway captures and watch for editorial signals.
+1. **Phase 6 — cookbook init/publish + workflows publish.** Mirror the showboat-backed logbook patterns. Substrate is fixed; this is mechanical extension. Smoke-test each tool with throwaway captures and watch for editorial signals. *(2026-05-10: cookbook landed — Task 11 ✓. Workflows publish next.)*
 2. **Phase 7 Task 14 — POST_SYSTEM.md v1.** Single living doc covering taxonomy + per-form rules + per-section quality criteria + anti-patterns. Informed by editorial signals collected during Phase 6 work. **Possibly split** into mechanical-usage doc + per-post-type editorial docs depending on length and feel — design v1 so a future split is cheap (each post-type's editorial section self-contained). Bar for v1: "good enough that Task 10 produces content the user is satisfied with on first review." Rules already in scope based on this session's findings:
    - Anti-jargon: no "Cycle X / Phase Y" references — anchor in dateable concrete events.
    - Section 6 must include at least one of: deterministic `logbook exec` block, `logbook screenshot`, or external observable behavior. Not just `cite` blocks.
@@ -170,3 +174,6 @@ Anything the user comments on about post quality, sample content, or what looks 
 - 2026-05-10 (smoke test on Phase-4 work): jargon-heavy prose ("Cycle 2", "Phase 4") meaningless to future-self or external readers. Anchor in dateable concrete events instead.
 - 2026-05-10: section 6 evidence was all `cite` blocks; user noted those are *where to look*, not *whether it works*. Real evidence = runnable exec, screenshot, or observable behavior.
 - 2026-05-10: wall-of-prose formatting was hard to scan; prefer structured/bulleted layouts when content is enumerable.
+- 2026-05-10 (cookbook smoke test): publish doesn't roll back on `zola check` failure — orphan files land in the dest dir even when publish exits non-zero. Same issue exists in logbook publish. Friction signal, not a blocker; could fix via write-temp-then-move, deferred. Editorial implication: include a "if publish fails, also delete `content/posts/<form>/<slug>.md`" step in POST_SYSTEM.md until the tool rolls back automatically.
+- 2026-05-10 (cookbook smoke test): `--from-logbook` placeholder is a **friction-positive** safety net — pre-fills a Zola link target that `zola check` validates at publish time, so a forgotten backlink fails loudly rather than silently. Worth noting in POST_SYSTEM.md as a deliberate authoring discipline pattern, not a bug.
+- 2026-05-10 (architecture): cookbook destinations are flat (`content/posts/cookbook/<slug>.md`), logbook destinations are per-project nested (`content/posts/logbook/<project>/<slug>.md`). Reason: cookbook patterns are cross-project by definition; per-project subdirs would imply the pattern belongs to one project. Worth documenting in POST_SYSTEM.md so the asymmetry is intentional, not accidental.

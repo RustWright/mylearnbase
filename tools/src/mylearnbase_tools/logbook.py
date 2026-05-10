@@ -11,40 +11,18 @@ from __future__ import annotations
 
 import argparse
 import datetime as dt
-import os
 import re
-import shutil
 import subprocess
 import sys
 from pathlib import Path
 
-from . import _capture, _frontmatter
-
-
-def _run_showboat(args: list[str]) -> subprocess.CompletedProcess:
-    """Invoke showboat. Raises RuntimeError if showboat is not on PATH."""
-    try:
-        return subprocess.run(["showboat", *args], capture_output=True, text=True, check=False)
-    except FileNotFoundError as exc:
-        raise RuntimeError("showboat not found on PATH; install showboat before using logbook") from exc
+from . import _capture, _frontmatter, _shared
 
 SECTION_WHAT = "What does this feature do?"
 SECTION_WHY = "Why was it added now?"
 SECTION_SCOPE = "What's in scope (and what's not)?"
 SECTION_EVIDENCE = "How do we know it works?"
 SECTION_NEXT = "What's worth remembering or doing next?"
-
-
-def _repo_root() -> Path:
-    out = subprocess.run(
-        ["git", "rev-parse", "--show-toplevel"],
-        capture_output=True,
-        text=True,
-        check=False,
-    )
-    if out.returncode != 0:
-        raise RuntimeError("not in a git repository")
-    return Path(out.stdout.strip())
 
 
 def _capture_path(repo_root: Path, slug: str) -> Path:
@@ -70,23 +48,12 @@ def _post_init_additions(project: str, slug: str) -> str:
     )
 
 
-def _read_text_arg(text: str | None) -> str:
-    """Return text arg if provided, else read from stdin."""
-    if text is not None:
-        return text
-    if sys.stdin.isatty():
-        print("logbook: no text provided; reading from stdin (Ctrl-D to end)...", file=sys.stderr)
-    return sys.stdin.read().rstrip("\n")
-
-
-
-
 def _resolve_capture_arg(arg: str) -> Path:
     """Accept either a path (foo.md) or a slug (resolves to logbook/_drafts/<slug>.md)."""
     p = Path(arg)
     if p.suffix == ".md" or "/" in arg:
         return p.resolve()
-    return _capture_path(_repo_root(), arg)
+    return _capture_path(_shared.repo_root(), arg)
 
 
 def _read_metadata_block(capture: Path) -> dict[str, str]:
@@ -134,58 +101,6 @@ def _split_metadata_and_body(capture: Path) -> tuple[dict[str, str], str, str]:
     return meta, title_block, body
 
 
-_IMAGE_REF_RE = re.compile(r"!\[[^\]]*\]\(([^)]+)\)")
-
-
-def _copy_referenced_images(body: str, src_dir: Path, dest_dir: Path) -> list[str]:
-    """Copy local image references from `src_dir` to `dest_dir`.
-
-    Returns a list of paths copied (relative names). Skips http(s) URLs and
-    absolute paths.
-    """
-    copied: list[str] = []
-    for match in _IMAGE_REF_RE.finditer(body):
-        ref = match.group(1).strip().split()[0]
-        if ref.startswith(("http://", "https://", "/")):
-            continue
-        src = src_dir / ref
-        if not src.is_file():
-            continue
-        dest = dest_dir / ref
-        dest.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(src, dest)
-        copied.append(ref)
-    return copied
-
-
-def _strip_empty_sections(body: str) -> str:
-    """Remove section headers whose body is empty (mainly the optional scope section)."""
-    parts = re.split(r"^(## .+)$", body, flags=re.MULTILINE)
-    out: list[str] = []
-    if parts and parts[0].strip():
-        out.append(parts[0])
-    for i in range(1, len(parts), 2):
-        header = parts[i]
-        section_body = parts[i + 1] if i + 1 < len(parts) else ""
-        if section_body.strip():
-            out.append(header)
-            out.append(section_body)
-    return "".join(out).strip() + "\n"
-
-
-def _mylearnbase_root() -> Path:
-    """Resolve the mylearnbase repo path. MYLEARNBASE_ROOT env wins; default fallback."""
-    env = os.environ.get("MYLEARNBASE_ROOT")
-    if env:
-        return Path(env).expanduser().resolve()
-    fallback = Path("~/productive_learning/projects/mylearnbase").expanduser().resolve()
-    if fallback.is_dir():
-        return fallback
-    raise RuntimeError(
-        "MYLEARNBASE_ROOT is unset and the default ~/productive_learning/projects/mylearnbase does not exist."
-    )
-
-
 def _project_section_template(project: str) -> str:
     """Render an `_index.md` for a per-project logbook sub-section.
 
@@ -220,28 +135,9 @@ def _project_section_template(project: str) -> str:
     )
 
 
-def _zola_check(content_root: Path, skip_external_links: bool = True) -> tuple[int, str]:
-    """Run `zola check` from a Zola site root. Returns (returncode, combined_output).
-
-    External-link probing is the slow part (HTTP per link); skipped by default
-    to keep publish under a few seconds. Run periodic full checks separately.
-    """
-    cmd = ["zola", "check"]
-    if skip_external_links:
-        cmd.append("--skip-external-links")
-    result = subprocess.run(
-        cmd,
-        cwd=content_root,
-        capture_output=True,
-        text=True,
-        check=False,
-    )
-    return result.returncode, (result.stdout + result.stderr).strip()
-
-
 def cmd_init(args: argparse.Namespace) -> int:
     try:
-        root = _repo_root()
+        root = _shared.repo_root()
     except RuntimeError as err:
         print(f"logbook: {err}", file=sys.stderr)
         return 2
@@ -258,7 +154,7 @@ def cmd_init(args: argparse.Namespace) -> int:
     title = args.title or _title_from_slug(slug)
 
     try:
-        result = _run_showboat(["init", str(capture), title])
+        result = _shared.run_showboat(["init", str(capture), title])
     except RuntimeError as err:
         print(f"logbook: {err}", file=sys.stderr)
         return 2
@@ -317,13 +213,13 @@ def cmd_run(args: argparse.Namespace) -> int:
         return 1
 
     pre_line_count = len(capture.read_text(encoding="utf-8").splitlines())
-    code = args.code if args.code is not None else _read_text_arg(None)
+    code = args.code if args.code is not None else _shared.read_text_arg(None)
     if not code.strip():
         print("logbook: refusing to run empty code", file=sys.stderr)
         return 1
 
     try:
-        result = _run_showboat(["exec", str(capture), args.lang, code])
+        result = _shared.run_showboat(["exec", str(capture), args.lang, code])
     except RuntimeError as err:
         print(f"logbook: {err}", file=sys.stderr)
         return 2
@@ -354,7 +250,7 @@ def cmd_screenshot(args: argparse.Namespace) -> int:
     pre_line_count = len(capture.read_text(encoding="utf-8").splitlines())
 
     try:
-        result = _run_showboat(["image", str(capture), str(image_path)])
+        result = _shared.run_showboat(["image", str(capture), str(image_path)])
     except RuntimeError as err:
         print(f"logbook: {err}", file=sys.stderr)
         return 2
@@ -394,7 +290,7 @@ def cmd_tags(args: argparse.Namespace) -> int:
 def _section_cmd(section_header: str) -> callable:
     def handler(args: argparse.Namespace) -> int:
         capture = _resolve_capture_arg(args.capture_file)
-        text = _read_text_arg(args.text)
+        text = _shared.read_text_arg(args.text)
         if not text.strip():
             print("logbook: refusing to write empty text", file=sys.stderr)
             return 1
@@ -416,7 +312,7 @@ def cmd_publish(args: argparse.Namespace) -> int:
 
     if not args.skip_verify:
         try:
-            verify_result = _run_showboat(["verify", str(capture)])
+            verify_result = _shared.run_showboat(["verify", str(capture)])
         except RuntimeError as err:
             print(f"logbook: {err}", file=sys.stderr)
             return 2
@@ -451,10 +347,10 @@ def cmd_publish(args: argparse.Namespace) -> int:
     if not title:
         title = _title_from_slug(slug)
 
-    body_clean = _strip_empty_sections(body)
+    body_clean = _shared.strip_empty_sections(body)
 
     try:
-        mb_root = _mylearnbase_root()
+        mb_root = _shared.mylearnbase_root()
     except RuntimeError as exc:
         print(f"logbook: {exc}", file=sys.stderr)
         return 2
@@ -491,9 +387,9 @@ def cmd_publish(args: argparse.Namespace) -> int:
         if not body_clean.endswith("\n"):
             f.write("\n")
 
-    images_copied = _copy_referenced_images(body_clean, capture.parent, dest.parent)
+    images_copied = _shared.copy_referenced_images(body_clean, capture.parent, dest.parent)
 
-    rc, output = _zola_check(mb_root, skip_external_links=not args.full_check)
+    rc, output = _shared.zola_check(mb_root, skip_external_links=not args.full_check)
     if rc != 0:
         print(f"logbook: zola check failed (rc={rc}):\n{output}", file=sys.stderr)
         return 1

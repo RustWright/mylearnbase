@@ -2,7 +2,7 @@
 
 **Status:** Active
 **Started:** 2026-01-31
-**Current Phase:** Cycle 2 Session 4 — Phases 1-4 complete + friction fixes; Phase 5 surfaced architectural gaps (showboat missing, editorial standard needed); showboat rework landed same session; remaining: POST_SYSTEM.md editorial-standard authorship (Task 14) + Task 10 redo on real omni-me work
+**Current Phase:** Cycle 2 Session 4 — Phases 1-4 complete + friction fixes; Phase 5 surfaced gaps (showboat integration ✓ fixed, editorial standard pending); Phase 6 Task 11 (cookbook init/publish) landed 2026-05-10 with `_shared.py` extraction; remaining: Task 12 (workflows publish), Task 14 (POST_SYSTEM.md), Task 13 (skill rewrite), Task 10 redo on real omni-me work
 **Domain:** mylearnbase.com
 
 ---

@@ -24,6 +24,10 @@ __pycache__/
 # aipack (personal workflow tooling)
 .aipack/
 
+# Post-system capture drafts (per POST_SYSTEM_PLAN — stay in working tree, never tracked)
+logbook/_drafts/
+cookbook/_drafts/
+
 # Session conversation logs
 .log/
 
