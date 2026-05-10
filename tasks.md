@@ -126,10 +126,15 @@ This is also the validation that capture commands meet the <10 second friction b
 - [ ] Refuse LLM-drafted content for human-only sections per per-form rules
 - [ ] Route to the right per-form workflow
 
-### 14. Author `mylearnbase/POST_SYSTEM.md`
-- [ ] User-facing rules doc, mirrors the taxonomy
-- [ ] Per-form quick-reference cards
-- [ ] **Editorial standard** (added 2026-05-10): per-form, per-section quality criteria covering at least: anti-jargon rule (no "Cycle X / Phase Y" references — anchor in dateable concrete events instead), formatting expectations (scannable structure, no wall-of-prose), what counts as section-6 evidence (runnable `showboat exec` outcomes, screenshots via `showboat image`, observable behavior — *not* just code citations), opinions on what belongs in section 7 ("what's worth remembering or doing next?"). Single doc per user; designed to be appended to as the user's sense of "good vs. bad" sharpens with use.
+### 14. Author per-form docs in `editorial/` (POST_SYSTEM.md is the seed)
+- [x] **v1 seed landed 2026-05-10** at `editorial/POST_SYSTEM.md` — 512 lines, all five forms, structured uniformly (*When to use* → *Tools* → *Editorial per section* → *Anti-patterns*). Designed as reference material for the per-form sessions, not as the final destination.
+- [ ] **Per-form rollout sequence** (separate fresh-context sessions, planned 2026-05-10):
+  1. `editorial/logbook.md` — first, because Task 10 depends on it
+  2. `editorial/cookbook.md`
+  3. `editorial/workflows.md`
+  4. `editorial/opinions.md`
+  5. `editorial/resources.md`
+- [ ] Each per-form session pulls the corresponding section from `editorial/POST_SYSTEM.md` v1, refines for that form's lived authoring rhythm, and decides whether the v1 section is replaced with a pointer or removed entirely.
 
 ## Phase 8 — Cycle close
 
@@ -159,17 +164,17 @@ Sequencing decision (user 2026-05-10, corrected): **tooling → docs → real co
 
 Order:
 
-1. **Phase 6 — cookbook init/publish + workflows publish.** Mirror the showboat-backed logbook patterns. Substrate is fixed; this is mechanical extension. Smoke-test each tool with throwaway captures and watch for editorial signals. *(2026-05-10: Tasks 11 + 12 both landed ✓. Phase 6 complete. Editorial signals collected.)*
-2. **Phase 7 Task 14 — POST_SYSTEM.md v1.** Single living doc covering taxonomy + per-form rules + per-section quality criteria + anti-patterns. Informed by editorial signals collected during Phase 6 work. **Possibly split** into mechanical-usage doc + per-post-type editorial docs depending on length and feel — design v1 so a future split is cheap (each post-type's editorial section self-contained). Bar for v1: "good enough that Task 10 produces content the user is satisfied with on first review." Rules already in scope based on this session's findings:
-   - Anti-jargon: no "Cycle X / Phase Y" references — anchor in dateable concrete events.
-   - Section 6 must include at least one of: deterministic `logbook exec` block, `logbook screenshot`, or external observable behavior. Not just `cite` blocks.
-   - Exec blocks must be reproducible (showboat verify enforces this); `--skip-verify` only with a documented reason.
-   - Screenshots: embed-only at the tool layer; capture stays human + LLM with quality guidelines in the doc.
-   - Formatting: scannable structure, not wall-of-prose; lists > paragraphs when content is enumerable.
-   - Additional rules: see "Editorial signals collected" below — extended as Phase 6 progresses.
-3. **Phase 7 Task 13 — `/create-post` skill rewrite.** Prompt for form first, route to per-form workflow, refuse LLM-drafted content for human-only sections, **load POST_SYSTEM.md and enforce its rules**. Built after Task 14 so the skill can reference the doc directly.
-4. **Phase 5 Task 10 — real-omni-me logbook entry.** Pick whatever omni-me work is current at the time, use the showboat-backed tools, follow POST_SYSTEM.md. The result is the canonical first logbook entry, validating the full chain on real content with the editorial standard in hand.
-5. **Phase 8 — cycle close.** Final verification sweep, archive plan.
+1. **Phase 6 — cookbook init/publish + workflows publish.** *(2026-05-10: Tasks 11 + 12 both landed ✓. Phase 6 complete.)*
+2. **Phase 7 Task 14 v1 seed — `editorial/POST_SYSTEM.md`.** *(2026-05-10 landed ✓. Single document covering all five forms, designed as reference material for per-form sessions.)*
+3. **Per-form authoring sessions** *(fresh context each, sequence locked 2026-05-10 by user):*
+   - Session A: `editorial/logbook.md`
+   - Session B: `editorial/cookbook.md`
+   - Session C: `editorial/workflows.md`
+   - Session D: `editorial/opinions.md`
+   - Session E: `editorial/resources.md`
+4. **Phase 7 Task 13 — `/create-post` skill rewrite.** Built after at least `editorial/logbook.md` exists, so the skill can reference real per-form docs (not just POST_SYSTEM v1). Prompt for form first, route to per-form workflow, refuse LLM-drafted content for human-only sections.
+5. **Phase 5 Task 10 — real-omni-me logbook entry.** Built once `editorial/logbook.md` is final. Use the showboat-backed tools; follow the editorial rules in `editorial/logbook.md`. The canonical first logbook entry, validating the full chain on real content.
+6. **Phase 8 — cycle close.** Final verification sweep, archive plan.
 
 ### Editorial signals collected (running notes for Task 14)
 

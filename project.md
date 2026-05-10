@@ -2,7 +2,7 @@
 
 **Status:** Active
 **Started:** 2026-01-31
-**Current Phase:** Cycle 2 Session 4 — Phases 1-6 complete (Phase 6: cookbook + workflows landed 2026-05-10 atop `_shared.py` extraction); remaining: Phase 7 Task 14 (POST_SYSTEM.md authoring), Task 13 (`/create-post` skill rewrite), Phase 5 Task 10 (real omni-me logbook), Phase 8 cycle close
+**Current Phase:** Cycle 2 Session 4 — Phases 1-6 complete; `editorial/POST_SYSTEM.md` v1 seed landed 2026-05-10. Next: per-form authoring sessions in fresh context, sequenced logbook → cookbook → workflows → opinions → resources. Skill rewrite (Task 13) and real-content Task 10 follow `editorial/logbook.md`.
 **Domain:** mylearnbase.com
 
 ---
@@ -89,7 +89,7 @@
 - [x] Session 4: Implementation (Cycle 1) (2026-02-04 to 2026-02-08)
 - [x] Session 5: Testing/Catchup (Cycle 1) (2026-02-11)
 - [x] Session 6: Tooling (out-of-cycle) (2026-02-18)
-- [~] Cycle 2 Session 4: Implementation — Phases 1-4 done, Phase 5 partial (2026-05-09 to 2026-05-10) — gaps surfaced, rework deferred to next session
+- [~] Cycle 2 Session 4: Implementation — Phases 1-6 done; Phase 7 Task 14 v1 seed landed (2026-05-09 to 2026-05-10) — per-form authoring + Task 10 carry forward to fresh sessions
 
 ---
 
@@ -299,4 +299,12 @@
 
 **Both gaps + the showboat rework + a real Task-10 redo carry forward to next session** (see `tasks.md` "Carry-forward to next session"). The smoke-test artifact (a draft logbook post about the Phase-4 tools) was deleted — re-authoring on the fixed substrate is cleaner than retrofitting.
 
-**Showboat rework landed same session** (after the user pushed back on stopping at the diagnosis): `logbook init` now wraps `showboat init`, new `logbook exec` and `logbook screenshot` subcommands wrap `showboat exec` / `showboat image` via post-append section relocation, `logbook publish` runs `showboat verify` (with `--skip-verify` escape) and copies referenced images to the destination. Confirmed working: a `date -u` exec block correctly fails verify (timestamp drift caught), a deterministic `echo` block passes; full publish round-trip in 194ms with verify on. Memory saved for future sessions: `feedback_wrap_existing_tools.md` (don't reinvent showboat-style tools), `feedback_screenshots_guideline_driven.md` (capture stays human + LLM, not auto-tool). Carry-forward narrows to (a) author POST_SYSTEM.md with editorial standard expanded, (b) Task 10 redo on real omni-me work, (c) Phase 6 (cookbook + workflows publish) now unblocked.
+**Showboat rework landed same session** (after the user pushed back on stopping at the diagnosis): `logbook init` now wraps `showboat init`, new `logbook exec` and `logbook screenshot` subcommands wrap `showboat exec` / `showboat image` via post-append section relocation, `logbook publish` runs `showboat verify` (with `--skip-verify` escape) and copies referenced images to the destination. Confirmed working: a `date -u` exec block correctly fails verify (timestamp drift caught), a deterministic `echo` block passes; full publish round-trip in 194ms with verify on. Memory saved for future sessions: `feedback_wrap_existing_tools.md` (don't reinvent showboat-style tools), `feedback_screenshots_guideline_driven.md` (capture stays human + LLM, not auto-tool).
+
+**Continuation 2026-05-10 (later same day, commits `fd538f3`, `6085732`):**
+
+- **Phase 6 Task 11 — `cookbook init/publish`.** Title-primary positional `<title>` (per-form deviation from logbook's `<slug>`-primary, justified by cookbook titles being public-facing). `--slug` auto-slugified with override; `--from-logbook PROJECT/SLUG` pre-fills section 6 with a Zola-resolvable backlink. Wraps `showboat init` + `showboat verify` (parity with logbook). Flat destination (`content/posts/cookbook/<slug>.md`) — no per-project subdir, unlike logbook. Default `draft = false` per plan; `--draft` opts into review. Cross-form helpers extracted into `_shared.py` (run_showboat, repo_root, mylearnbase_root, zola_check, copy_referenced_images, strip_empty_sections, read_text_arg); logbook refactored to import from `_shared`. Smoke-tested in 181ms; orphan-publish failure mode confirmed (zola check runs after dest write — manual cleanup required on failure). Added `logbook/_drafts/` and `cookbook/_drafts/` to `.gitignore` (plan said "untracked by default" but never gitignored — same precedent as the Phase-3 `__pycache__` add).
+- **Phase 6 Task 12 — `workflows publish`.** One-way sync from a source markdown doc (e.g., `PROJECT_PROCESS.md`) to `content/posts/workflows/<slug>.md`. `<source-doc-path>` positional knob; `--slug`/`--title` overrides. First publish writes fresh frontmatter; republish preserves `date`, sets `updated = today`, replaces body, preserves `taxonomies` + `extra`. Zola shortcode escape (`{{ x }}` → `{{/* x */}}`, `{% x %}` → `{%/* x */%}`) made **idempotent** via lookahead/lookbehind — re-publishing an already-escaped doc is a no-op. `--dry-run` prints unified diff; recommended habit before every republish. `_frontmatter.render(fields) → str` extracted from `write()` so the dry-run path doesn't round-trip to disk. Smoke-tested on real PROJECT_PROCESS.md (262 lines) + synthetic Zola-escape test; 163ms publish; verified date preservation with backdated `2026-02-01`.
+- **Phase 7 Task 14 v1 seed — `editorial/POST_SYSTEM.md`.** 512-line document covering all five forms with uniform per-form structure (*When to use* → *Tools* → *Editorial per section* → *Anti-patterns*). Designed as reference material for the per-form authoring sessions, not as the final destination.
+
+**Per-form rollout sequence locked 2026-05-10:** separate fresh-context sessions in order — logbook, cookbook, workflows, opinions, resources. Each session produces `editorial/<form>.md`. Memory updated (`project_post_system_doc_may_split.md`). Task 13 (`/create-post` skill rewrite) and Phase 5 Task 10 (real-omni-me logbook entry) follow `editorial/logbook.md`.
