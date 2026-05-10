@@ -147,16 +147,26 @@ This is also the validation that capture commands meet the <10 second friction b
 
 ## Carry-forward to next session
 
-These items remain after the showboat rework landed in this session.
+Sequencing decision (user 2026-05-10, corrected): **tooling → docs → real content.** Mechanical tooling first surfaces editorial signals the user couldn't predict up front; the doc gets drafted with those signals in hand; real content follows the doc. Authoring real content before the doc exists would regenerate the same quality issues already identified.
 
-1. **~~Rewrite logbook to wrap showboat.~~** Done 2026-05-10. `logbook init` wraps `showboat init`; `logbook exec`/`logbook screenshot` wrap `showboat exec`/`showboat image` via post-append section relocation; `logbook publish` runs `showboat verify` with a `--skip-verify` escape.
-2. **~~Wire `showboat exec` and `showboat image` into the capture flow.~~** Done 2026-05-10. Default section is 6 ("How do we know it works?"); `--section` flag overrides. Image copy at publish landed.
-3. **~~Hook `showboat verify` into `logbook publish`.~~** Done 2026-05-10. Verify failure aborts publish with diff printed. Flag `--skip-verify` for non-deterministic captures.
-4. **Author POST_SYSTEM.md with the editorial standard expanded** (Task 14). Single living doc covering taxonomy + per-form rules + per-section quality criteria + anti-patterns. The substrate is now correct so the editorial standard can reference real showboat usage. Specific rules to include based on this session's findings:
-   - Anti-jargon: no "Cycle X / Phase Y" references — anchor in dateable concrete events (e.g., "the 2026-05 post-system reset").
-   - Section 6 must include at least one of: deterministic `logbook exec` block, `logbook screenshot`, or external observable behavior. Not just `cite` blocks (those are *where to look*, not *whether it works*).
-   - Exec blocks must be reproducible (showboat verify enforces this); use `--skip-verify` only with a documented reason in section 7.
-   - Screenshots: embed-only at the tool layer; capture mechanism stays human + LLM, with quality guidelines in this doc.
-   - Formatting: scannable structure, not wall-of-prose. Lists > paragraphs when the content is enumerable.
-5. **Re-run Phase 5's Task 10** on real omni-me work — using the showboat-backed tools and the new editorial standard. The result is the canonical first logbook entry; smoke-test artifacts from this session were deleted because they were synthetic, not real work.
-6. **Phase 6** can now start in parallel (or sequentially) with item 4: cookbook init/publish + workflows publish, both built on the same showboat-backed substrate.
+Order:
+
+1. **Phase 6 — cookbook init/publish + workflows publish.** Mirror the showboat-backed logbook patterns. Substrate is fixed; this is mechanical extension. Smoke-test each tool with throwaway captures and watch for editorial signals.
+2. **Phase 7 Task 14 — POST_SYSTEM.md v1.** Single living doc covering taxonomy + per-form rules + per-section quality criteria + anti-patterns. Informed by editorial signals collected during Phase 6 work. **Possibly split** into mechanical-usage doc + per-post-type editorial docs depending on length and feel — design v1 so a future split is cheap (each post-type's editorial section self-contained). Bar for v1: "good enough that Task 10 produces content the user is satisfied with on first review." Rules already in scope based on this session's findings:
+   - Anti-jargon: no "Cycle X / Phase Y" references — anchor in dateable concrete events.
+   - Section 6 must include at least one of: deterministic `logbook exec` block, `logbook screenshot`, or external observable behavior. Not just `cite` blocks.
+   - Exec blocks must be reproducible (showboat verify enforces this); `--skip-verify` only with a documented reason.
+   - Screenshots: embed-only at the tool layer; capture stays human + LLM with quality guidelines in the doc.
+   - Formatting: scannable structure, not wall-of-prose; lists > paragraphs when content is enumerable.
+   - Additional rules: see "Editorial signals collected" below — extended as Phase 6 progresses.
+3. **Phase 7 Task 13 — `/create-post` skill rewrite.** Prompt for form first, route to per-form workflow, refuse LLM-drafted content for human-only sections, **load POST_SYSTEM.md and enforce its rules**. Built after Task 14 so the skill can reference the doc directly.
+4. **Phase 5 Task 10 — real-omni-me logbook entry.** Pick whatever omni-me work is current at the time, use the showboat-backed tools, follow POST_SYSTEM.md. The result is the canonical first logbook entry, validating the full chain on real content with the editorial standard in hand.
+5. **Phase 8 — cycle close.** Final verification sweep, archive plan.
+
+### Editorial signals collected (running notes for Task 14)
+
+Anything the user comments on about post quality, sample content, or what looks wrong/right during Phase 6 build-and-test. Add inline as bullets with date + context.
+
+- 2026-05-10 (smoke test on Phase-4 work): jargon-heavy prose ("Cycle 2", "Phase 4") meaningless to future-self or external readers. Anchor in dateable concrete events instead.
+- 2026-05-10: section 6 evidence was all `cite` blocks; user noted those are *where to look*, not *whether it works*. Real evidence = runnable exec, screenshot, or observable behavior.
+- 2026-05-10: wall-of-prose formatting was hard to scan; prefer structured/bulleted layouts when content is enumerable.
