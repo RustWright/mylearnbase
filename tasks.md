@@ -39,15 +39,15 @@ Sequencing follows the natural dependency chain (later phases assume earlier pha
 ## Phase 3 — Tools package scaffold
 
 ### 5. `mylearnbase/tools/` Python package
-- [ ] `tools/pyproject.toml` with `[project.scripts]` entries for `cite`, `logbook`, `cookbook`, `workflows`, conversion-tool name
-- [ ] `src/mylearnbase_tools/` skeleton: `__init__.py`, one stub module per entry point
-- [ ] Install: `uv tool install --editable /full/path/to/mylearnbase/tools`
-- [ ] Each entry point responds to `--help` (stubbed bodies are fine)
+- [x] `tools/pyproject.toml` with `[project.scripts]` entries for `cite`, `logbook`, `cookbook`, `workflows` (4 entries — knob settled: conversion exposed as `logbook publish` subcommand, not a 5th entry point, mirrors cookbook/workflows convention)
+- [x] `src/mylearnbase_tools/` skeleton: `__init__.py`, `cite.py`, `logbook.py`, `cookbook.py`, `workflows.py` — each with argparse + stub handlers
+- [x] Installed via `uv tool install --editable /home/me/productive_learning/projects/mylearnbase/tools` (4 executables on PATH)
+- [x] Verified `--help` for all 4 top-level commands and subcommands (logbook init/what/why/scope/note/publish, cookbook init/publish, workflows publish)
 
 ### 6. Shared frontmatter helper (`_frontmatter.py`)
-- [ ] `read_keys(path, keys)` — line-based extraction of specific keys (date, updated, slug, etc.) from existing post frontmatter
-- [ ] `write(path, fields_dict)` — render fresh frontmatter using string templates per cross-form spec
-- [ ] Round-trip sanity check on a sample post
+- [x] `read_keys(path, keys)` — line-based extraction with dotted-key support (`extra.outdate_alert_days`, `taxonomies.tags`); returns dict, missing keys absent
+- [x] `write(path, fields_dict)` — accepts nested dict; renders top-level keys in canonical order, then `[taxonomies]` + `[extra]` tables; preserves any existing body
+- [x] Round-trip sanity check on `2026-02-11-building-my-learnbase-mvp.md`: 7 keys across 3 sections (string/date/bool/int/array) match byte-for-byte after read→write→read
 
 ## Phase 4 — Core capture tools
 

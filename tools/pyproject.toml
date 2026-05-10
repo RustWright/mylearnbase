@@ -1,0 +1,19 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "mylearnbase-tools"
+version = "0.1.0"
+description = "Cross-project capture and conversion tools for mylearnbase post forms (logbook, cookbook, workflows)."
+requires-python = ">=3.10"
+dependencies = []
+
+[project.scripts]
+cite = "mylearnbase_tools.cite:main"
+logbook = "mylearnbase_tools.logbook:main"
+cookbook = "mylearnbase_tools.cookbook:main"
+workflows = "mylearnbase_tools.workflows:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/mylearnbase_tools"]
