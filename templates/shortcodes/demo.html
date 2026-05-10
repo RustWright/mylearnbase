@@ -1,0 +1,22 @@
+{#-
+  Demo shortcode — embeds a same-origin iframe pointing at a self-contained
+  demo under static/demos/<name>/.
+
+  Usage:
+    {{ demo(name="omni-me/calendar", height=480, caption="optional caption") }}
+
+  Args:
+    name     — required. Path under /demos/, typically <project>/<demo-name>.
+    height   — optional. Iframe pixel height; defaults to 480.
+    caption  — optional. Rendered as a <figcaption>.
+-#}
+{%- set demo_url = "/demos/" ~ name ~ "/" -%}
+{%- set h = height | default(value=480) -%}
+{%- set cap = caption | default(value="") -%}
+<figure class="demo">
+  <iframe src="{{ demo_url }}" width="100%" height="{{ h }}" loading="lazy" title="Demo: {{ name }}" style="border: 1px solid var(--text-decoration-color); border-radius: var(--detail-border-radius, 0);"></iframe>
+  {%- if cap %}
+  <figcaption>{{ cap }}</figcaption>
+  {%- endif %}
+  <p class="demo-standalone-link" style="font-size: 0.9em; margin-top: 0.5em;"><a href="{{ demo_url }}">Open standalone →</a></p>
+</figure>

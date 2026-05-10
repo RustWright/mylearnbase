@@ -123,6 +123,13 @@
           </div>
           {% endif %}
 
+        {% if page.extra.superseded_by %}
+          {% set superseder = get_page(path=page.extra.superseded_by) %}
+          <blockquote id="superseded-by" class="callout warning">
+            <p><strong>Superseded:</strong> This post has been replaced by <a href="{{ superseder.permalink }}">{{ superseder.title }}</a>.</p>
+          </blockquote>
+        {% endif %}
+
         {% if page.extra.outdate_alert is defined %}{% set show_outdate_alert = page.extra.outdate_alert %}{% else %}{% set show_outdate_alert = section.extra.outdate_alert %}{% endif %}
         {% if page.extra.outdate_alert_days is defined %}{% set outdate_alert_days = page.extra.outdate_alert_days %}{% else %}{% set outdate_alert_days = section.extra.outdate_alert_days %}{% endif %}
 

@@ -28,13 +28,13 @@ Sequencing follows the natural dependency chain (later phases assume earlier pha
 ## Phase 2 — Theme template additions
 
 ### 3. Superseded-by banner
-- [ ] Add render block to `themes/serene/templates/post.html` for `extra.superseded_by` (banner at top of post, link to replacement)
-- [ ] Smoke-test with a temporary draft that sets the field
+- [x] Add render block to `templates/post.html` (project-level override, not theme submodule) for `extra.superseded_by` (banner above outdate_alert, uses `get_page` to resolve to title + permalink). Frontmatter convention: `superseded_by` is a content-relative path like `posts/cookbook/foo.md`.
+- [x] Smoke-test confirmed: banner renders with `callout warning` class, links auto-populate from target post
 
 ### 4. Demo shortcode
-- [ ] Create `templates/shortcodes/demo.html` — iframe wrapper + `<figcaption>` + standalone-link
-- [ ] Decide default iframe height when caller omits it (plan open knob)
-- [ ] Test render against a placeholder asset under `static/demos/test/`
+- [x] Create `templates/shortcodes/demo.html` — `<figure>` wrapper, `<iframe>` w/ `loading=lazy` + 1px themed border, optional `<figcaption>`, standalone-link
+- [x] Default iframe height **480** (knob settled — matches plan example; per-call override available)
+- [x] Smoke-tested 3 invocations against `static/demos/test/` placeholder: default-height + figcaption ✓, custom-height (240) + figcaption ✓, custom-height (200) + no figcaption ✓ — all rendered correctly
 
 ## Phase 3 — Tools package scaffold
 
