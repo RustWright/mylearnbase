@@ -17,6 +17,10 @@ docs/book/
 target/
 dist/
 
+# Python bytecode caches
+__pycache__/
+*.pyc
+
 # aipack (personal workflow tooling)
 .aipack/
 
