@@ -138,34 +138,13 @@ def _format_value(value: Any) -> str:
 _TOP_LEVEL_ORDER = ("title", "slug", "date", "updated", "draft")
 
 
-def write(path: Path | str, fields: dict[str, Any]) -> None:
-    """Render fresh frontmatter and write it (plus any existing body) to `path`.
+def render(fields: dict[str, Any]) -> str:
+    """Render `fields` as a `+++`-delimited TOML frontmatter block (no body).
 
-    `fields` is a nested dict:
-        {
-            "title": "...", "slug": "...", "date": "2026-05-09",
-            "draft": False,
-            "taxonomies": {"tags": [...], "series": [...]},
-            "extra": {"series_order": 1, "outdate_alert_days": 120},
-        }
-
-    Top-level keys render in a canonical order; tables follow alphabetically
-    (`taxonomies` before `extra` is conventional but ordering inside a
-    section follows insertion order from the input dict).
+    Top-level keys render in `_TOP_LEVEL_ORDER`; convention-tables
+    (`taxonomies`, `extra`) follow in that order; other dict-valued keys
+    after those. The returned string ends with a trailing newline.
     """
-    p = Path(path)
-    body = ""
-    if p.exists():
-        try:
-            existing_text = p.read_text(encoding="utf-8")
-            existing_lines = _extract_block(existing_text)
-            after = existing_text.splitlines()[len(existing_lines) + 2:]
-            body = "\n".join(after)
-            if existing_text.endswith("\n") and not body.endswith("\n"):
-                body += "\n"
-        except ValueError:
-            body = ""
-
     out: list[str] = [DELIMITER]
 
     for k in _TOP_LEVEL_ORDER:
@@ -192,7 +171,34 @@ def write(path: Path | str, fields: dict[str, Any]) -> None:
             out.append(f"{sub_k} = {_format_value(sub_v)}")
 
     out.append(DELIMITER)
-    rendered = "\n".join(out) + "\n"
+    return "\n".join(out) + "\n"
+
+
+def write(path: Path | str, fields: dict[str, Any]) -> None:
+    """Render fresh frontmatter and write it (plus any existing body) to `path`.
+
+    `fields` is a nested dict:
+        {
+            "title": "...", "slug": "...", "date": "2026-05-09",
+            "draft": False,
+            "taxonomies": {"tags": [...], "series": [...]},
+            "extra": {"series_order": 1, "outdate_alert_days": 120},
+        }
+    """
+    p = Path(path)
+    body = ""
+    if p.exists():
+        try:
+            existing_text = p.read_text(encoding="utf-8")
+            existing_lines = _extract_block(existing_text)
+            after = existing_text.splitlines()[len(existing_lines) + 2:]
+            body = "\n".join(after)
+            if existing_text.endswith("\n") and not body.endswith("\n"):
+                body += "\n"
+        except ValueError:
+            body = ""
+
+    rendered = render(fields)
     if body:
         rendered += body
     p.write_text(rendered, encoding="utf-8")

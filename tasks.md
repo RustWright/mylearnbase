@@ -110,10 +110,14 @@ This is also the validation that capture commands meet the <10 second friction b
 - [x] `.gitignore`: added `logbook/_drafts/` and `cookbook/_drafts/` (plan said "untracked by default" but never gitignored — session-end `git add -A` would otherwise track them; precedent set by Phase-3 `__pycache__` gitignore).
 - [x] Editorial signals collected — see "Editorial signals collected" section below.
 
-### 12. `workflows publish <name>`
-- [ ] First publish: prepend frontmatter, write to `mylearnbase/content/posts/workflows/<slug>.md`
-- [ ] Republish: preserve `date`, set `updated = today`, replace body
-- [ ] Handle Zola shortcode escaping in source content (`{{/*` `*/}}` for `{{ }}`, `{%/*` `*/%}` for `{% %}`)
+### 12. `workflows publish <source-doc-path>`
+- [x] Argument shape settled: `<source-doc-path>` positional (knob), `--slug`/`--title` overrides. Source doc is the input; title from H1, slug auto-slugified. Different from cookbook's title-positional because workflows is a sync operation, not a draft creation.
+- [x] **First publish:** read source, extract H1 as title, strip H1 from body, escape Zola shortcodes, render frontmatter (title, slug, date=today, draft default false), write to `<MYLEARNBASE_ROOT>/content/posts/workflows/<slug>.md`. 163ms.
+- [x] **Republish:** detects existing post; preserves `date` (read via `_frontmatter.read_keys`), sets `updated = today`, preserves `taxonomies.tags` + `extra.outdate_alert_days` if present, replaces body. Confirmed with a backdated date (2026-02-01) — date survives, updated reflects today.
+- [x] **Zola shortcode escape:** `{{ x }}` → `{{/* x */}}`, `{% x %}` → `{%/* x */%}`. Lookahead/lookbehind in regex makes it **idempotent** — already-escaped pairs are skipped on re-runs (verified: a doc with both raw and pre-escaped pairs escapes only the raw ones).
+- [x] **`--dry-run`** prints a unified diff against the current dest (or against empty for first publish). Useful for previewing changes when the source doc is large.
+- [x] **`_frontmatter.render(fields)`** added (factored out of `write`) so workflows can compose frontmatter without round-tripping to disk. Avoided the `/dev/shm` hack from the first draft.
+- [x] Smoke-tested on real `PROJECT_PROCESS.md` (262-line doc, no shortcodes to escape) + synthetic doc with both inline and code-block Tera syntax. Both clean. Site build: 9 → 10 pages → 9 after cleanup, 0 orphans throughout.
 
 ## Phase 7 — Skill rewrite & final rules doc
 
@@ -155,7 +159,7 @@ Sequencing decision (user 2026-05-10, corrected): **tooling → docs → real co
 
 Order:
 
-1. **Phase 6 — cookbook init/publish + workflows publish.** Mirror the showboat-backed logbook patterns. Substrate is fixed; this is mechanical extension. Smoke-test each tool with throwaway captures and watch for editorial signals. *(2026-05-10: cookbook landed — Task 11 ✓. Workflows publish next.)*
+1. **Phase 6 — cookbook init/publish + workflows publish.** Mirror the showboat-backed logbook patterns. Substrate is fixed; this is mechanical extension. Smoke-test each tool with throwaway captures and watch for editorial signals. *(2026-05-10: Tasks 11 + 12 both landed ✓. Phase 6 complete. Editorial signals collected.)*
 2. **Phase 7 Task 14 — POST_SYSTEM.md v1.** Single living doc covering taxonomy + per-form rules + per-section quality criteria + anti-patterns. Informed by editorial signals collected during Phase 6 work. **Possibly split** into mechanical-usage doc + per-post-type editorial docs depending on length and feel — design v1 so a future split is cheap (each post-type's editorial section self-contained). Bar for v1: "good enough that Task 10 produces content the user is satisfied with on first review." Rules already in scope based on this session's findings:
    - Anti-jargon: no "Cycle X / Phase Y" references — anchor in dateable concrete events.
    - Section 6 must include at least one of: deterministic `logbook exec` block, `logbook screenshot`, or external observable behavior. Not just `cite` blocks.
@@ -177,3 +181,6 @@ Anything the user comments on about post quality, sample content, or what looks 
 - 2026-05-10 (cookbook smoke test): publish doesn't roll back on `zola check` failure — orphan files land in the dest dir even when publish exits non-zero. Same issue exists in logbook publish. Friction signal, not a blocker; could fix via write-temp-then-move, deferred. Editorial implication: include a "if publish fails, also delete `content/posts/<form>/<slug>.md`" step in POST_SYSTEM.md until the tool rolls back automatically.
 - 2026-05-10 (cookbook smoke test): `--from-logbook` placeholder is a **friction-positive** safety net — pre-fills a Zola link target that `zola check` validates at publish time, so a forgotten backlink fails loudly rather than silently. Worth noting in POST_SYSTEM.md as a deliberate authoring discipline pattern, not a bug.
 - 2026-05-10 (architecture): cookbook destinations are flat (`content/posts/cookbook/<slug>.md`), logbook destinations are per-project nested (`content/posts/logbook/<project>/<slug>.md`). Reason: cookbook patterns are cross-project by definition; per-project subdirs would imply the pattern belongs to one project. Worth documenting in POST_SYSTEM.md so the asymmetry is intentional, not accidental.
+- 2026-05-10 (workflows): Category 1 workflows (LLM-referenced docs) have *two* canonical locations now — the source-of-truth in the project repo (read by the LLM at session start) and the rendered post on mylearnbase (read by humans + future-self). The user's prose discipline should treat the project-repo doc as the source — edits flow doc → post, never post → doc. Worth flagging in POST_SYSTEM.md: "edit the doc, then republish; never edit the post directly because the next republish will overwrite."
+- 2026-05-10 (workflows): the dry-run/diff output is genuinely useful for a sync tool — gives the user a "what would change?" preview when an upstream doc is large. Worth surfacing in POST_SYSTEM.md as a recommended habit before each republish. Anti-pattern: blind republish without diff review, which loses sight of which paragraphs are new vs. which were already published.
+- 2026-05-10 (workflows): three forms now use the same shared `_shared.py` substrate. Each form's per-form module is ~150-250 lines (logbook 580 because of capture subcommands, cookbook 270, workflows 200). Per-form modules feel right-sized; further extraction (e.g., a `_publish_base` mixin) would obscure the actual differences. Hold on extraction until a 4th form joins.
