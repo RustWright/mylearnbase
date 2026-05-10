@@ -1,7 +1,8 @@
-"""logbook: capture (init/what/why/scope/note) and publish (capture -> Zola post).
+"""logbook: capture (init/what/why/scope/note/exec/screenshot) and publish.
 
-Captures live in the *project* repo at `<repo-root>/logbook/_drafts/<slug>.md`
-(mirrors cookbook's draft layout). Section writers append to a named section.
+Captures are showboat documents structured into 7 sections (logbook owns the
+section discipline; showboat handles title block, exec/image blocks, and
+verify). Captures live at `<repo-root>/logbook/_drafts/<slug>.md`.
 Publish converts a capture to a Zola post under
 `<mylearnbase>/content/posts/logbook/<project>/<slug>.md`.
 """
@@ -18,6 +19,14 @@ import sys
 from pathlib import Path
 
 from . import _capture, _frontmatter
+
+
+def _run_showboat(args: list[str]) -> subprocess.CompletedProcess:
+    """Invoke showboat. Raises RuntimeError if showboat is not on PATH."""
+    try:
+        return subprocess.run(["showboat", *args], capture_output=True, text=True, check=False)
+    except FileNotFoundError as exc:
+        raise RuntimeError("showboat not found on PATH; install showboat before using logbook") from exc
 
 SECTION_WHAT = "What does this feature do?"
 SECTION_WHY = "Why was it added now?"
@@ -42,18 +51,14 @@ def _capture_path(repo_root: Path, slug: str) -> Path:
     return repo_root / "logbook" / "_drafts" / f"{slug}.md"
 
 
-def _utc_iso_now() -> str:
-    return dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-
-
 def _title_from_slug(slug: str) -> str:
     return slug.replace("-", " ").replace("_", " ").capitalize()
 
 
-def _capture_template(project: str, slug: str, title: str, timestamp: str) -> str:
+def _post_init_additions(project: str, slug: str) -> str:
+    """Metadata blockquote + 7 empty section headers, appended after `showboat init`."""
     return (
-        f"# {title}\n"
-        f"*{timestamp}*\n\n"
+        "\n"
         f"> Project: {project}\n"
         f"> Slug: {slug}\n"
         f"> Tags: TBD\n\n"
@@ -127,6 +132,30 @@ def _split_metadata_and_body(capture: Path) -> tuple[dict[str, str], str, str]:
     title_block = "\n".join(lines[:meta_start]).rstrip()
     body = "\n".join(lines[meta_end:]).strip()
     return meta, title_block, body
+
+
+_IMAGE_REF_RE = re.compile(r"!\[[^\]]*\]\(([^)]+)\)")
+
+
+def _copy_referenced_images(body: str, src_dir: Path, dest_dir: Path) -> list[str]:
+    """Copy local image references from `src_dir` to `dest_dir`.
+
+    Returns a list of paths copied (relative names). Skips http(s) URLs and
+    absolute paths.
+    """
+    copied: list[str] = []
+    for match in _IMAGE_REF_RE.finditer(body):
+        ref = match.group(1).strip().split()[0]
+        if ref.startswith(("http://", "https://", "/")):
+            continue
+        src = src_dir / ref
+        if not src.is_file():
+            continue
+        dest = dest_dir / ref
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(src, dest)
+        copied.append(ref)
+    return copied
 
 
 def _strip_empty_sections(body: str) -> str:
@@ -213,8 +242,8 @@ def _zola_check(content_root: Path, skip_external_links: bool = True) -> tuple[i
 def cmd_init(args: argparse.Namespace) -> int:
     try:
         root = _repo_root()
-    except RuntimeError as exc:
-        print(f"logbook: {exc}", file=sys.stderr)
+    except RuntimeError as err:
+        print(f"logbook: {err}", file=sys.stderr)
         return 2
 
     slug = args.feature_name
@@ -224,13 +253,117 @@ def cmd_init(args: argparse.Namespace) -> int:
         return 1
 
     capture.parent.mkdir(parents=True, exist_ok=True)
+    if capture.exists():
+        capture.unlink()
     title = args.title or _title_from_slug(slug)
-    capture.write_text(
-        _capture_template(args.project, slug, title, _utc_iso_now()),
-        encoding="utf-8",
-    )
+
+    try:
+        result = _run_showboat(["init", str(capture), title])
+    except RuntimeError as err:
+        print(f"logbook: {err}", file=sys.stderr)
+        return 2
+    if result.returncode != 0:
+        print(f"logbook: showboat init failed: {result.stderr.strip()}", file=sys.stderr)
+        return 1
+
+    with capture.open("a", encoding="utf-8") as f:
+        f.write(_post_init_additions(args.project, slug))
+
     print(str(capture))
     return 0
+
+
+def _relocate_appended_to_section(capture: Path, pre_line_count: int, target_section: str) -> int:
+    """Move newly-appended lines (everything after `pre_line_count`) into `target_section`.
+
+    Used after invoking a showboat command that appends to end-of-file. Returns
+    0 on success, nonzero on failure.
+    """
+    text = capture.read_text(encoding="utf-8")
+    lines = text.splitlines()
+    if len(lines) <= pre_line_count:
+        print("logbook: showboat command produced no new content", file=sys.stderr)
+        return 1
+
+    appended = lines[pre_line_count:]
+    while appended and not appended[0].strip():
+        appended.pop(0)
+    while appended and not appended[-1].strip():
+        appended.pop()
+
+    if not appended:
+        print("logbook: showboat command appended only blank lines", file=sys.stderr)
+        return 1
+
+    pre_lines = lines[:pre_line_count]
+    while pre_lines and not pre_lines[-1].strip():
+        pre_lines.pop()
+    capture.write_text("\n".join(pre_lines) + "\n", encoding="utf-8")
+
+    section_block = "\n".join(appended)
+    try:
+        _capture.append_to_section(capture, target_section, section_block)
+    except (FileNotFoundError, ValueError) as err:
+        print(f"logbook: {err}", file=sys.stderr)
+        return 1
+    return 0
+
+
+def cmd_run(args: argparse.Namespace) -> int:
+    """Run a code block via showboat and embed it into the target section."""
+    capture = _resolve_capture_arg(args.capture_file)
+    if not capture.exists():
+        print(f"logbook: capture does not exist: {capture}", file=sys.stderr)
+        return 1
+
+    pre_line_count = len(capture.read_text(encoding="utf-8").splitlines())
+    code = args.code if args.code is not None else _read_text_arg(None)
+    if not code.strip():
+        print("logbook: refusing to run empty code", file=sys.stderr)
+        return 1
+
+    try:
+        result = _run_showboat(["exec", str(capture), args.lang, code])
+    except RuntimeError as err:
+        print(f"logbook: {err}", file=sys.stderr)
+        return 2
+
+    if result.stdout:
+        sys.stdout.write(result.stdout)
+    if result.stderr:
+        sys.stderr.write(result.stderr)
+
+    target = args.section or SECTION_EVIDENCE
+    relocate_rc = _relocate_appended_to_section(capture, pre_line_count, target)
+    if relocate_rc != 0:
+        return relocate_rc
+    return result.returncode
+
+
+def cmd_screenshot(args: argparse.Namespace) -> int:
+    capture = _resolve_capture_arg(args.capture_file)
+    if not capture.exists():
+        print(f"logbook: capture does not exist: {capture}", file=sys.stderr)
+        return 1
+
+    image_path = Path(args.path).expanduser()
+    if not image_path.is_file():
+        print(f"logbook: image not found: {image_path}", file=sys.stderr)
+        return 1
+
+    pre_line_count = len(capture.read_text(encoding="utf-8").splitlines())
+
+    try:
+        result = _run_showboat(["image", str(capture), str(image_path)])
+    except RuntimeError as err:
+        print(f"logbook: {err}", file=sys.stderr)
+        return 2
+    if result.returncode != 0:
+        print(f"logbook: showboat image failed: {result.stderr.strip()}", file=sys.stderr)
+        return 1
+
+    target = args.section or SECTION_EVIDENCE
+    return _relocate_appended_to_section(capture, pre_line_count, target)
 
 
 def cmd_tags(args: argparse.Namespace) -> int:
@@ -280,6 +413,17 @@ def cmd_publish(args: argparse.Namespace) -> int:
     if not capture.exists():
         print(f"logbook: capture does not exist: {capture}", file=sys.stderr)
         return 1
+
+    if not args.skip_verify:
+        try:
+            verify_result = _run_showboat(["verify", str(capture)])
+        except RuntimeError as err:
+            print(f"logbook: {err}", file=sys.stderr)
+            return 2
+        if verify_result.returncode != 0:
+            output = (verify_result.stdout + verify_result.stderr).strip()
+            print(f"logbook: showboat verify failed (rc={verify_result.returncode}):\n{output}", file=sys.stderr)
+            return 1
 
     try:
         meta, title_block, body = _split_metadata_and_body(capture)
@@ -347,16 +491,22 @@ def cmd_publish(args: argparse.Namespace) -> int:
         if not body_clean.endswith("\n"):
             f.write("\n")
 
+    images_copied = _copy_referenced_images(body_clean, capture.parent, dest.parent)
+
     rc, output = _zola_check(mb_root, skip_external_links=not args.full_check)
     if rc != 0:
         print(f"logbook: zola check failed (rc={rc}):\n{output}", file=sys.stderr)
         return 1
 
     check_label = "clean (full)" if args.full_check else "clean (internal links only)"
+    verify_label = "skipped" if args.skip_verify else "clean"
     print(str(dest))
     print(f"  draft = true (review, then flip to false in frontmatter)")
     print(f"  tags = {tags or '(none — pass --tags or edit frontmatter)'}")
+    print(f"  showboat verify: {verify_label}")
     print(f"  zola check: {check_label}")
+    if images_copied:
+        print(f"  copied {len(images_copied)} image(s): {', '.join(images_copied)}")
     if project_index_created:
         print(f"  created {project_index} (review title/description if desired)")
     return 0
@@ -367,7 +517,7 @@ def main(argv: list[str] | None = None) -> int:
         prog="logbook",
         description="Capture and publish logbook entries (per-feature implementation logs).",
     )
-    sub = parser.add_subparsers(dest="cmd", required=True, metavar="{init,what,why,scope,note,tags,publish}")
+    sub = parser.add_subparsers(dest="cmd", required=True, metavar="{init,what,why,scope,note,exec,screenshot,tags,publish}")
 
     p_init = sub.add_parser("init", help="Template a fresh capture file with the 7-section structure.")
     p_init.add_argument("project")
@@ -387,6 +537,19 @@ def main(argv: list[str] | None = None) -> int:
         p.add_argument("text", nargs="?", help="Text to write (reads from stdin if omitted).")
         p.set_defaults(handler=_section_cmd(header))
 
+    p_run = sub.add_parser("exec", help="Run code via showboat and embed it as runnable evidence in the target section (default: section 6).")
+    p_run.add_argument("capture_file", help="Capture path or bare slug.")
+    p_run.add_argument("lang", help="Language identifier (bash, python, etc.) — passed through to showboat.")
+    p_run.add_argument("code", nargs="?", help="Code to run (reads from stdin if omitted).")
+    p_run.add_argument("--section", help="Target section header text (default: 'How do we know it works?').", default=None)
+    p_run.set_defaults(handler=cmd_run)
+
+    p_shot = sub.add_parser("screenshot", help="Embed an existing image file via showboat into the target section (default: section 6).")
+    p_shot.add_argument("capture_file", help="Capture path or bare slug.")
+    p_shot.add_argument("path", help="Path to an existing image file.")
+    p_shot.add_argument("--section", help="Target section header text (default: 'How do we know it works?').", default=None)
+    p_shot.set_defaults(handler=cmd_screenshot)
+
     p_pub = sub.add_parser("publish", help="Convert a capture to a Zola post under content/posts/logbook/<project>/.")
     p_pub.add_argument("capture_file", help="Capture path or bare slug.")
     p_pub.add_argument("--slug", help="Override the slug from metadata.", default=None)
@@ -396,6 +559,11 @@ def main(argv: list[str] | None = None) -> int:
         "--full-check",
         action="store_true",
         help="Run a full `zola check` including external links (slow). Default skips external links.",
+    )
+    p_pub.add_argument(
+        "--skip-verify",
+        action="store_true",
+        help="Skip the `showboat verify` pre-check that re-runs embedded exec blocks.",
     )
     p_pub.set_defaults(handler=cmd_publish)
 

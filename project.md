@@ -2,7 +2,7 @@
 
 **Status:** Active
 **Started:** 2026-01-31
-**Current Phase:** Cycle 2 Session 4 Partial — Phases 1-4 complete + friction fixes; Phase 5 surfaced architectural gaps (showboat integration missing, editorial standard needed); rework + Phase 5 redo carry-forward to next session
+**Current Phase:** Cycle 2 Session 4 — Phases 1-4 complete + friction fixes; Phase 5 surfaced architectural gaps (showboat missing, editorial standard needed); showboat rework landed same session; remaining: POST_SYSTEM.md editorial-standard authorship (Task 14) + Task 10 redo on real omni-me work
 **Domain:** mylearnbase.com
 
 ---
@@ -298,3 +298,5 @@
 2. **Editorial standard not defined.** Tools mechanically work but produce content that fails the editorial bar: project-internal jargon ("Cycle X / Phase Y") that won't survive process changes or external readers, wall-of-prose formatting, and section-6 evidence conflated with code citations. Single-doc decision: expand Task 14 (`POST_SYSTEM.md`) to include per-form per-section quality criteria + anti-patterns; designed as a living doc.
 
 **Both gaps + the showboat rework + a real Task-10 redo carry forward to next session** (see `tasks.md` "Carry-forward to next session"). The smoke-test artifact (a draft logbook post about the Phase-4 tools) was deleted — re-authoring on the fixed substrate is cleaner than retrofitting.
+
+**Showboat rework landed same session** (after the user pushed back on stopping at the diagnosis): `logbook init` now wraps `showboat init`, new `logbook exec` and `logbook screenshot` subcommands wrap `showboat exec` / `showboat image` via post-append section relocation, `logbook publish` runs `showboat verify` (with `--skip-verify` escape) and copies referenced images to the destination. Confirmed working: a `date -u` exec block correctly fails verify (timestamp drift caught), a deterministic `echo` block passes; full publish round-trip in 194ms with verify on. Memory saved for future sessions: `feedback_wrap_existing_tools.md` (don't reinvent showboat-style tools), `feedback_screenshots_guideline_driven.md` (capture stays human + LLM, not auto-tool). Carry-forward narrows to (a) author POST_SYSTEM.md with editorial standard expanded, (b) Task 10 redo on real omni-me work, (c) Phase 6 (cookbook + workflows publish) now unblocked.

@@ -51,7 +51,7 @@ Sequencing follows the natural dependency chain (later phases assume earlier pha
 
 ## Phase 4 — Core capture tools
 
-> **Architectural gap surfaced 2026-05-10:** the plan says "A logbook capture is a showboat document" and "logbook thin wrapper... wrapping showboat note with section-targeting" (POST_SYSTEM_PLAN lines 253, 307). The Tasks-8/9 implementation reinvented section-tracking from scratch (`_capture.append_to_section`, hand-rolled 7-section template) instead of wrapping `showboat init/note/exec/image/verify`. Symptom: Phase 5 smoke test produced a "How do we know it works?" section that was all `cite` blocks with no runnable evidence. Tasks 8 and 9 below remain checked for the *capability* layer (init/section-fill/publish/auto-create/frontmatter all functional), but the **substrate is wrong** and rework is the first item next session. See "Carry-forward to next session" at the bottom.
+> **Architectural gap surfaced + addressed 2026-05-10:** initial Tasks-8/9 implementation reinvented section-tracking instead of wrapping showboat (plan lines 253, 307). Smoke-test symptom: section 6 was all `cite` blocks, no runnable evidence. **Reworked same day** to use showboat as the substrate: `logbook init` wraps `showboat init`, new `logbook exec` and `logbook screenshot` wrap `showboat exec` / `showboat image` via post-append section relocation, `logbook publish` runs `showboat verify` (with `--skip-verify` escape). `_capture.append_to_section` retained — it's the section-targeting layer logbook adds on top of showboat's structureless append model. See updated Tasks 8 and 9 below.
 
 ### 7. `cite` (cross-form, used everywhere)
 - [x] Discover repo via `git rev-parse --show-toplevel`; project context via `git remote get-url origin`; works from any GitHub-hosted repo
@@ -60,11 +60,13 @@ Sequencing follows the natural dependency chain (later phases assume earlier pha
 - [x] Knob settled: per-file dirty check (only the cited file blocks); `--allow-dirty` override; non-GitHub remotes degrade to no-permalink (file:line + SHA still recorded)
 - [x] Verified end-to-end: clean cite produces real GitHub permalink (`RustWright/mylearnbase`); dirty rejected; `--allow-dirty` succeeds; bad ref formats and out-of-range lines fail with clear messages; **44ms total** (well under <10s budget)
 
-### 8. `logbook` thin wrapper
-- [x] `logbook init <project> <feature_name>` — writes capture template at `<repo-root>/logbook/_drafts/<slug>.md` (path knob settled: mirrors cookbook's `<project>/cookbook/_drafts/` layout). Title/timestamp/metadata blockquote auto-populated; sections 3-7 created empty.
-- [x] `logbook what/why/scope/note <slug-or-path> [text]` — append to the named section (uses shared `_capture.append_to_section`); reads from stdin if text is omitted; bare slug resolves under `logbook/_drafts/`
-- [x] `cite --section "How do we know it works?"` fills section 6 (cite stays form-agnostic; logbook tells it which section)
-- [x] Smoke test: full init → what×2 (multi-append) → why → scope → cite → note×2 → published file structurally clean
+### 8. `logbook` thin wrapper (showboat-backed)
+- [x] `logbook init <project> <feature_name>` — invokes `showboat init` for the title block + showboat-id, then appends our metadata blockquote + 7 section headers. Path: `<repo-root>/logbook/_drafts/<slug>.md`.
+- [x] `logbook what/why/scope/note <slug-or-path> [text]` — append plain markdown text to the named section via `_capture.append_to_section`; reads from stdin if text omitted; bare slug resolves under `logbook/_drafts/`.
+- [x] `logbook exec <slug> <lang> [code] [--section <header>]` — wraps `showboat exec` (which appends to end-of-file) and relocates the produced fenced blocks into the target section (default: section 6). Pipes stdout/stderr through. Returns the executed command's exit code.
+- [x] `logbook screenshot <slug> <path> [--section <header>]` — wraps `showboat image`; relocates the showboat-generated image block into the target section. Capture mechanism stays human-driven (memory: `feedback_screenshots_guideline_driven`).
+- [x] `cite --section "How do we know it works?"` still works for code-reference evidence; complements showboat exec/image as a different evidence kind.
+- [x] Smoke test: init → what/why → exec (deterministic block) → screenshot (test PNG) → publish-with-verify clean → 194ms total publish.
 
 ### 9. Conversion tool — implemented as `logbook publish <slug>` subcommand
 - [x] Reads capture, extracts metadata blockquote (Project/Slug/Tags), splits title block from body
@@ -77,8 +79,9 @@ Sequencing follows the natural dependency chain (later phases assume earlier pha
   - `--skip-external-links` on internal `zola check` by default (publish: 14.4s → 163ms, ~88× speedup); `--full-check` flag for paranoid mode.
   - `--tags "a,b,c"` flag on `publish` to fill tags inline at conversion time.
   - New subcommand `logbook tags <slug> "a,b,c"` to update the metadata blockquote in place.
-- [ ] **Rework needed** (next session): integrate `showboat verify` to re-run any embedded exec blocks at publish time; treat verify failure as publish-failing.
-- [x] Smoke-tested end-to-end on test-project/test-feature: 0 orphans, 8 sections after publish (auto-created the test-project section), back to 7 after cleanup.
+- [x] **Showboat verify integrated** (2026-05-10 rework): publish runs `showboat verify` on the capture before writing the dest; verify failure aborts publish with the diff printed. `--skip-verify` flag for intentionally non-deterministic captures. Confirmed working: a `date -u` exec block correctly fails verify (timestamp drift); a `echo` exec block passes.
+- [x] **Image copy at publish** (2026-05-10): `_copy_referenced_images` scans the body for `![alt](path)` markdown image references, copies local files from the capture dir to the dest dir alongside the post. Plan line 308: "copies the capture file + referenced images to mylearnbase/content/posts/logbook/<project>/<slug>.md."
+- [x] Smoke-tested end-to-end on verify-happy-path/showboat-rework captures: 0 orphans, 8 sections after publish, images present in dest, back to 7 sections + 9 pages after cleanup.
 
 ## Phase 5 — End-to-end smoke test
 
@@ -144,10 +147,16 @@ This is also the validation that capture commands meet the <10 second friction b
 
 ## Carry-forward to next session
 
-These items must land BEFORE Phase 6 work begins. They are the residue of the architectural gaps surfaced during Phase 5's smoke test.
+These items remain after the showboat rework landed in this session.
 
-1. **Rewrite logbook to wrap showboat.** Replace `_capture.append_to_section` calls with `showboat note <file> --section "..."` (or equivalent). `cmd_init` becomes `showboat init` followed by section scaffolding. Delete `_capture.py` if the wrapper makes it redundant. Surface area reduction goal: ~150 LOC → ~30 LOC of glue + dispatch.
-2. **Wire `showboat exec` and `showboat image` into the logbook capture flow.** Section 6 ("How do we know it works?") needs first-class support for runnable evidence and screenshots — not just `cite` blocks. UI-related logbook entries explicitly need screenshot capture (user flagged this 2026-05-10). Likely shape: thin `logbook exec <slug> <lang> <code>` and `logbook screenshot <slug> <path>` wrappers that delegate to showboat with section targeting.
-3. **Hook `showboat verify` into `logbook publish`.** When the capture has any embedded exec blocks, run `showboat verify` before declaring publish successful; treat verify failure as a non-zero publish exit. Ungated publish is a missing safety check.
-4. **Author POST_SYSTEM.md with the editorial standard expanded** (Task 14). Single living doc covering taxonomy + per-form rules + per-section quality criteria + anti-patterns. Drafting it correctly depends on the rework being done first (so the editorial standard can reference correct showboat usage in section 6).
-5. **Re-run Phase 5's Task 10** on real omni-me work — using the rewritten tools and the new editorial standard. The result is the canonical first logbook entry; the test artifact from this session was deleted because it was authored under the broken substrate.
+1. **~~Rewrite logbook to wrap showboat.~~** Done 2026-05-10. `logbook init` wraps `showboat init`; `logbook exec`/`logbook screenshot` wrap `showboat exec`/`showboat image` via post-append section relocation; `logbook publish` runs `showboat verify` with a `--skip-verify` escape.
+2. **~~Wire `showboat exec` and `showboat image` into the capture flow.~~** Done 2026-05-10. Default section is 6 ("How do we know it works?"); `--section` flag overrides. Image copy at publish landed.
+3. **~~Hook `showboat verify` into `logbook publish`.~~** Done 2026-05-10. Verify failure aborts publish with diff printed. Flag `--skip-verify` for non-deterministic captures.
+4. **Author POST_SYSTEM.md with the editorial standard expanded** (Task 14). Single living doc covering taxonomy + per-form rules + per-section quality criteria + anti-patterns. The substrate is now correct so the editorial standard can reference real showboat usage. Specific rules to include based on this session's findings:
+   - Anti-jargon: no "Cycle X / Phase Y" references — anchor in dateable concrete events (e.g., "the 2026-05 post-system reset").
+   - Section 6 must include at least one of: deterministic `logbook exec` block, `logbook screenshot`, or external observable behavior. Not just `cite` blocks (those are *where to look*, not *whether it works*).
+   - Exec blocks must be reproducible (showboat verify enforces this); use `--skip-verify` only with a documented reason in section 7.
+   - Screenshots: embed-only at the tool layer; capture mechanism stays human + LLM, with quality guidelines in this doc.
+   - Formatting: scannable structure, not wall-of-prose. Lists > paragraphs when the content is enumerable.
+5. **Re-run Phase 5's Task 10** on real omni-me work — using the showboat-backed tools and the new editorial standard. The result is the canonical first logbook entry; smoke-test artifacts from this session were deleted because they were synthetic, not real work.
+6. **Phase 6** can now start in parallel (or sequentially) with item 4: cookbook init/publish + workflows publish, both built on the same showboat-backed substrate.
