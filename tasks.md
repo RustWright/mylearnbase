@@ -52,22 +52,26 @@ Sequencing follows the natural dependency chain (later phases assume earlier pha
 ## Phase 4 — Core capture tools
 
 ### 7. `cite` (cross-form, used everywhere)
-- [ ] Discover project context from `os.getcwd()` and `git remote get-url origin` — must work from any project repo
-- [ ] Capture `file:line` + line content + HEAD SHA + GitHub permalink
-- [ ] Append to capture file (location passed via flag or env)
-- [ ] Decide working-tree-dirty policy (hard reject vs warning) — open knob
+- [x] Discover repo via `git rev-parse --show-toplevel`; project context via `git remote get-url origin`; works from any GitHub-hosted repo
+- [x] Capture `file:line` + line content + HEAD SHA + GitHub permalink (markdown citation block format: `[`path:line`](permalink) at `sha7`` + quoted line content)
+- [x] Append to capture file (positional arg); creates parent dirs if needed; preserves prior content with blank-line separator
+- [x] Knob settled: per-file dirty check (only the cited file blocks); `--allow-dirty` override; non-GitHub remotes degrade to no-permalink (file:line + SHA still recorded)
+- [x] Verified end-to-end: clean cite produces real GitHub permalink (`RustWright/mylearnbase`); dirty rejected; `--allow-dirty` succeeds; bad ref formats and out-of-range lines fail with clear messages; **44ms total** (well under <10s budget)
 
 ### 8. `logbook` thin wrapper
-- [ ] `logbook init <project> <feature-name>` — template a fresh capture with the 7-section structure
-- [ ] `logbook what <file> <text>` — fill section 3
-- [ ] `logbook why <file> <text>` — fill section 4
-- [ ] `logbook scope <file> <text>` — fill section 5 (optional)
-- [ ] `logbook note <file> <text>` — fill section 7
+- [x] `logbook init <project> <feature_name>` — writes capture template at `<repo-root>/logbook/_drafts/<slug>.md` (path knob settled: mirrors cookbook's `<project>/cookbook/_drafts/` layout). Title/timestamp/metadata blockquote auto-populated; sections 3-7 created empty.
+- [x] `logbook what/why/scope/note <slug-or-path> [text]` — append to the named section (uses shared `_capture.append_to_section`); reads from stdin if text is omitted; bare slug resolves under `logbook/_drafts/`
+- [x] `cite --section "How do we know it works?"` fills section 6 (cite stays form-agnostic; logbook tells it which section)
+- [x] Smoke test: full init → what×2 (multi-append) → why → scope → cite → note×2 → published file structurally clean
 
-### 9. Conversion tool (logbook capture → Zola post)
-- [ ] Read capture, write frontmatter, optionally generate one-line summary
-- [ ] Copy capture body + referenced images to `mylearnbase/content/posts/logbook/<project>/<slug>.md`
-- [ ] Run `zola check` and `showboat verify` (when exec blocks present) before declaring success
+### 9. Conversion tool — implemented as `logbook publish <slug>` subcommand
+- [x] Reads capture, extracts metadata blockquote (Project/Slug/Tags), splits title block from body
+- [x] Generates frontmatter via `_frontmatter.write` (title, slug, date=today, draft=true, tags from metadata if present)
+- [x] Strips literal `TBD` from tags; prunes empty optional sections (e.g., scope when unused) via `_strip_empty_sections`
+- [x] Writes to `<MYLEARNBASE_ROOT>/content/posts/logbook/<project>/<slug>.md` (env var with `~/productive_learning/projects/mylearnbase` fallback); creates dest dir; `--force` to overwrite
+- [x] Runs `zola check` after write; failure aborts and prints output (non-zero exit). `showboat verify` deferred to when capture grows exec blocks (none in v1 captures).
+- [x] **Auto-create per-project `_index.md`** when missing (mirrors `posts/logbook/omni-me/_index.md` shape, with `<project> Logbook` title/description); publish output notes the creation. Removes orphan-warning friction for first-time-per-project publishes.
+- [x] Smoke-tested end-to-end on test-project/test-feature: 0 orphans, 8 sections after publish (auto-created the test-project section), back to 7 after cleanup.
 
 ## Phase 5 — End-to-end smoke test
 
