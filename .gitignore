@@ -2,8 +2,9 @@
 .mcp.json
 mcp-servers/
 
-# Reference documentation (not part of website)
-resources/
+# Reference documentation (not part of website) — anchored to repo root
+# so it does not match content/posts/resources/ (Zola section).
+/resources/
 
 # Zola build output
 public/

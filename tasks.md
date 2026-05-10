@@ -11,19 +11,19 @@ Sequencing follows the natural dependency chain (later phases assume earlier pha
 ## Phase 1 — Migration & directory setup
 
 ### 1. Delete superseded drafts
-- [ ] Remove `content/posts/2026-04-26-cycle-2-four-perspective-review.md`
-- [ ] Remove `content/posts/2026-04-26-cycle-2-implementation-calendar-obsidian-sync-and-auto-save.md`
-- [ ] Remove `content/posts/2026-04-26-omni-me-cycle-2-closing-sitting.md`
-- [ ] Confirm `grep -rn '@/posts/' content/` returns 11 lines (down from 13 baseline)
+- [x] Remove `content/posts/2026-04-26-cycle-2-four-perspective-review.md`
+- [x] Remove `content/posts/2026-04-26-cycle-2-implementation-calendar-obsidian-sync-and-auto-save.md`
+- [x] Remove `content/posts/2026-04-26-omni-me-cycle-2-closing-sitting.md`
+- [x] Confirm `grep -rn '@/posts/' content/` — actual: 12 → 10 (tasks.md noted "13 → 11"; drift was in baseline labeling, drop matches expected)
 
 ### 2. Create new section structure
-- [ ] `content/posts/logbook/_index.md` and `content/posts/logbook/omni-me/_index.md`
-- [ ] `content/posts/cookbook/_index.md`
-- [ ] `content/posts/workflows/_index.md`
-- [ ] `content/posts/opinions/_index.md`
-- [ ] `content/posts/resources/_index.md`
-- [ ] Each `_index.md` sets `outdate_alert` + `outdate_alert_days` per cross-form starting candidates (logbook 120, cookbook 365, workflows 180 / 365, opinions unset, resources 180)
-- [ ] `zola serve --drafts` renders the new (empty) sections and the original 9 posts still resolve
+- [x] `content/posts/logbook/_index.md` and `content/posts/logbook/omni-me/_index.md`
+- [x] `content/posts/cookbook/_index.md`
+- [x] `content/posts/workflows/_index.md`
+- [x] `content/posts/opinions/_index.md`
+- [x] `content/posts/resources/_index.md`
+- [x] Each `_index.md` sets `outdate_alert` + `outdate_alert_days` per cross-form starting candidates (logbook 120, cookbook 365, workflows **180** [knob settled — LLM-referenced default; post-only category overrides per-page], opinions `outdate_alert = false` + placeholder days=180, resources 180)
+- [x] `zola build` clean (9 pages, 7 sections, 0 warnings, 626ms); `zola check` clean (no broken links)
 
 ## Phase 2 — Theme template additions
 
