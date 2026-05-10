@@ -2,7 +2,7 @@
 
 **Status:** Active
 **Started:** 2026-01-31
-**Current Phase:** Cycle 2 Session 3 Complete — Ready for Session 4 (Implementation)
+**Current Phase:** Cycle 2 Session 4 Partial — Phases 1-4 complete + friction fixes; Phase 5 surfaced architectural gaps (showboat integration missing, editorial standard needed); rework + Phase 5 redo carry-forward to next session
 **Domain:** mylearnbase.com
 
 ---
@@ -89,6 +89,7 @@
 - [x] Session 4: Implementation (Cycle 1) (2026-02-04 to 2026-02-08)
 - [x] Session 5: Testing/Catchup (Cycle 1) (2026-02-11)
 - [x] Session 6: Tooling (out-of-cycle) (2026-02-18)
+- [~] Cycle 2 Session 4: Implementation — Phases 1-4 done, Phase 5 partial (2026-05-09 to 2026-05-10) — gaps surfaced, rework deferred to next session
 
 ---
 
@@ -279,3 +280,21 @@
 - Chose global slash command over MCP server (simpler, sufficient)
 - Subagent delegation over inline execution (clean context for writing)
 - Interactive gathering stays in main conversation (subagents can't ask questions mid-run)
+
+### Cycle 2 Session 4 - Implementation (partial) (2026-05-09 to 2026-05-10)
+
+**Goal:** Execute the post-system reset per `POST_SYSTEM_PLAN.md` — five-form taxonomy (logbook/cookbook/workflows/opinions/resources) + supporting tools.
+
+**Phases 1-4 landed cleanly (commits `1e30f14`, `bd0d924`, `185265a`, `a09a15d`, `c5a55cb`):**
+
+- **Phase 1 — Section migration:** Deleted 3 superseded drafts. Created 5 form-section `_index.md` files plus `logbook/omni-me/` sub-section. Fixed unanchored `resources/` rule in `.gitignore` that was matching the new Zola section path. Build clean (9 pages, 7 sections).
+- **Phase 2 — Theme additions:** Added `extra.superseded_by` banner to project-level `templates/post.html` override (uses `get_page` to auto-resolve title + permalink). Created `templates/shortcodes/demo.html` for self-contained iframe demos with optional caption + standalone link. Default iframe height settled at 480 (per plan example); knob noted in tasks.md.
+- **Phase 3 — Tools scaffold:** Greenfield Python package at `tools/` with hatchling backend; 4 entry points (`cite`, `logbook`, `cookbook`, `workflows`) installed via `uv tool install --editable`. Conversion exposed as `logbook publish` subcommand (4 entries, not 5). `_frontmatter.py` hand-rolled TOML reader/writer (Python 3.10 has no `tomllib`); round-trip byte-perfect on a real post. Added Python bytecode ignore to `.gitignore` after the first commit accidentally tracked `__pycache__`.
+- **Phase 4 — Capture + publish tools:** `cite` produces commit-pinned GitHub permalinks with per-file dirty check + `--allow-dirty` override; 44ms total per call. `logbook init/what/why/scope/note/publish` end-to-end working; auto-creates per-project `_index.md` on first publish to a new project (corrected after user pushed back on my misframing of "Phase 1 already created it"). Friction fixes added post-Phase-5 findings: `--skip-external-links` on internal `zola check` by default (publish 14.4s → 163ms), `--tags "a,b,c"` flag, `logbook tags <slug> "a,b,c"` subcommand for in-place metadata edit.
+
+**Phase 5 surfaced two gaps that defer Task 10 to next session:**
+
+1. **Showboat not integrated.** The plan was explicit ("A logbook capture is a showboat document", "logbook thin wrapper... wrapping showboat note with section-targeting"); the implementation reinvented section-tracking from scratch (`_capture.append_to_section`) instead. Symptom: smoke-test post's "How do we know it works?" was all `cite` blocks, no `showboat exec` runnable evidence, no `showboat image` screenshot capability. User caught it. Memory saved (`feedback_wrap_existing_tools.md`).
+2. **Editorial standard not defined.** Tools mechanically work but produce content that fails the editorial bar: project-internal jargon ("Cycle X / Phase Y") that won't survive process changes or external readers, wall-of-prose formatting, and section-6 evidence conflated with code citations. Single-doc decision: expand Task 14 (`POST_SYSTEM.md`) to include per-form per-section quality criteria + anti-patterns; designed as a living doc.
+
+**Both gaps + the showboat rework + a real Task-10 redo carry forward to next session** (see `tasks.md` "Carry-forward to next session"). The smoke-test artifact (a draft logbook post about the Phase-4 tools) was deleted — re-authoring on the fixed substrate is cleaner than retrofitting.

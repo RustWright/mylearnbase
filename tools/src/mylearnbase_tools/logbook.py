@@ -191,10 +191,17 @@ def _project_section_template(project: str) -> str:
     )
 
 
-def _zola_check(content_root: Path) -> tuple[int, str]:
-    """Run `zola check` from a Zola site root. Returns (returncode, combined_output)."""
+def _zola_check(content_root: Path, skip_external_links: bool = True) -> tuple[int, str]:
+    """Run `zola check` from a Zola site root. Returns (returncode, combined_output).
+
+    External-link probing is the slow part (HTTP per link); skipped by default
+    to keep publish under a few seconds. Run periodic full checks separately.
+    """
+    cmd = ["zola", "check"]
+    if skip_external_links:
+        cmd.append("--skip-external-links")
     result = subprocess.run(
-        ["zola", "check"],
+        cmd,
         cwd=content_root,
         capture_output=True,
         text=True,
@@ -223,6 +230,31 @@ def cmd_init(args: argparse.Namespace) -> int:
         encoding="utf-8",
     )
     print(str(capture))
+    return 0
+
+
+def cmd_tags(args: argparse.Namespace) -> int:
+    capture = _resolve_capture_arg(args.capture_file)
+    if not capture.exists():
+        print(f"logbook: capture does not exist: {capture}", file=sys.stderr)
+        return 1
+
+    text = capture.read_text(encoding="utf-8")
+    new_line = f"> Tags: {args.tags}"
+    new_lines: list[str] = []
+    replaced = False
+    for line in text.splitlines():
+        if not replaced and line.startswith("> Tags:"):
+            new_lines.append(new_line)
+            replaced = True
+        else:
+            new_lines.append(line)
+    if not replaced:
+        print(f"logbook: capture has no `> Tags:` line in metadata blockquote", file=sys.stderr)
+        return 1
+
+    capture.write_text("\n".join(new_lines) + ("\n" if text.endswith("\n") else ""), encoding="utf-8")
+    print(new_line)
     return 0
 
 
@@ -257,8 +289,11 @@ def cmd_publish(args: argparse.Namespace) -> int:
 
     project = meta.get("project")
     slug = args.slug or meta.get("slug")
-    tags_raw = meta.get("tags", "")
-    tags = [t.strip() for t in tags_raw.split(",") if t.strip() and t.strip() != "TBD"]
+    if args.tags is not None:
+        tags = [t.strip() for t in args.tags.split(",") if t.strip()]
+    else:
+        tags_raw = meta.get("tags", "")
+        tags = [t.strip() for t in tags_raw.split(",") if t.strip() and t.strip() != "TBD"]
 
     if not project or not slug:
         print(f"logbook: capture missing Project/Slug metadata: {meta!r}", file=sys.stderr)
@@ -312,15 +347,16 @@ def cmd_publish(args: argparse.Namespace) -> int:
         if not body_clean.endswith("\n"):
             f.write("\n")
 
-    rc, output = _zola_check(mb_root)
+    rc, output = _zola_check(mb_root, skip_external_links=not args.full_check)
     if rc != 0:
         print(f"logbook: zola check failed (rc={rc}):\n{output}", file=sys.stderr)
         return 1
 
+    check_label = "clean (full)" if args.full_check else "clean (internal links only)"
     print(str(dest))
     print(f"  draft = true (review, then flip to false in frontmatter)")
-    print(f"  tags = {tags or '(none — fill in frontmatter)'}")
-    print(f"  zola check: clean")
+    print(f"  tags = {tags or '(none — pass --tags or edit frontmatter)'}")
+    print(f"  zola check: {check_label}")
     if project_index_created:
         print(f"  created {project_index} (review title/description if desired)")
     return 0
@@ -331,7 +367,7 @@ def main(argv: list[str] | None = None) -> int:
         prog="logbook",
         description="Capture and publish logbook entries (per-feature implementation logs).",
     )
-    sub = parser.add_subparsers(dest="cmd", required=True, metavar="{init,what,why,scope,note,publish}")
+    sub = parser.add_subparsers(dest="cmd", required=True, metavar="{init,what,why,scope,note,tags,publish}")
 
     p_init = sub.add_parser("init", help="Template a fresh capture file with the 7-section structure.")
     p_init.add_argument("project")
@@ -354,8 +390,19 @@ def main(argv: list[str] | None = None) -> int:
     p_pub = sub.add_parser("publish", help="Convert a capture to a Zola post under content/posts/logbook/<project>/.")
     p_pub.add_argument("capture_file", help="Capture path or bare slug.")
     p_pub.add_argument("--slug", help="Override the slug from metadata.", default=None)
+    p_pub.add_argument("--tags", help="Comma-separated tags; overrides the capture's metadata blockquote.", default=None)
     p_pub.add_argument("--force", action="store_true", help="Overwrite the destination if it exists.")
+    p_pub.add_argument(
+        "--full-check",
+        action="store_true",
+        help="Run a full `zola check` including external links (slow). Default skips external links.",
+    )
     p_pub.set_defaults(handler=cmd_publish)
+
+    p_tags = sub.add_parser("tags", help="Update the Tags line in a capture's metadata blockquote.")
+    p_tags.add_argument("capture_file", help="Capture path or bare slug.")
+    p_tags.add_argument("tags", help='Comma-separated tags (e.g., "rust, dioxus, ui").')
+    p_tags.set_defaults(handler=cmd_tags)
 
     args = parser.parse_args(argv)
     return args.handler(args)

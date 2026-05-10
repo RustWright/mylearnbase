@@ -51,6 +51,8 @@ Sequencing follows the natural dependency chain (later phases assume earlier pha
 
 ## Phase 4 — Core capture tools
 
+> **Architectural gap surfaced 2026-05-10:** the plan says "A logbook capture is a showboat document" and "logbook thin wrapper... wrapping showboat note with section-targeting" (POST_SYSTEM_PLAN lines 253, 307). The Tasks-8/9 implementation reinvented section-tracking from scratch (`_capture.append_to_section`, hand-rolled 7-section template) instead of wrapping `showboat init/note/exec/image/verify`. Symptom: Phase 5 smoke test produced a "How do we know it works?" section that was all `cite` blocks with no runnable evidence. Tasks 8 and 9 below remain checked for the *capability* layer (init/section-fill/publish/auto-create/frontmatter all functional), but the **substrate is wrong** and rework is the first item next session. See "Carry-forward to next session" at the bottom.
+
 ### 7. `cite` (cross-form, used everywhere)
 - [x] Discover repo via `git rev-parse --show-toplevel`; project context via `git remote get-url origin`; works from any GitHub-hosted repo
 - [x] Capture `file:line` + line content + HEAD SHA + GitHub permalink (markdown citation block format: `[`path:line`](permalink) at `sha7`` + quoted line content)
@@ -69,18 +71,30 @@ Sequencing follows the natural dependency chain (later phases assume earlier pha
 - [x] Generates frontmatter via `_frontmatter.write` (title, slug, date=today, draft=true, tags from metadata if present)
 - [x] Strips literal `TBD` from tags; prunes empty optional sections (e.g., scope when unused) via `_strip_empty_sections`
 - [x] Writes to `<MYLEARNBASE_ROOT>/content/posts/logbook/<project>/<slug>.md` (env var with `~/productive_learning/projects/mylearnbase` fallback); creates dest dir; `--force` to overwrite
-- [x] Runs `zola check` after write; failure aborts and prints output (non-zero exit). `showboat verify` deferred to when capture grows exec blocks (none in v1 captures).
+- [x] Runs `zola check` after write; failure aborts and prints output (non-zero exit).
 - [x] **Auto-create per-project `_index.md`** when missing (mirrors `posts/logbook/omni-me/_index.md` shape, with `<project> Logbook` title/description); publish output notes the creation. Removes orphan-warning friction for first-time-per-project publishes.
+- [x] **Friction fixes** (post-Phase-5 findings, applied 2026-05-10):
+  - `--skip-external-links` on internal `zola check` by default (publish: 14.4s → 163ms, ~88× speedup); `--full-check` flag for paranoid mode.
+  - `--tags "a,b,c"` flag on `publish` to fill tags inline at conversion time.
+  - New subcommand `logbook tags <slug> "a,b,c"` to update the metadata blockquote in place.
+- [ ] **Rework needed** (next session): integrate `showboat verify` to re-run any embedded exec blocks at publish time; treat verify failure as publish-failing.
 - [x] Smoke-tested end-to-end on test-project/test-feature: 0 orphans, 8 sections after publish (auto-created the test-project section), back to 7 after cleanup.
 
 ## Phase 5 — End-to-end smoke test
 
 ### 10. Author one real logbook entry
-- [ ] Pick whatever omni-me work is current at the time (NOT a Cycle 2 retrospective)
+- [ ] Pick whatever omni-me work is current at the time (NOT a Cycle 2 retrospective) — **deferred until showboat rework lands**, since current logbook impl produces structurally wrong evidence sections
 - [ ] Run the full cycle: `logbook init` → capture during work → conversion → `zola check` → flip `draft = false`
 - [ ] Confirm published post renders correctly, links resolve, permalinks valid
 
-This is also the validation that capture commands meet the <10 second friction budget. If they don't, that's a blocker for the cadence and gets fixed before Phase 6.
+#### Findings from initial smoke test (2026-05-10, against Cycle 2 work — partial run, not the canonical entry)
+
+- **Capture friction PASSES the <10s budget** by ~200×: each capture command (`init`, `what`, `why`, `scope`, `cite`, `note`, `tags`) runs in 40-50ms. Multi-cite sessions stay under 1 second cumulative.
+- **Publish friction was 14.4s** (slow path: `zola check` with external link probing). Fixed in Task 9: default-skip external links → 163ms publish.
+- **Architectural gap: showboat not integrated.** Surfaced via the test post's "How do we know it works?" section being all `cite` blocks (code locations) with no runnable evidence (no `showboat exec`, no `showboat image`). Symptom of the broader Tasks-8/9 substrate issue. Blocks completion of Task 10 — re-running the smoke test on real omni-me work has to wait for the showboat rework.
+- **Editorial-standard gap.** The test post made me realize tools alone don't enforce content quality: the prose was full of project-internal jargon ("Cycle 2", "Phase 4") that won't survive process changes or external readers, formatting was wall-of-prose hard-to-scan, and the evidence-section conflated "where the code is" with "how we know it works." Fix: expand Task 14's scope (see Phase 7 below).
+
+This is also the validation that capture commands meet the <10 second friction budget. Mechanical budget passed; real-content quality budget did not, and gets addressed via the showboat rework + editorial standard before Phase 6.
 
 ## Phase 6 — Remaining per-form tools
 
@@ -104,6 +118,7 @@ This is also the validation that capture commands meet the <10 second friction b
 ### 14. Author `mylearnbase/POST_SYSTEM.md`
 - [ ] User-facing rules doc, mirrors the taxonomy
 - [ ] Per-form quick-reference cards
+- [ ] **Editorial standard** (added 2026-05-10): per-form, per-section quality criteria covering at least: anti-jargon rule (no "Cycle X / Phase Y" references — anchor in dateable concrete events instead), formatting expectations (scannable structure, no wall-of-prose), what counts as section-6 evidence (runnable `showboat exec` outcomes, screenshots via `showboat image`, observable behavior — *not* just code citations), opinions on what belongs in section 7 ("what's worth remembering or doing next?"). Single doc per user; designed to be appended to as the user's sense of "good vs. bad" sharpens with use.
 
 ## Phase 8 — Cycle close
 
@@ -124,3 +139,15 @@ This is also the validation that capture commands meet the <10 second friction b
 - **Open knobs:** treat them as decisions made when the task lands, not in advance. Each one is small enough to settle in-session.
 - **Smoke test gate:** Phase 5 is a real go/no-go on the friction budget. If capture is laborious, fix that before cookbook + workflows are built — same friction issue would only get worse.
 - **Cross-project tools:** `cite`, `logbook`, `cookbook`, `workflows` are designed to run from *any* project repo, not just mylearnbase. Test from inside `omni-me/` (or another project repo) before declaring done.
+
+---
+
+## Carry-forward to next session
+
+These items must land BEFORE Phase 6 work begins. They are the residue of the architectural gaps surfaced during Phase 5's smoke test.
+
+1. **Rewrite logbook to wrap showboat.** Replace `_capture.append_to_section` calls with `showboat note <file> --section "..."` (or equivalent). `cmd_init` becomes `showboat init` followed by section scaffolding. Delete `_capture.py` if the wrapper makes it redundant. Surface area reduction goal: ~150 LOC → ~30 LOC of glue + dispatch.
+2. **Wire `showboat exec` and `showboat image` into the logbook capture flow.** Section 6 ("How do we know it works?") needs first-class support for runnable evidence and screenshots — not just `cite` blocks. UI-related logbook entries explicitly need screenshot capture (user flagged this 2026-05-10). Likely shape: thin `logbook exec <slug> <lang> <code>` and `logbook screenshot <slug> <path>` wrappers that delegate to showboat with section targeting.
+3. **Hook `showboat verify` into `logbook publish`.** When the capture has any embedded exec blocks, run `showboat verify` before declaring publish successful; treat verify failure as a non-zero publish exit. Ungated publish is a missing safety check.
+4. **Author POST_SYSTEM.md with the editorial standard expanded** (Task 14). Single living doc covering taxonomy + per-form rules + per-section quality criteria + anti-patterns. Drafting it correctly depends on the rework being done first (so the editorial standard can reference correct showboat usage in section 6).
+5. **Re-run Phase 5's Task 10** on real omni-me work — using the rewritten tools and the new editorial standard. The result is the canonical first logbook entry; the test artifact from this session was deleted because it was authored under the broken substrate.
