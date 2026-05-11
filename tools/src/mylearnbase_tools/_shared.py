@@ -81,10 +81,17 @@ def copy_referenced_images(body: str, src_dir: Path, dest_dir: Path) -> list[str
     return copied
 
 
-def strip_empty_sections(body: str) -> str:
-    """Drop `## ` headers whose body is empty/whitespace."""
+def strip_empty_sections(body: str, required_headers: list[str] | None = None) -> str:
+    """Drop `## ` headers whose body is empty/whitespace.
+
+    If `required_headers` is provided, raise ValueError naming any required
+    sections whose body is empty — caller is the form module that knows which
+    section headers are required vs optional.
+    """
+    required = set(required_headers or [])
     parts = re.split(r"^(## .+)$", body, flags=re.MULTILINE)
     out: list[str] = []
+    missing: list[str] = []
     if parts and parts[0].strip():
         out.append(parts[0])
     for i in range(1, len(parts), 2):
@@ -93,6 +100,12 @@ def strip_empty_sections(body: str) -> str:
         if section_body.strip():
             out.append(header)
             out.append(section_body)
+        else:
+            header_text = header[3:].strip()
+            if header_text in required:
+                missing.append(header_text)
+    if missing:
+        raise ValueError(f"required section(s) empty: {', '.join(missing)}")
     return "".join(out).strip() + "\n"
 
 

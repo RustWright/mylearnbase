@@ -2,7 +2,7 @@
 
 **Status:** Active
 **Started:** 2026-01-31
-**Current Phase:** Cycle 2 Session 4 — Phases 1-6 complete; `editorial/POST_SYSTEM.md` v1 seed landed 2026-05-10. Next: per-form authoring sessions in fresh context, sequenced logbook → cookbook → workflows → opinions → resources. Skill rewrite (Task 13) and real-content Task 10 follow `editorial/logbook.md`.
+**Current Phase:** Cycle 2 Session 4 — Per-form authoring (1/5) complete; `editorial/logbook.md` drafted and published as `authoring-a-logbook-entry` (2026-05-11). Next: per-form authoring continues in fresh-context sessions — cookbook → workflows → opinions → resources. Skill rewrite (Task 13) and real-content Task 10 follow.
 **Domain:** mylearnbase.com
 
 ---
@@ -89,7 +89,7 @@
 - [x] Session 4: Implementation (Cycle 1) (2026-02-04 to 2026-02-08)
 - [x] Session 5: Testing/Catchup (Cycle 1) (2026-02-11)
 - [x] Session 6: Tooling (out-of-cycle) (2026-02-18)
-- [~] Cycle 2 Session 4: Implementation — Phases 1-6 done; Phase 7 Task 14 v1 seed landed (2026-05-09 to 2026-05-10) — per-form authoring + Task 10 carry forward to fresh sessions
+- [~] Cycle 2 Session 4: Implementation — Phases 1-6 + Task 14 v1 + per-form 1/5 (logbook) done (2026-05-09 to 2026-05-11) — cookbook + 3 more + Task 10 carry forward
 
 ---
 
@@ -308,3 +308,28 @@
 - **Phase 7 Task 14 v1 seed — `editorial/POST_SYSTEM.md`.** 512-line document covering all five forms with uniform per-form structure (*When to use* → *Tools* → *Editorial per section* → *Anti-patterns*). Designed as reference material for the per-form authoring sessions, not as the final destination.
 
 **Per-form rollout sequence locked 2026-05-10:** separate fresh-context sessions in order — logbook, cookbook, workflows, opinions, resources. Each session produces `editorial/<form>.md`. Memory updated (`project_post_system_doc_may_split.md`). Task 13 (`/create-post` skill rewrite) and Phase 5 Task 10 (real-omni-me logbook entry) follow `editorial/logbook.md`.
+
+### Per-form authoring (1/5): logbook (2026-05-10 to 2026-05-11)
+
+**Goal:** First per-form authoring session — produce `editorial/logbook.md` as a standalone authoring guide and publish it as a workflow post.
+
+**Process:** Walked through Topics 1-6 (why exists, how tools work, section purposes, quality writing with good/bad examples, anti-patterns, end-to-end walk-through), one topic per turn with synthesis-then-react loops. Drafted `editorial/logbook.md` section-by-section after Topics 1-6 converged. Verbosity pass at the end trimmed the `draft = true` mention in section 3 and reworded the §6 soft-ordering rule to acknowledge the pairing-rule exception.
+
+**Tool changes during the walkthrough (hand-verified):**
+- `_shared.strip_empty_sections` accepts `required_headers` and raises `ValueError` if any required section is empty.
+- `logbook publish` passes `[SECTION_WHAT, SECTION_WHY, SECTION_EVIDENCE]` and refuses to publish if any are empty (caught before destination write).
+- `logbook init` `--title` is mandatory; auto-derivation dropped (produced bad titles ~4/5 of the time).
+- User reinstall needed: `uv tool install --reinstall ./tools` (or `--editable`).
+
+**Publish:** First real publish failed on a broken `@/posts/cookbook/...` Zola link in a §7 cross-form-link example. Orphan destination cleaned up; example blocks converted to fenced code blocks (syntax teaching) and non-link notation (`[screenshot: foo.png]`) for §6 image references. Second publish clean.
+
+**Final state:**
+- `editorial/logbook.md`: 7-section editorial doc, publish-quality voice.
+- `content/posts/workflows/authoring-a-logbook-entry.md`: live; `draft = false`, `date = 2026-05-11`.
+
+**Memory entries saved for next-session continuity:**
+- `project_logbook_arc_complete.md`
+- `feedback_editorial_examples_no_live_markdown.md`
+- `feedback_per_form_walkthrough_rhythm.md`
+
+**Carry-forward:** cookbook is the next per-form session (fresh context). Then workflows → opinions → resources. Task 13 (skill rewrite) and Task 10 (real omni-me logbook entry) follow.

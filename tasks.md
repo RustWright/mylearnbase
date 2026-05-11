@@ -135,6 +135,18 @@ This is also the validation that capture commands meet the <10 second friction b
   4. `editorial/opinions.md`
   5. `editorial/resources.md`
 - [ ] Each per-form session pulls the corresponding section from `editorial/POST_SYSTEM.md` v1, refines for that form's lived authoring rhythm, and decides whether the v1 section is replaced with a pointer or removed entirely.
+- [ ] We also need a project document that can be referenced when creating new tags because the current strategy for creating tags randomly is creating an incoherent and confused tagging system
+- [ ] The current home page has no way to access any of the new type of posts other than direct url entry
+
+### 15. Update PROJECT PROCESS to incorporate the new workflows to support content creation
+- [ ] Update and sync all project process documents, Omni me version is currently the most up to date, all others need to match it
+- [ ] Add updates that allow easy use of the new workflows, examples are
+  - Identifying potential features to log during the planning stage of each cycle so the question is clear when it comes to write the post itself, if something is enough of a feature or not
+  - Specify how to make frequent commits, and then when you get to the commit that lands a feature there can be a pause to quickly make the first draft of the capture, if needed certain UI tests that need screenshots can be saved till later and batched so as not to slow down other development
+  - Code reviews can identify cookbook entries or other pieces of code that are worth pulling out
+  - Code reviews also allow for time to review and see if there are any features worth turning into a demo, depending on how cool it is, and how well it works within the limitations of the demo implementation process
+  - Reference the editorial standard on how to use each tool and the quality of content in each section, we should have links to the files, right now since everything is local I'm fine with just pointing to it across the file system boundary, but maybe we should point to a fetchable remote repo link eventually
+- [ ] Decide which sort of updates are needed in the shared files like the Claude.md to make the new post content clear and not just recorded in memory files
 
 ## Phase 8 — Cycle close
 

@@ -24,6 +24,8 @@ SECTION_SCOPE = "What's in scope (and what's not)?"
 SECTION_EVIDENCE = "How do we know it works?"
 SECTION_NEXT = "What's worth remembering or doing next?"
 
+REQUIRED_SECTIONS = [SECTION_WHAT, SECTION_WHY, SECTION_EVIDENCE]
+
 
 def _capture_path(repo_root: Path, slug: str) -> Path:
     return repo_root / "logbook" / "_drafts" / f"{slug}.md"
@@ -151,7 +153,7 @@ def cmd_init(args: argparse.Namespace) -> int:
     capture.parent.mkdir(parents=True, exist_ok=True)
     if capture.exists():
         capture.unlink()
-    title = args.title or _title_from_slug(slug)
+    title = args.title
 
     try:
         result = _shared.run_showboat(["init", str(capture), title])
@@ -347,7 +349,11 @@ def cmd_publish(args: argparse.Namespace) -> int:
     if not title:
         title = _title_from_slug(slug)
 
-    body_clean = _shared.strip_empty_sections(body)
+    try:
+        body_clean = _shared.strip_empty_sections(body, required_headers=REQUIRED_SECTIONS)
+    except ValueError as exc:
+        print(f"logbook: {exc}", file=sys.stderr)
+        return 1
 
     try:
         mb_root = _shared.mylearnbase_root()
@@ -418,7 +424,7 @@ def main(argv: list[str] | None = None) -> int:
     p_init = sub.add_parser("init", help="Template a fresh capture file with the 7-section structure.")
     p_init.add_argument("project")
     p_init.add_argument("feature_name", help="Slug for the capture (used as filename and metadata).")
-    p_init.add_argument("--title", help="Override the auto-derived title.", default=None)
+    p_init.add_argument("--title", required=True, help="Post title; must read as a real phrase, not a slug fragment.")
     p_init.add_argument("--force", action="store_true", help="Overwrite an existing capture.")
     p_init.set_defaults(handler=cmd_init)
 
