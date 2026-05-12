@@ -2,6 +2,7 @@
 title = "Authoring a logbook entry"
 slug = "authoring-a-logbook-entry"
 date = 2026-05-11
+updated = 2026-05-11
 draft = false
 +++
 
@@ -32,8 +33,9 @@ Use this form when:
 Don't use this form when:
 
 - You're writing a how-to or tutorial. (Use a *workflows* post.)
-- You're explaining a code or design pattern as the post's primary
-  content. (Use a *cookbook* entry.)
+- A concept you didn't understand — and the interactive demo you
+  built to come to understand it — is the post's primary content.
+  (Use a *concepts* post.)
 - The work covers several unrelated features. (Split into multiple
   logbook entries, one per feature.)
 - The take itself is the point. (Use an *opinions* post.)
@@ -78,9 +80,9 @@ Install the tools onto your PATH:
 uv tool install ./mylearnbase/tools
 ```
 
-That installs four executables: `logbook`, `cite`, `cookbook`, `workflows`.
-The logbook flow uses the first two; the others apply to sibling forms
-covered by their own editorial docs.
+That installs `logbook` and `cite` — the two tools the logbook flow
+uses — along with a couple of sibling-form executables you won't
+reach for here.
 
 One separate prerequisite: `showboat` ships as its own package.
 
@@ -117,8 +119,9 @@ documenting:
    optionally `logbook scope`. Each command appends text to the named
    section.
 3. **Add evidence** to *"How do we know it works?"* with `logbook exec`
-   (runnable code), `logbook screenshot` (existing images), and `cite`
-   (commit-pinned code citations).
+   (runnable code), `logbook screenshot` (existing images), `cite`
+   (commit-pinned code citations), and — for interactive features —
+   the `{{/* demo() */}}` shortcode embedded directly in the capture.
 4. **Tag and add tail notes** with `logbook tags "..."` and optional
    `logbook note "- ..."` calls.
 5. **Publish** with `logbook publish <slug>`. Converts the capture to a
@@ -216,8 +219,11 @@ The tool appends verbatim.
 
 ### Adding evidence — `cite`, `logbook exec`, `logbook screenshot`
 
-Three tools, three evidence kinds. All three default to writing into §6
-*(How do we know it works?)*.
+Three CLI tools, three evidence kinds. All three default to writing
+into §6 *(How do we know it works?)*. A fourth evidence kind —
+interactive demos via the `{{/* demo() */}}` shortcode — has no CLI tool
+and is authored by hand; see §6 *(Writing each section well)* for
+when to reach for it.
 
 **`cite`** — form-agnostic, cross-project.
 
@@ -354,10 +360,10 @@ multi-platform feature with one platform in).
 be non-empty but don't constrain what kind of content fills them.
 
 **Tail notes (§7) carry what would otherwise be a separate file.**
-Cookbook candidates noted in §7 sit in context with the feature that
-surfaced them, rather than collecting in a separate registry. Same for
-considered-and-rejected alternatives, deferrals, and known gaps — they
-stay where they came up.
+Things noted while drafting — a deferral with its revisit trigger,
+a considered-and-rejected alternative, a concept that might be worth
+a future demo — sit in context with the feature that surfaced them,
+rather than collecting in a separate registry.
 
 ## Writing each section well
 
@@ -573,6 +579,7 @@ The evidence types and what each one is for:
 |---|---|---|
 | `logbook exec` | The code runs and produces the output it claimed | Tests, scripts, anything with deterministic terminal output |
 | `logbook screenshot` | The feature presents the way it claims | UI features, rendered output, error states |
+| `{{/* demo() */}}` shortcode | The feature behaves as claimed when a reader interacts with it | UI or visual features with meaningful interactivity; portfolio-quality artifacts that benefit from being playable, not just pictured |
 | External observable | The feature is live and reachable | Deployed endpoints, public artifacts |
 | `cite` | *Where* the code lives, with commit pinning | Always usable; never sufficient alone |
 
@@ -656,8 +663,8 @@ this on the next publish.
 
 **Quality bar.**
 
-1. At least one of runnable exec, observable screenshot, or external
-   observable — never citations alone.
+1. At least one of runnable exec, observable screenshot, interactive
+   demo, or external observable — never citations alone.
 2. Each evidence element earns its place. A screenshot of *tooling*
    doesn't prove the feature works; a screenshot of *the feature*
    does.
@@ -669,10 +676,12 @@ this on the next publish.
    *"src/auth.rs:42 — the JWT is issued here"* is a citation.
 
 **Soft ordering within §6.** Not a rule, but the natural progression
-is exec (and its paired cite) → screenshot → cite. From most-objective
-(*"the code runs and outputs X"*) to most-static (*"the code lives at
-this address"*). The ordering tells a reader: *here's the test result;
-here's how it looks; here's where it lives.*
+is exec (and its paired cite) → screenshot → demo → cite. From
+most-objective (*"the code runs and outputs X"*) through visual and
+behavioral evidence (*"here's how it looks"*; *"here's what it does
+when you play with it"*) to most-static (*"the code lives at this
+address"*). The ordering tells a reader: *here's the test result;
+here's how it looks; here's how it behaves; here's where it lives.*
 
 **Practical test.** Cover the section header and read just the
 evidence. Does it answer *"does this feature work?"* If a reader
@@ -687,16 +696,17 @@ code, not evidence — and the section isn't doing its job, even if
 > - Considered passwordless email magic-links instead. Rejected — more
 >   infra (email sender, link expiry, abuse prevention) for marginally
 >   better UX. Revisit if Google's terms become a problem.
-> - The trait-bound JWT generation pattern might be a cookbook entry.
+> - JWT signature verification could be a concepts demo — visualizing
+>   what makes a signed token valid vs forged.
 > - Refresh tokens deferred — 24h JWT lifetime is acceptable for the
 >   multi-device use case. Revisit if re-auth friction surfaces.
 > - Missing test: "user changes their Google email mid-session." Low
 >   priority; on the next sweep.
 
 Each bullet does one thing — a rejected alternative with the reason,
-a cookbook candidate, a deferral with its revisit trigger, a known
-gap with its priority. Future-you walks in knowing where the unsaid
-bits are.
+a concepts-demo candidate, a deferral with its revisit trigger, a
+known gap with its priority. Future-you walks in knowing where the
+unsaid bits are.
 
 **✗ Bad (stale TODOs):**
 
@@ -725,26 +735,26 @@ alternatives, leave §7 empty and let `logbook publish` strip it.
 *"Nothing to note"* is louder than silence.
 
 **Quality bar.** Each bullet does one thing — decision rejected (with
-reason), cookbook candidate, deferral (with revisit trigger), known
-gap (with priority). Skipping is valid.
+reason), concepts-demo candidate, deferral (with revisit trigger),
+known gap (with priority). Skipping is valid.
 
-**Cross-form link patterns.** When a cookbook candidate noted in §7
-later becomes a real cookbook entry, the §7 bullet is updated manually
-with a Zola internal link:
+**Cross-form link patterns.** When a concepts-demo candidate noted
+in §7 later becomes a real concepts post, the §7 bullet is updated
+manually with a Zola internal link:
 
 ```markdown
-- The trait-bound JWT generation pattern is now its own cookbook
-  entry: [trait-bound JWT generation](@/posts/cookbook/trait-bound-jwt-generation.md).
+- JWT signature verification is now its own concepts demo:
+  [what JWT signatures actually do](@/posts/concepts/jwt-signature-verification.md).
 ```
 
 Or, when the discovery narrative isn't worth preserving:
 
 ```markdown
-- See [trait-bound JWT generation](@/posts/cookbook/trait-bound-jwt-generation.md)
-  for the JWT issuance pattern.
+- See [what JWT signatures actually do](@/posts/concepts/jwt-signature-verification.md)
+  for the signature math.
 ```
 
-The cookbook entry's *"Where it shows up"* section gets a
+The concepts post's *"Where this shows up"* section gets a
 corresponding manual link back. Bidirectional updates are the
 author's discipline.
 
@@ -858,7 +868,7 @@ logbook note oauth-login-google \
      better UX. Revisit if Google's terms become a problem."
 
 logbook note oauth-login-google \
-  "- The trait-bound JWT generation pattern might be a cookbook entry."
+  "- JWT signature verification could be a concepts demo — visualizing what makes a signed token valid vs forged."
 
 # 7. Metadata
 logbook tags oauth-login-google "rust, auth, oauth"
@@ -921,7 +931,7 @@ Not in: refresh tokens, account deletion, other providers, session revocation.
 
 - Considered passwordless email magic-links instead. Rejected — more infra (email sender, link expiry, abuse prevention) for marginally better UX. Revisit if Google's terms become a problem.
 
-- The trait-bound JWT generation pattern might be a cookbook entry.
+- JWT signature verification could be a concepts demo — visualizing what makes a signed token valid vs forged.
 ```
 
 ### The published post

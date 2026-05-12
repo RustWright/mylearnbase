@@ -178,15 +178,32 @@ Order:
 
 1. **Phase 6 — cookbook init/publish + workflows publish.** *(2026-05-10: Tasks 11 + 12 both landed ✓. Phase 6 complete.)*
 2. **Phase 7 Task 14 v1 seed — `editorial/POST_SYSTEM.md`.** *(2026-05-10 landed ✓. Single document covering all five forms, designed as reference material for per-form sessions.)*
-3. **Per-form authoring sessions** *(fresh context each, sequence locked 2026-05-10 by user):*
-   - Session A: `editorial/logbook.md`
-   - Session B: `editorial/cookbook.md`
+3. **Per-form authoring sessions** *(fresh context each; cookbook → concepts redesign happened 2026-05-11):*
+   - Session A: `editorial/logbook.md` *(2026-05-11 ✓ — published as `authoring-a-logbook-entry`)*
+   - Session B: `editorial/concepts.md` *(2026-05-11 ✓ — rough/lightweight v0; **form was redesigned from cookbook during this session**, see project.md log)*
    - Session C: `editorial/workflows.md`
    - Session D: `editorial/opinions.md`
    - Session E: `editorial/resources.md`
-4. **Phase 7 Task 13 — `/create-post` skill rewrite.** Built after at least `editorial/logbook.md` exists, so the skill can reference real per-form docs (not just POST_SYSTEM v1). Prompt for form first, route to per-form workflow, refuse LLM-drafted content for human-only sections.
-5. **Phase 5 Task 10 — real-omni-me logbook entry.** Built once `editorial/logbook.md` is final. Use the showboat-backed tools; follow the editorial rules in `editorial/logbook.md`. The canonical first logbook entry, validating the full chain on real content.
-6. **Phase 8 — cycle close.** Final verification sweep, archive plan.
+4. **Phase 7 Task 13 — `/create-post` skill rewrite.** Built after the remaining per-form docs exist. Prompt for form first, route to per-form workflow. Form list updated: logbook / concepts / workflows / opinions / resources (cookbook removed).
+5. **Phase 5 Task 10 — real-omni-me logbook entry.** Built once `editorial/logbook.md` is validated by first real use. The canonical first logbook entry, validating the full chain on real content.
+6. **First concepts post — hash demo.** Identified as first candidate during the 2026-05-11 redesign session. Build after the curiosity-log mechanism is shipped and after at least one cycle of curiosity capture has surfaced surviving candidates (the hash curiosity is already known to survive; the mechanism just needs to exist to format it).
+7. **Curiosity-log mechanism.** Provisional shape: `<project-repo>/.curiosities/<cycle-id>.md`, gitignored in submodule, parent-synced like `.log/`. LLM appends during cycle work; cycle-close session reviews. Design + ship before first concepts post.
+8. **Phase 8 — cycle close.** Final verification sweep, archive plan.
+
+### Cookbook → concepts redesign (2026-05-11)
+
+The "cookbook" form as defined in `POST_SYSTEM.md` v1 (pull out a pattern worth reusing, with code + recognition story as evidence) failed the *satisfying* half of the *useful + satisfying* criterion for this author's workflow. Root cause: heavy LLM reliance for implementation means the pattern itself was rarely the author's intellectual contribution, and the LLM-as-recognizer also dissolves the "I noticed I was doing this twice" trigger. Result: a form that may have fired near-zero times if kept as-is.
+
+**Reframe.** Replace cookbook with **concepts** — interactive demos built to help the author understand something they didn't grasp. The intellectual ownership shifts from "I recognized this pattern" to "I designed this demo to teach me this concept." The latter is LLM-resilient: the LLM can write the code, but choosing what makes the concept teach is the author's work.
+
+**Implications carried forward** (not done in the redesign session):
+
+- `POST_SYSTEM.md`'s cookbook section is stale. The user said "don't care; may delete after all per-form editorials are made." No action this session.
+- The `cookbook init/publish` tools (Phase 6) are left in place but unused for concepts. Repurpose-or-retire is downstream.
+- `editorial/logbook.md` §6 needs a small addition: interactive demos count as a fourth evidence type (alongside cite, showboat exec, showboat image, external observable). Logbook portfolio demos fold into logbook via this addition rather than living as a separate form. Update queued for after workflows/opinions/resources sessions.
+- The provisional sections of `editorial/concepts.md` (5 sections: stake, curiosity moment, demo, what clicked, cross-refs) are starting points; the first real concepts post will reshape them.
+
+The redesign happened entirely in Topic 1 of what was originally planned as a 6-topic walkthrough. Topics 2-6 were skipped because the form was redefined, not documented — prescriptive editorial rules in the abstract would be premature for a form authored zero times.
 
 ### Editorial signals collected (running notes for Task 14)
 

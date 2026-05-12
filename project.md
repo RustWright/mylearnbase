@@ -2,7 +2,7 @@
 
 **Status:** Active
 **Started:** 2026-01-31
-**Current Phase:** Cycle 2 Session 4 — Per-form authoring (1/5) complete; `editorial/logbook.md` drafted and published as `authoring-a-logbook-entry` (2026-05-11). Next: per-form authoring continues in fresh-context sessions — cookbook → workflows → opinions → resources. Skill rewrite (Task 13) and real-content Task 10 follow.
+**Current Phase:** Cycle 2 Session 4 — Per-form authoring (2/5); cookbook form redesigned as **concepts** during Session B (2026-05-11). `editorial/logbook.md` republished with `{{ demo() }}` evidence type; `editorial/concepts.md` v0 written (rough/lightweight, not yet published). Next: per-form sessions continue — workflows → opinions → resources. Curiosity-log mechanism + first concepts post (hash demo) queued after that. Skill rewrite (Task 13) and real-content Task 10 follow.
 **Domain:** mylearnbase.com
 
 ---
@@ -89,7 +89,7 @@
 - [x] Session 4: Implementation (Cycle 1) (2026-02-04 to 2026-02-08)
 - [x] Session 5: Testing/Catchup (Cycle 1) (2026-02-11)
 - [x] Session 6: Tooling (out-of-cycle) (2026-02-18)
-- [~] Cycle 2 Session 4: Implementation — Phases 1-6 + Task 14 v1 + per-form 1/5 (logbook) done (2026-05-09 to 2026-05-11) — cookbook + 3 more + Task 10 carry forward
+- [~] Cycle 2 Session 4: Implementation — Phases 1-6 + Task 14 v1 + per-form 2/5 (logbook + concepts-v0) done (2026-05-09 to 2026-05-11); cookbook form **redesigned as concepts** mid-session; workflows + opinions + resources + Task 10 + curiosity-log + first concepts post carry forward
 
 ---
 
@@ -333,3 +333,43 @@
 - `feedback_per_form_walkthrough_rhythm.md`
 
 **Carry-forward:** cookbook is the next per-form session (fresh context). Then workflows → opinions → resources. Task 13 (skill rewrite) and Task 10 (real omni-me logbook entry) follow.
+
+### Per-form authoring (2/5): cookbook → concepts redesign (2026-05-11)
+
+**Goal:** Second per-form authoring session — produce `editorial/cookbook.md` as a standalone authoring guide and publish it as a workflow post.
+
+**Actual outcome:** Topic 1 (when to use this form) surfaced that cookbook as defined would not survive the user's LLM-heavy workflow. The user articulated that prompting an LLM to implement a pattern doesn't create authentic intellectual ownership of that pattern, and posting it on mylearnbase would feel cheap. The trigger model (logbook §7 callouts, "I'm doing this twice" recognition) also dissolves when the LLM is doing the recognition.
+
+After exploring direction-setting reframes (rejected as another rhetorical move) and the structural option of dropping the form entirely, the user proposed a third path: **elevate demos into a form-level identity, centered on building interactive demos to come to understand concepts.** The author contribution is the design judgment about what teaches the concept — survivable under heavy LLM use.
+
+**Form redesign:**
+
+- **New form name (provisional):** concepts. Replaces cookbook in the five-form taxonomy.
+- **Job:** Build an interactive demo to help the author (and reader) understand a concept the author didn't fully grasp.
+- **Trigger:** Cycle-close review of a curiosity log — LLM-tracked during cycle work, reviewed at cycle close, survivors become candidates.
+- **Cadence:** Lower than cookbook ever was. Zero per cycle is a normal outcome.
+- **Distinction from logbook portfolio demos:** Same `{{ demo() }}` shortcode, different role. Logbook demo = evidence-of-feature; concepts demo = teaching-instrument.
+
+**Artifacts written this session:**
+
+- `editorial/concepts.md` — rough/lightweight v0. Intentionally less prescriptive than `editorial/logbook.md` because the form has zero real posts; the first concepts post (hash demo) will pressure-test the doc and drive its v1. Not yet published as a workflow post (waiting until form has been validated in practice).
+- `editorial/logbook.md` updates — added `{{ demo() }}` as a fourth evidence type in §6 (so logbook portfolio demos fold into logbook); swapped all 13 cookbook references for concepts/demo equivalents; rethemed the §7 worked-example note from "trait-bound JWT pattern → cookbook" to "JWT signature verification → concepts demo." Republished cleanly via `workflows publish` (date preserved, updated = 2026-05-11, zola check clean).
+- `tasks.md` carry-forward updated with the redesign, the new per-form sequence (workflows next, then opinions, resources), the curiosity-log mechanism design+ship task, and the first concepts post (hash demo) task.
+
+**First concepts post candidate:** A demo explaining what hash functions do (SHA-256 vs SHA-512, avalanche effect, simulated upload-validation handshake), sourced from the user's omni-me upload-validation work where they realized mid-implementation they didn't understand hashes.
+
+**Implications carried forward (not done in session):**
+
+- POST_SYSTEM.md v1's cookbook section is stale; user said don't care, may delete after all per-form editorials are done.
+- The `cookbook init/publish` tools (Phase 6) are left in place but unused for concepts. Repurpose-or-retire is downstream.
+- The curiosity-log mechanism is provisional shape only — design + ship before first concepts post.
+
+**Memory entries saved:**
+
+- `project_cookbook_to_concepts_redesign.md` (new)
+- `feedback_form_design_requires_author_contribution.md` (new — the load-bearing design principle)
+- `project_curiosity_log_mechanism.md` (new — the provisional trigger mechanism)
+- `project_logbook_arc_complete.md` (updated — now reflects 2/5 progress)
+- `project_logbook_vs_cookbook.md` (deleted — superseded by the redesign)
+
+**Carry-forward:** workflows is the next per-form session (fresh context). Then opinions → resources. Curiosity-log mechanism + first concepts post (hash demo) follow. Task 13 (skill rewrite) and Task 10 (real omni-me logbook entry) still queued.
