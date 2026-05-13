@@ -2,7 +2,7 @@
 
 **Status:** Active
 **Started:** 2026-01-31
-**Current Phase:** Cycle 2 Session 4 — Per-form authoring (2/5); cookbook form redesigned as **concepts** during Session B (2026-05-11). `editorial/logbook.md` republished with `{{ demo() }}` evidence type; `editorial/concepts.md` v0 written (rough/lightweight, not yet published). Next: per-form sessions continue — workflows → opinions → resources. Curiosity-log mechanism + first concepts post (hash demo) queued after that. Skill rewrite (Task 13) and real-content Task 10 follow.
+**Current Phase:** Cycle 2 Session 4 — Per-form authoring (3/5); workflows landed 2026-05-13 with `--supersede-from` + image-copy additions to the tool. `editorial/workflows.md` written + published as `authoring-a-workflows-post`. Next: per-form sessions continue — opinions → resources. Curiosity-log mechanism + first concepts post (hash demo) queued after that. Skill rewrite (Task 13) and real-content Task 10 follow.
 **Domain:** mylearnbase.com
 
 ---
@@ -89,7 +89,7 @@
 - [x] Session 4: Implementation (Cycle 1) (2026-02-04 to 2026-02-08)
 - [x] Session 5: Testing/Catchup (Cycle 1) (2026-02-11)
 - [x] Session 6: Tooling (out-of-cycle) (2026-02-18)
-- [~] Cycle 2 Session 4: Implementation — Phases 1-6 + Task 14 v1 + per-form 2/5 (logbook + concepts-v0) done (2026-05-09 to 2026-05-11); cookbook form **redesigned as concepts** mid-session; workflows + opinions + resources + Task 10 + curiosity-log + first concepts post carry forward
+- [~] Cycle 2 Session 4: Implementation — Phases 1-6 + Task 14 v1 + per-form 3/5 (logbook + concepts-v0 + workflows) done (2026-05-09 to 2026-05-13); cookbook form **redesigned as concepts** during Session B; `workflows publish` extended with `--supersede-from` + image-copy during Session C; opinions + resources + Task 10 + curiosity-log + first concepts post carry forward
 
 ---
 
@@ -373,3 +373,35 @@ After exploring direction-setting reframes (rejected as another rhetorical move)
 - `project_logbook_vs_cookbook.md` (deleted — superseded by the redesign)
 
 **Carry-forward:** workflows is the next per-form session (fresh context). Then opinions → resources. Curiosity-log mechanism + first concepts post (hash demo) follow. Task 13 (skill rewrite) and Task 10 (real omni-me logbook entry) still queued.
+
+### Per-form authoring (3/5): workflows (2026-05-13)
+
+**Goal:** Third per-form authoring session — produce `editorial/workflows.md` as a standalone authoring guide and publish it as a workflow post.
+
+**Process:** Topics 1-6 walkthrough per the locked rhythm. Two structural decisions surfaced during Topic 1 and reshaped the form's framing:
+
+1. **Binary category split, not ternary.** POST_SYSTEM v1's three categories (LLM-referenced / coding-not-LLM / non-coding-personal) collapsed to two — LLM-referenced and personal-reference — when the user identified that the load-bearing axis is **who reads it in the future**, not whether it's code-related. Both categories can be LLM-collaborative in authoring; consumption is what splits them.
+2. **Cat 1 has dual-reader pressure; Cat 2 doesn't.** Cat 1's source doc serves an LLM at session start AND a stranger on mylearnbase; the editorial discipline is "make it work for both, optimize for the human in conflicts." Cat 2's only future reader is future-self.
+
+**Tool changes (Topic 2 surfaced and landed same session):**
+
+- `workflows publish --supersede-from <old-slug>` — net-new operation. Writes new post at new slug + adds `extra.superseded_by` banner to the old post. Both pass `zola check` together.
+- `_frontmatter.read_all(path)` — new helper (factored from `read_keys` via a shared `_parse_block_flat`); returns the full nested-dict shape that `render` consumes. Used by the supersession edit on the old post.
+- `--slug` semantics tightened: error if `--slug` differs from auto AND a post exists at the auto-slug (orphan prevention). Error message names the fix.
+- Image copy added (parity with logbook/cookbook publish) — referenced local images copied to dest dir.
+- 9 hand-verified test cases covering first publish, vanilla republish, supersession happy path, three supersession error paths, slug-mismatch orphan prevention, dry-run with supersession note, and existing real post unaffected. Committed `ca69ad4`.
+
+**Editorial decisions (Topics 3-5):**
+
+- **Cat 1 section template:** none prescribed. Initial draft included a descriptive "long-form Cat 1 docs converge on this arc" table — user judged unhelpful and asked it removed. Final stance: "structure follows the source doc," full stop.
+- **Cat 2 section template:** deferred pending first real Cat 2 post. Same pattern as concepts — don't prescribe before lived data exists. Memory `feedback_form_design_requires_author_contribution.md` is the load-bearing principle.
+- **Jargon rule refinement:** the anti-jargon rule has a finer edge for workflows. When a doc *defines* its process vocabulary, those terms are content (Cycle, Session, Phase as defined in `PROJECT_PROCESS.md`). What stays jargon: *instance references* ("we decided this in Cycle 2 Session 3") and inherited-vocab-without-redefinition ("the M2 milestone" with no anchor). Saved as `feedback_jargon_rule_defines_vs_instances.md`.
+- **Writing-well ↔ anti-patterns overlap:** because workflows has no per-section structure, the doc-level "writing well" and form-level "anti-patterns" sections collided at the same level. User flagged the redundancy; anti-patterns trimmed from 7 entries to 2 (Speculative workflow + Trying to rename when intent is supersede). Saved as `feedback_per_form_section_overlap.md` for the next per-form sessions.
+
+**Final state:**
+
+- `editorial/workflows.md`: ~410-line editorial doc.
+- `content/posts/workflows/authoring-a-workflows-post.md`: live; `draft = false`, `date = 2026-05-13`.
+- Site: 11 pages, 7 sections, 0 orphans, clean.
+
+**Carry-forward:** opinions is the next per-form session (fresh context). Then resources. Curiosity-log mechanism + first concepts post (hash demo) follow. Task 13 (skill rewrite) and Task 10 (real omni-me logbook entry) still queued. Open mechanism question from this session: where the "sync-after-edit-source" reminder lives (source doc / `/create-post` skill / `CLAUDE.md`) — deferred to Task 13 or Task 15. Duplicate-source-docs hygiene is a known sharp edge that needs a meta-process fix (Task 15).

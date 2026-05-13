@@ -181,7 +181,7 @@ Order:
 3. **Per-form authoring sessions** *(fresh context each; cookbook → concepts redesign happened 2026-05-11):*
    - Session A: `editorial/logbook.md` *(2026-05-11 ✓ — published as `authoring-a-logbook-entry`)*
    - Session B: `editorial/concepts.md` *(2026-05-11 ✓ — rough/lightweight v0; **form was redesigned from cookbook during this session**, see project.md log)*
-   - Session C: `editorial/workflows.md`
+   - Session C: `editorial/workflows.md` *(2026-05-13 ✓ — published as `authoring-a-workflows-post`; tool extended with `--supersede-from` + image copy)*
    - Session D: `editorial/opinions.md`
    - Session E: `editorial/resources.md`
 4. **Phase 7 Task 13 — `/create-post` skill rewrite.** Built after the remaining per-form docs exist. Prompt for form first, route to per-form workflow. Form list updated: logbook / concepts / workflows / opinions / resources (cookbook removed).
