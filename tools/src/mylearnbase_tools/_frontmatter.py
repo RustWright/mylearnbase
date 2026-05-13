@@ -84,18 +84,9 @@ def _split_array(inner: str) -> list[str]:
     return [i.strip() for i in items if i.strip()]
 
 
-def read_keys(path: Path | str, keys: Sequence[str]) -> dict[str, Any]:
-    """Extract specific keys from a frontmatter block.
-
-    Keys may be top-level (`"title"`) or dotted to address a table
-    (`"extra.outdate_alert_days"`, `"taxonomies.tags"`).
-
-    Missing keys are simply absent from the result; the caller checks with
-    `key in result` rather than relying on a sentinel.
-    """
-    text = Path(path).read_text(encoding="utf-8")
+def _parse_block_flat(text: str) -> dict[str, Any]:
+    """Return a flat dict of all keys in the frontmatter block; dotted for table keys."""
     lines = _extract_block(text)
-
     current_table = ""
     parsed: dict[str, Any] = {}
     for line in lines:
@@ -111,12 +102,40 @@ def read_keys(path: Path | str, keys: Sequence[str]) -> dict[str, Any]:
         key = key.strip()
         full_key = f"{current_table}.{key}" if current_table else key
         parsed[full_key] = _parse_value(raw_val)
+    return parsed
 
-    requested: dict[str, Any] = {}
-    for k in keys:
-        if k in parsed:
-            requested[k] = parsed[k]
-    return requested
+
+def read_keys(path: Path | str, keys: Sequence[str]) -> dict[str, Any]:
+    """Extract specific keys from a frontmatter block.
+
+    Keys may be top-level (`"title"`) or dotted to address a table
+    (`"extra.outdate_alert_days"`, `"taxonomies.tags"`).
+
+    Missing keys are simply absent from the result; the caller checks with
+    `key in result` rather than relying on a sentinel.
+    """
+    text = Path(path).read_text(encoding="utf-8")
+    parsed = _parse_block_flat(text)
+    return {k: parsed[k] for k in keys if k in parsed}
+
+
+def read_all(path: Path | str) -> dict[str, Any]:
+    """Read every key from a frontmatter block as a nested dict matching `render`'s input.
+
+    Top-level scalars come back as `{key: value}`; table entries fold into
+    `{table_name: {sub_key: value}}`. The returned shape round-trips through
+    `render` cleanly for the post schemas the tools generate.
+    """
+    text = Path(path).read_text(encoding="utf-8")
+    flat = _parse_block_flat(text)
+    nested: dict[str, Any] = {}
+    for full_key, value in flat.items():
+        if "." in full_key:
+            table, sub_key = full_key.split(".", 1)
+            nested.setdefault(table, {})[sub_key] = value
+        else:
+            nested[full_key] = value
+    return nested
 
 
 def _format_value(value: Any) -> str:
