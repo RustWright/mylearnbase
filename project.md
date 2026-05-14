@@ -2,7 +2,7 @@
 
 **Status:** Active
 **Started:** 2026-01-31
-**Current Phase:** Cycle 2 Session 4 — Per-form authoring (3/5); workflows landed 2026-05-13 with `--supersede-from` + image-copy additions to the tool. `editorial/workflows.md` written + published as `authoring-a-workflows-post`. Next: per-form sessions continue — opinions → resources. Curiosity-log mechanism + first concepts post (hash demo) queued after that. Skill rewrite (Task 13) and real-content Task 10 follow.
+**Current Phase:** Cycle 2 Session 4 — Per-form authoring (4/5); opinions landed 2026-05-14. `editorial/opinions.md` written + published as `authoring-an-opinions-post`. Walkthrough refinements: provocation reframed from opposing to extreme-same-direction; fast/slow reframed as à-la-carte phase spectrum; Tier 1 substantive feedback runs as suggest-then-decide; mechanical pass implements approved fixes directly. Next: resources is the final per-form session. Curiosity-log mechanism + first concepts post (hash demo) queued after that. Skill rewrite (Task 13) and real-content Task 10 follow.
 **Domain:** mylearnbase.com
 
 ---
@@ -89,7 +89,7 @@
 - [x] Session 4: Implementation (Cycle 1) (2026-02-04 to 2026-02-08)
 - [x] Session 5: Testing/Catchup (Cycle 1) (2026-02-11)
 - [x] Session 6: Tooling (out-of-cycle) (2026-02-18)
-- [~] Cycle 2 Session 4: Implementation — Phases 1-6 + Task 14 v1 + per-form 3/5 (logbook + concepts-v0 + workflows) done (2026-05-09 to 2026-05-13); cookbook form **redesigned as concepts** during Session B; `workflows publish` extended with `--supersede-from` + image-copy during Session C; opinions + resources + Task 10 + curiosity-log + first concepts post carry forward
+- [~] Cycle 2 Session 4: Implementation — Phases 1-6 + Task 14 v1 + per-form 4/5 (logbook + concepts-v0 + workflows + opinions) done (2026-05-09 to 2026-05-14); cookbook form **redesigned as concepts** during Session B; `workflows publish` extended with `--supersede-from` + image-copy during Session C; opinions doc surfaced provocation reframe + entry-point spectrum + suggest-then-decide Tier 1 during Session D; resources + Task 10 + curiosity-log + first concepts post carry forward
 
 ---
 
@@ -405,3 +405,47 @@ After exploring direction-setting reframes (rejected as another rhetorical move)
 - Site: 11 pages, 7 sections, 0 orphans, clean.
 
 **Carry-forward:** opinions is the next per-form session (fresh context). Then resources. Curiosity-log mechanism + first concepts post (hash demo) follow. Task 13 (skill rewrite) and Task 10 (real omni-me logbook entry) still queued. Open mechanism question from this session: where the "sync-after-edit-source" reminder lives (source doc / `/create-post` skill / `CLAUDE.md`) — deferred to Task 13 or Task 15. Duplicate-source-docs hygiene is a known sharp edge that needs a meta-process fix (Task 15).
+
+### Per-form authoring (4/5): opinions (2026-05-14)
+
+**Goal:** Fourth per-form authoring session — produce `editorial/opinions.md` as a standalone authoring guide and publish it as a workflow post.
+
+**Process:** Topics 1-6 walkthrough per the locked rhythm. Each topic synthesized POST_SYSTEM v1's 10-day-old opinion-section content + relevant memory entries, pressure-tested against current intent, and locked.
+
+**Topic 1 lock:** willingness-to-post / writing-practice / take-is-the-point framing all still hold. **Dropped** the three origination paths (reactive / reflective / cross-form spillover) from the editorial doc — user identified they don't change handling, so enumerating them was scaffolding not structure.
+
+**Topic 2 lock:** 7-phase workflow table stays canonical. Added title concern via two micro-additions inside existing phases — Phase 1 / starter template annotates "working title is fine"; Phase 6 adds "title revisit (low-stakes glance, time-box it)" as a default-on sub-step of the mechanical pass. No new phase number.
+
+**Topic 3 lock — significant corrections:**
+
+- *Tier 1 substantive feedback mechanism:* LLM **suggests** "want Tier 1 feedback?" on draft share; user accepts or declines per-post. Threads the willingness-to-post needle between auto-critique-pressure and full silence. Tiers 2/3/4 stay request-only.
+- *Provocation reframed from opposing-position to extreme-same-direction:* the LLM should propose the user's own argument pushed to absurdity along its existing dimension, not a counter-argument. Memory `feedback_opinions_prompting_modes.md` corrected.
+- *Default chain locked:* provocation-first opener, mirror-and-probe consolidates, pause-and-ask between cycles, iterate (provocation→mirror OR multiple-framings→mirror), summary on request closes Phase 1.
+- *Letters (C/D/F) dropped:* user pointed out they were misleading without A/B/E. Use names only.
+
+**Topic 4 lock — structural cleanup:**
+
+- *No standalone "Writing Well" section.* The three of four proposed concerns (own the take / length follows take / voice / specificity) overlapped with Phase 4 tier definitions and Phase 6 mechanical checks. Resolution: define each tier/pass check at its application site (Phase 4 tier definitions inline; Phase 6 checklist inline). One definition, no catalog drift.
+- *Author disciplines:* slim subsection (own the take + length follows take) for the non-LLM-checkable items.
+- *Anti-patterns:* form-level only, no Writing-Well-in-reverse.
+
+**Topic 5 lock:** 6 anti-patterns (user dropped 2 of my initial 8 — running-all-modes and provocation-ceiling — because the chain's "user picks next" already prevents both organically).
+
+**Topic 6 lock — two refinements:**
+
+- *Mechanical pass implements approved fixes directly.* Asymmetry vs. Phase 4: substantive feedback requires user voice/judgment (user reworks prose); mechanical fixes are surface-level and unambiguous once approved (LLM implements). Phase 6 is the one phase where LLM modifies the post.
+- *Fast/slow reframed as entry-point spectrum, not binary.* Phases are à la carte; user enters at any phase and walks forward. LLM detects entry point by user-declaration / one-question-ask-if-ambiguous / artifact-inference.
+
+**Publish:** Dry-run clean; published in one shot (no orphan, no zola check failures). Site: 12 pages, 7 sections, 0 orphans.
+
+**Final state:**
+
+- `editorial/opinions.md`: 445 lines (449 → 445 after verbosity pass dropped re-enumerated origination paths + four minor restatements).
+- `content/posts/workflows/authoring-an-opinions-post.md`: live; `draft = false`, `date = 2026-05-14`.
+
+**Memory entries saved/updated:**
+
+- `feedback_opinions_prompting_modes.md` (rewritten — corrected provocation to extreme-same-direction; added default chain; dropped letter labels)
+- `project_logbook_arc_complete.md` (updated — now reflects 4/5 progress)
+
+**Carry-forward:** resources is the final per-form session (fresh context). Curiosity-log mechanism + first concepts post (hash demo) follow. Task 13 (skill rewrite) and Task 10 (real omni-me logbook entry) still queued.

@@ -182,7 +182,7 @@ Order:
    - Session A: `editorial/logbook.md` *(2026-05-11 ✓ — published as `authoring-a-logbook-entry`)*
    - Session B: `editorial/concepts.md` *(2026-05-11 ✓ — rough/lightweight v0; **form was redesigned from cookbook during this session**, see project.md log)*
    - Session C: `editorial/workflows.md` *(2026-05-13 ✓ — published as `authoring-a-workflows-post`; tool extended with `--supersede-from` + image copy)*
-   - Session D: `editorial/opinions.md`
+   - Session D: `editorial/opinions.md` *(2026-05-14 ✓ — published as `authoring-an-opinions-post`; provocation reframed to extreme-same-direction, fast/slow → entry-point spectrum, Tier 1 = suggest-then-decide, mechanical pass implements approved fixes)*
    - Session E: `editorial/resources.md`
 4. **Phase 7 Task 13 — `/create-post` skill rewrite.** Built after the remaining per-form docs exist. Prompt for form first, route to per-form workflow. Form list updated: logbook / concepts / workflows / opinions / resources (cookbook removed).
 5. **Phase 5 Task 10 — real-omni-me logbook entry.** Built once `editorial/logbook.md` is validated by first real use. The canonical first logbook entry, validating the full chain on real content.
