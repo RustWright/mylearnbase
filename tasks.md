@@ -128,13 +128,13 @@ This is also the validation that capture commands meet the <10 second friction b
 
 ### 14. Author per-form docs in `editorial/` (POST_SYSTEM.md is the seed)
 - [x] **v1 seed landed 2026-05-10** at `editorial/POST_SYSTEM.md` — 512 lines, all five forms, structured uniformly (*When to use* → *Tools* → *Editorial per section* → *Anti-patterns*). Designed as reference material for the per-form sessions, not as the final destination.
-- [ ] **Per-form rollout sequence** (separate fresh-context sessions, planned 2026-05-10):
-  1. `editorial/logbook.md` — first, because Task 10 depends on it
-  2. `editorial/cookbook.md`
-  3. `editorial/workflows.md`
-  4. `editorial/opinions.md`
-  5. `editorial/resources.md`
-- [ ] Each per-form session pulls the corresponding section from `editorial/POST_SYSTEM.md` v1, refines for that form's lived authoring rhythm, and decides whether the v1 section is replaced with a pointer or removed entirely.
+- [x] **Per-form rollout sequence complete** (separate fresh-context sessions, 2026-05-11 → 2026-05-14):
+  1. `editorial/logbook.md` ✓ (2026-05-11)
+  2. `editorial/concepts.md` ✓ (2026-05-11; **cookbook redesigned to concepts during this session**)
+  3. `editorial/workflows.md` ✓ (2026-05-13)
+  4. `editorial/opinions.md` ✓ (2026-05-14)
+  5. `editorial/resources.md` ✓ (2026-05-14)
+- [x] Each per-form session pulled the corresponding section from `editorial/POST_SYSTEM.md` v1, refined for that form's lived authoring rhythm, and surfaced load-bearing reframes (concepts redesign, binary-category split, provocation reframe, by-act curation). POST_SYSTEM.md v1 deletion now unlocked (user: "don't care; may delete after all per-form editorials are made").
 - [ ] We also need a project document that can be referenced when creating new tags because the current strategy for creating tags randomly is creating an incoherent and confused tagging system
 - [ ] The current home page has no way to access any of the new type of posts other than direct url entry
 
@@ -183,7 +183,7 @@ Order:
    - Session B: `editorial/concepts.md` *(2026-05-11 ✓ — rough/lightweight v0; **form was redesigned from cookbook during this session**, see project.md log)*
    - Session C: `editorial/workflows.md` *(2026-05-13 ✓ — published as `authoring-a-workflows-post`; tool extended with `--supersede-from` + image copy)*
    - Session D: `editorial/opinions.md` *(2026-05-14 ✓ — published as `authoring-an-opinions-post`; provocation reframed to extreme-same-direction, fast/slow → entry-point spectrum, Tier 1 = suggest-then-decide, mechanical pass implements approved fixes)*
-   - Session E: `editorial/resources.md`
+   - Session E: `editorial/resources.md` *(2026-05-14 ✓ — published as `authoring-a-resources-post`; author contribution **by-act** framing (curation-by-act, not prose-per-bullet), sub-types 3 → 2 (question-driven dropped), Topic 4 fully collapsed as standalone section)*
 4. **Phase 7 Task 13 — `/create-post` skill rewrite.** Built after the remaining per-form docs exist. Prompt for form first, route to per-form workflow. Form list updated: logbook / concepts / workflows / opinions / resources (cookbook removed).
 5. **Phase 5 Task 10 — real-omni-me logbook entry.** Built once `editorial/logbook.md` is validated by first real use. The canonical first logbook entry, validating the full chain on real content.
 6. **First concepts post — hash demo.** Identified as first candidate during the 2026-05-11 redesign session. Build after the curiosity-log mechanism is shipped and after at least one cycle of curiosity capture has surfaced surviving candidates (the hash curiosity is already known to survive; the mechanism just needs to exist to format it).

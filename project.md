@@ -2,7 +2,7 @@
 
 **Status:** Active
 **Started:** 2026-01-31
-**Current Phase:** Cycle 2 Session 4 — Per-form authoring (4/5); opinions landed 2026-05-14. `editorial/opinions.md` written + published as `authoring-an-opinions-post`. Walkthrough refinements: provocation reframed from opposing to extreme-same-direction; fast/slow reframed as à-la-carte phase spectrum; Tier 1 substantive feedback runs as suggest-then-decide; mechanical pass implements approved fixes directly. Next: resources is the final per-form session. Curiosity-log mechanism + first concepts post (hash demo) queued after that. Skill rewrite (Task 13) and real-content Task 10 follow.
+**Current Phase:** Cycle 2 Session 4 — Per-form authoring sweep **COMPLETE** (5/5); resources landed 2026-05-14. `editorial/resources.md` written + published as `authoring-a-resources-post`. Walkthrough refinements: job statement sharpened to "future-you can find them in one place when the need arises"; author contribution framed as **implicit by curation-by-act** (not prose-per-bullet); sub-types collapsed 3 → 2 (question-driven dropped); Topic 4 (writing-well) skipped as standalone section — third consecutive form to do so. Remaining Cycle 2 work: Task 13 (`/create-post` skill rewrite), Task 10 (real omni-me logbook entry), curiosity-log mechanism, first concepts post (hash demo), Phase 8 cycle close, POST_SYSTEM.md v1 deletion (now unlocked).
 **Domain:** mylearnbase.com
 
 ---
@@ -89,7 +89,7 @@
 - [x] Session 4: Implementation (Cycle 1) (2026-02-04 to 2026-02-08)
 - [x] Session 5: Testing/Catchup (Cycle 1) (2026-02-11)
 - [x] Session 6: Tooling (out-of-cycle) (2026-02-18)
-- [~] Cycle 2 Session 4: Implementation — Phases 1-6 + Task 14 v1 + per-form 4/5 (logbook + concepts-v0 + workflows + opinions) done (2026-05-09 to 2026-05-14); cookbook form **redesigned as concepts** during Session B; `workflows publish` extended with `--supersede-from` + image-copy during Session C; opinions doc surfaced provocation reframe + entry-point spectrum + suggest-then-decide Tier 1 during Session D; resources + Task 10 + curiosity-log + first concepts post carry forward
+- [~] Cycle 2 Session 4: Implementation — Phases 1-6 + Task 14 v1 + per-form **5/5** (logbook + concepts-v0 + workflows + opinions + resources) done (2026-05-09 to 2026-05-14); cookbook form **redesigned as concepts** during Session B; `workflows publish` extended with `--supersede-from` + image-copy during Session C; opinions doc surfaced provocation reframe + entry-point spectrum + suggest-then-decide Tier 1 during Session D; resources doc landed by-act curation framing + sub-type collapse during Session E; Task 13 + Task 10 + curiosity-log + first concepts post + Phase 8 cycle close carry forward
 
 ---
 
@@ -449,3 +449,52 @@ After exploring direction-setting reframes (rejected as another rhetorical move)
 - `project_logbook_arc_complete.md` (updated — now reflects 4/5 progress)
 
 **Carry-forward:** resources is the final per-form session (fresh context). Curiosity-log mechanism + first concepts post (hash demo) follow. Task 13 (skill rewrite) and Task 10 (real omni-me logbook entry) still queued.
+
+### Per-form authoring (5/5): resources (2026-05-14)
+
+**Goal:** Final per-form authoring session — produce `editorial/resources.md` as a standalone authoring guide and publish it as a workflow post.
+
+**Process:** Topics 1-6 walkthrough per the locked rhythm. User's repeated framing throughout: "resources is the form I'm least worried about." Topics ran through quickly; Topic 4 (writing-well) skipped entirely as standalone section — third consecutive form to do so (workflows trimmed, opinions dropped, resources skipped).
+
+**Topic 1 lock — POST_SYSTEM v1 reframed:**
+
+- Job sharpened: "**future-you can find them in one place when the need arises**" — motivating scenario is future-you remembering doing a similar project and wanting the consolidated entry point.
+- Author contribution is **implicit by curation-by-act** — having used a resource during a project, or saved a bookmark deliberately, IS the curation. LLM does the surface work (gather, organize, format).
+- Sub-types: 3 → 2 (project-derived + collection-driven; question-driven dropped because LLM-curated answers would fail the by-act floor).
+- Dropped: path-priority ranking (predictive without data), cadence framing (not worth real estate), single-resource boundary question (premature).
+
+**Topic 2 lock:** no form-specific tool (same as opinions). Draft directly at `content/posts/resources/<slug>.md`. `zola check` + `cite` apply as general cross-form tools; no per-form call-out needed. Bookmark-import and `--supersede-from` parallel intentionally absent from the doc.
+
+**Topic 3 lock — three corrections from v1:**
+
+- Sections 7 → 6 (read-state legend dropped as standalone section; folded into §2 summary blockquote when used).
+- §5 cross-references to logbook: **soft convention** (not publish-time gate) for the project-derived path.
+- Per-bullet structure: descriptive line (LLM-first) + optional context line, fully discretionary with no floor. User stance: "if there's nothing important to be said, then there's nothing to be said other than providing the link."
+
+**Topic 4 skipped** as standalone section (confirmed pattern from `feedback_per_form_section_overlap`).
+
+**Topic 5 lock — four anti-patterns:** title-paraphrase / no-lived-curation / unmarked-mixed-states / vendor-marketing-tone. V1's "no opinion glue" anti-pattern dropped (contradicted Topic 3 lock); "forgetting to bump `updated`" dropped (cross-form hygiene, not per-form).
+
+**Topic 6 lock:** project-derived 7-step walkthrough (trigger → gather → draft → LLM organize → user edit → bidirectional backlink → publish). Collection-driven documented as four divergences from project-derived. Worked example skipped on user request. Frontmatter shape kept inline (no init tool means doc must spell it out).
+
+**Publish:** Dry-run clean; one-shot publish. Doc 165 lines (184 → 165 after verbosity pass cut decorative intro paragraph, cadence-anxiety paragraph, non-existent-tool callouts, and final recap line; plus typo fix).
+
+**Final state:**
+
+- `editorial/resources.md`: 165 lines.
+- `content/posts/workflows/authoring-a-resources-post.md`: live; `draft = false`, `date = 2026-05-14`.
+
+**Memory entries saved/updated:**
+
+- `feedback_author_contribution_by_act.md` (new — refinement of `feedback_form_design_requires_author_contribution` covering the by-act-vs-by-prose temporal distinction)
+- `project_logbook_arc_complete.md` (updated — arc closed, 5/5 complete; renamed to "all-five-per-form-editorial-arcs-complete")
+- `feedback_per_form_section_overlap.md` (updated — resources confirmed pattern across 3 of 5 forms)
+
+**Carry-forward:** Per-form authoring sweep is **complete**. Remaining Cycle 2 work:
+
+- Task 13 — `/create-post` skill rewrite. Form list locked at logbook / concepts / workflows / opinions / resources.
+- Task 10 — real omni-me logbook entry. Canonical first logbook entry; validates the full chain on real content.
+- Curiosity-log mechanism — design + ship before first concepts post.
+- First concepts post (hash demo) — after curiosity-log mechanism is live.
+- Phase 8 — cycle close: verification sweep + archive POST_SYSTEM_PLAN.md.
+- POST_SYSTEM.md v1 deletion (now unlocked).
