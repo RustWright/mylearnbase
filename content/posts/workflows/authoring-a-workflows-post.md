@@ -3,6 +3,9 @@ title = "Authoring a workflows post"
 slug = "authoring-a-workflows-post"
 date = 2026-05-13
 draft = false
+
+[taxonomies]
+tags = ["post-system", "meta"]
 +++
 
 A workflows post describes a *prescriptive process* — how to do

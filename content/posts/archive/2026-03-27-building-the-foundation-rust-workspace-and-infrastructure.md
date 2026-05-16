@@ -1,6 +1,7 @@
 +++
 title = "Building the Foundation: Rust Workspace, Database Layer, and CI/CD"
 slug = "building-the-foundation-rust-workspace-and-infrastructure"
+aliases = ["/posts/building-the-foundation-rust-workspace-and-infrastructure/"]
 date = 2026-03-27
 draft = false
 
@@ -37,7 +38,7 @@ The core tension I'm trying to resolve is wanting to move fast without getting i
 
 ## Tutorial: From POC to Production Workspace — Rust Monorepo, SurrealDB Schema, Axum Server, and CI/CD
 
-The [previous post](@/posts/2026-03-08-validating-a-rust-mobile-app-stack.md) in this series validated the technology stack with 5 proof-of-concept tests: Tauri v2, Dioxus WASM, SurrealDB embedded, CodeMirror 6, and Android APK deployment. Every POC passed. The stack works.
+The [previous post](@/posts/archive/2026-03-08-validating-a-rust-mobile-app-stack.md) in this series validated the technology stack with 5 proof-of-concept tests: Tauri v2, Dioxus WASM, SurrealDB embedded, CodeMirror 6, and Android APK deployment. Every POC passed. The stack works.
 
 This post covers Phase 1: turning that pile of throwaway POC code into real project infrastructure. Four tasks were completed across two working sessions (March 25-26, 2026):
 

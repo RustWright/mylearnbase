@@ -1,6 +1,7 @@
 +++
 title = "Event Sourcing, Sync Protocol, and the LLM Pipeline"
 slug = "event-sourcing-sync-and-llm-pipeline"
+aliases = ["/posts/event-sourcing-sync-and-llm-pipeline/"]
 date = 2026-04-11
 draft = false
 
@@ -16,7 +17,7 @@ series_order = 3
 
 It's been almost two weeks since the last post. The work covered here was actually completed right after the previous post — I finished it in a three-day stretch from March 27 to 30. But when it came time to sit down and write this reflection, I started overthinking it and let other things in my life take over.
 
-The overall approach I described in the last post — getting out of the LLM's way to maintain development velocity — worked well. But there seems to be a weird conservation-of-effort effect at play: even after getting so much done so quickly, I let the project sit untouched for almost two weeks. I'll be picking it back up after releasing this article and its [companion post](@/posts/2026-03-30-from-shell-to-ship-ui-features-and-android.md) about the later phases of Cycle 1.
+The overall approach I described in the last post — getting out of the LLM's way to maintain development velocity — worked well. But there seems to be a weird conservation-of-effort effect at play: even after getting so much done so quickly, I let the project sit untouched for almost two weeks. I'll be picking it back up after releasing this article and its [companion post](@/posts/archive/2026-03-30-from-shell-to-ship-ui-features-and-android.md) about the later phases of Cycle 1.
 
 I'm still wrestling with how to stay knowledgeable about my own codebase. In the last post, I mentioned some overly complicated knowledge-test idea — a theory portion plus a practical portion — which sounds more and more daunting the more I think about it. But while proofreading this article, I realized I could get most of that value by leveraging what already exists: I asked myself whether I could just add quizzes to the mylearnbase project.
 
@@ -28,7 +29,7 @@ As for the practical side, I use a learning output style when working with Claud
 
 ## Tutorial: The Invisible Engine --- Event Store, Sync, and LLM Processing in Rust
 
-The [previous post](@/posts/2026-03-27-building-the-foundation-rust-workspace-and-infrastructure.md) set up the workspace scaffold, the SurrealDB connection layer, the Axum server skeleton, and CI/CD. That was Phase 1 --- the skeleton. This post covers Phases 2 and 3: the event store, the sync protocol, the projection framework, and the LLM processing pipeline. None of this has a UI yet. It is the invisible engine that everything visible will eventually depend on.
+The [previous post](@/posts/archive/2026-03-27-building-the-foundation-rust-workspace-and-infrastructure.md) set up the workspace scaffold, the SurrealDB connection layer, the Axum server skeleton, and CI/CD. That was Phase 1 --- the skeleton. This post covers Phases 2 and 3: the event store, the sync protocol, the projection framework, and the LLM processing pipeline. None of this has a UI yet. It is the invisible engine that everything visible will eventually depend on.
 
 Phase 2 builds the append-only event log, the projections that derive read-optimized views from those events, and the sync protocol that replicates events between devices. Phase 3 adds an LLM pipeline that processes journal notes through Gemini 2.0 Flash, extracting tags, mood, tasks, dates, and expenses via tool calling --- then records the results as events themselves, closing the loop.
 

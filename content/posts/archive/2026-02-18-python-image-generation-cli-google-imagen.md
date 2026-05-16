@@ -1,6 +1,7 @@
 +++
 title = "Building a Python Image Generation CLI with Google Imagen 4"
 slug = "python-image-generation-cli-google-imagen"
+aliases = ["/posts/python-image-generation-cli-google-imagen/"]
 date = 2026-02-18
 draft = false
 

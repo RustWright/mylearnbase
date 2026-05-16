@@ -31,6 +31,9 @@ cookbook/_drafts/
 # Session conversation logs
 .log/
 
+# Curiosity captures (concepts-post trigger pipeline) — gitignored, parent-synced
+.curiosities/
+
 # OS files
 .DS_Store
 Thumbs.db

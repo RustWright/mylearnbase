@@ -1,6 +1,7 @@
 +++
 title = "Dev Setup From Scratch: Claude Code, Dotfiles & Git Submodules"
 slug = "dev-setup-from-scratch"
+aliases = ["/posts/dev-setup-from-scratch/"]
 date = 2026-02-24
 updated = 2026-03-12
 draft = false

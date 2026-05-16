@@ -1,6 +1,7 @@
 +++
 title = "Four Code Reviews After Cycle 1"
 slug = "post-cycle-code-reviews"
+aliases = ["/posts/post-cycle-code-reviews/"]
 date = 2026-04-15
 draft = false
 
@@ -20,7 +21,7 @@ A recurring theme in my recent reflections is the tension between wanting to slo
 
 That said, taking the time to identify these issues and work through them slowly was genuinely valuable. It's become another tool in my approach as someone with very little professional coding experience trying to design and build ambitious projects outside my comfort zone. I'd like to keep up this habit, though the reviews themselves are expensive; the codebase is large enough that generating the initial review documents takes significant time and tokens.
 
-Ideally, after a few more of these, I can run a meta-review to spot recurring patterns and things I can learn to control for before they happen, rather than catching them after the fact. I already export a log from every Claude session, and I plan to use those to identify recurring issues in my workflow and find ways to improve my [dev setup](@/posts/2026-02-24-dev-setup-from-scratch.md).
+Ideally, after a few more of these, I can run a meta-review to spot recurring patterns and things I can learn to control for before they happen, rather than catching them after the fact. I already export a log from every Claude session, and I plan to use those to identify recurring issues in my workflow and find ways to improve my [dev setup](@/posts/archive/2026-02-24-dev-setup-from-scratch.md).
 
 But that's a project for later. Right now I want to get omni-me to the point where I'm comfortable switching from Obsidian to it for daily note-taking. I'm also looking forward to building a custom budgeting tool for tracking where my money goes and setting better goals. Until I have a working app, though, I don't think I'll be able to focus on anything else.
 

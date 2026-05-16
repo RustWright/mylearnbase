@@ -1,8 +1,8 @@
 # Personal Website Project
 
-**Status:** Active
+**Status:** Active — **Cycle 2 closed 2026-05-16**
 **Started:** 2026-01-31
-**Current Phase:** Cycle 2 Session 4 — Per-form authoring sweep **COMPLETE** (5/5); resources landed 2026-05-14. `editorial/resources.md` written + published as `authoring-a-resources-post`. Walkthrough refinements: job statement sharpened to "future-you can find them in one place when the need arises"; author contribution framed as **implicit by curation-by-act** (not prose-per-bullet); sub-types collapsed 3 → 2 (question-driven dropped); Topic 4 (writing-well) skipped as standalone section — third consecutive form to do so. Remaining Cycle 2 work: Task 13 (`/create-post` skill rewrite), Task 10 (real omni-me logbook entry), curiosity-log mechanism, first concepts post (hash demo), Phase 8 cycle close, POST_SYSTEM.md v1 deletion (now unlocked).
+**Current Phase:** Cycle 2 Session 4 — Per-form authoring sweep **COMPLETE** (5/5); resources landed 2026-05-14. `editorial/resources.md` written + published as `authoring-a-resources-post`. Walkthrough refinements: job statement sharpened to "future-you can find them in one place when the need arises"; author contribution framed as **implicit by curation-by-act** (not prose-per-bullet); sub-types collapsed 3 → 2 (question-driven dropped); Topic 4 (writing-well) skipped as standalone section — third consecutive form to do so. **Curiosity-log mechanism + Task 13 (`/create-post` skill rewrite) shipped 2026-05-15** — instructions in global `~/.claude/CLAUDE.md`; mylearnbase seeded with `cycle-2.md`; create-post skill is now a routing skill that prompts for form first and reads the relevant `editorial/<form>.md` as source of truth. Remaining Cycle 2 work: Task 15 (PROJECT_PROCESS + CLAUDE.md sync with cycle-close review pass), Task 14 sub-items (tagging strategy doc, home-page navigation), POST_SYSTEM.md v1 deletion, Phase 8 cycle close. Task 10 (real omni-me logbook entry) + first concepts post (hash demo) deferred — user opted for full scaffolding build over real-content validation.
 **Domain:** mylearnbase.com
 
 ---
@@ -89,7 +89,7 @@
 - [x] Session 4: Implementation (Cycle 1) (2026-02-04 to 2026-02-08)
 - [x] Session 5: Testing/Catchup (Cycle 1) (2026-02-11)
 - [x] Session 6: Tooling (out-of-cycle) (2026-02-18)
-- [~] Cycle 2 Session 4: Implementation — Phases 1-6 + Task 14 v1 + per-form **5/5** (logbook + concepts-v0 + workflows + opinions + resources) done (2026-05-09 to 2026-05-14); cookbook form **redesigned as concepts** during Session B; `workflows publish` extended with `--supersede-from` + image-copy during Session C; opinions doc surfaced provocation reframe + entry-point spectrum + suggest-then-decide Tier 1 during Session D; resources doc landed by-act curation framing + sub-type collapse during Session E; Task 13 + Task 10 + curiosity-log + first concepts post + Phase 8 cycle close carry forward
+- [x] Cycle 2 Session 4: Implementation — Phases 1-8 complete (2026-05-09 to 2026-05-16). Per-form **5/5** (logbook + concepts-v0 + workflows + opinions + resources) + cross-form tagging editorial (2026-05-16). Session F (2026-05-15 → 2026-05-16) shipped the entire scaffolding closeout: **curiosity-log mechanism**, **Task 13 `/create-post` skill rewrite**, **Task 15 PROJECT_PROCESS + CLAUDE.md structural sync** (re-canonicalized to `setup_files/`, all 4 mirrors synced, per-project CLAUDE.md restructured to point at PROJECT_PROCESS), **Task 14 sub-items** (tagging strategy doc + homepage navigation), **POST_SYSTEM.md v1 deletion**, **Phase 8 final verification + plan archive**. Task 10 + first concepts post (hash demo) deferred per user — editorial docs will validate on first organic use.
 
 ---
 
@@ -498,3 +498,97 @@ After exploring direction-setting reframes (rejected as another rhetorical move)
 - First concepts post (hash demo) — after curiosity-log mechanism is live.
 - Phase 8 — cycle close: verification sweep + archive POST_SYSTEM_PLAN.md.
 - POST_SYSTEM.md v1 deletion (now unlocked).
+
+### Cycle 2 Session F: Scaffolding sweep (2026-05-15) — curiosity-log + Task 13
+
+**Goal:** Build structural scaffolding for remaining Cycle 2 carry-forward items. User opted to skip the planned validation passes (Task 10 + hash-demo concepts post) — editorial docs will validate on first real use rather than via deliberate dry-runs.
+
+**Curiosity-log mechanism shipped:**
+
+**What landed:**
+
+- `~/.claude/CLAUDE.md` (symlinked from `~/.dotfiles/claude/CLAUDE.md`) — added *Curiosity Capture* section: triggers, location (`<project-repo>/.curiosities/<cycle-id>.md`), cycle-id resolution (grep `Cycle \d+` from project.md, highest match; fallback `current.md` — handles both mylearnbase's `Current Phase:` and omni-me's `Status:` header conventions and img_gen's no-project.md case), entry format, self-bootstrap behavior. Fires in any project session (user picked global-not-conditional placement).
+- `~/.claude/CLAUDE.md` Step 2 of session-end protocol — extended to copy `.curiosities/*` → `<parent>/curiosities/<project-name>/` alongside existing log-copy.
+- `mylearnbase/.gitignore` — added `.curiosities/` (parallel to `.log/`).
+- `mylearnbase/.curiosities/cycle-2.md` — seeded with header + format reminder + 1 backfilled entry (hash curiosity from omni-me upload validation, already documented in `editorial/concepts.md` worked sketch).
+- Omni-me bootstrap deferred — happens lazily on first append per the self-bootstrap rule. Not pre-modifying that repo from inside mylearnbase.
+
+**Task 13 — `/create-post` skill rewrite shipped:**
+
+- File: `~/.dotfiles/claude/commands/create-post.md` (symlinked from `~/.claude/commands/create-post.md`). 106 lines, replacing the 100-line single-form Reflections-+-Tutorial pattern from Session 6 (2026-02-18).
+- New shape: **routing skill**, not content-generation skill. Old subagent-delegation pattern dropped — most forms (logbook/concepts/opinions/resources) operate in the main conversation now where iteration is the point.
+- Phase 1 prompts for form. Phase 2 reads `editorial/<form>.md` as source of truth. Phase 3 anchors per-form tools + non-negotiables (each form section names what the LLM does NOT draft — opinions' take, logbook §7 voice-bearing, resources without lived curation). Phase 4 surfaces tag-drift awareness. Phase 5 verification + form-specific summary.
+- Cookbook removed from form list; concepts replaces it per the 2026-05-11 redesign. Original Task 13 spec said "logbook / cookbook / workflows / opinions / resources"; lived state is "logbook / concepts / workflows / opinions / resources."
+
+**Decisions locked this session:**
+
+- Cycle-id rule: highest `Cycle \d+` match in `project.md`. Survives both projects' header conventions and any future drift.
+- Detection threshold: bias toward capturing ("false positives cheap, missed captures unrecoverable"). Cycle-close review filters resolved/faded ones.
+- Self-bootstrap: LLM creates `.curiosities/` + adds gitignore entry on first append in any project. Zero per-project setup needed.
+
+**Carry-forward changes:**
+
+- Task 10 (real omni-me logbook entry) — deferred per user.
+- First concepts post (hash demo) — deferred per user. Hash curiosity preserved in `cycle-2.md` for when the user revisits.
+- Cycle-close review pass workflow — design lands in Task 15 (PROJECT_PROCESS + CLAUDE.md sync).
+- Memory entry `project_curiosity_log_mechanism.md` flips from "provisional, not yet implemented" → "shipped" at session end.
+
+Remaining Cycle 2 scaffolding queue: Task 14 sub-items (tagging strategy doc, home-page navigation), POST_SYSTEM.md v1 deletion, Phase 8 verification sweep + archive plan.
+
+### Cycle 2 Session F (cont'd): Task 15 shipped (2026-05-16)
+
+**PROJECT_PROCESS + CLAUDE.md structural sync + post-system integration.**
+
+- All four `PROJECT_PROCESS.md` copies now identical (329-line canonical at `setup_files/PROJECT_PROCESS.md`; 331-line mirrors at root, `projects/mylearnbase/`, `projects/omni-me/` with MIRROR banners). Re-established setup_files as the canonical per user direction; omni-me had been the lived master during Cycle 2 drift.
+- Post-system additions in canonical: Session 4 planning trigger identification, Session 5 capture cadence at feature-landing commits, Session 6 **Phase D** (cycle-close curiosity review + portfolio-demo identification — both are discovery work, not fix code), End-of-Session step 7 (parent-sync `.curiosities/` alongside `.log/`), new top-level **Post System** section with form-to-trigger table.
+- `.curiosities/` added to Project Documentation Structure section with explicit gitignore/parent-sync semantics (also clarified the same for `.log/`, which was implicit before — user caught the gap during the propagation pass).
+- **Structural fix to CLAUDE.md drift class** (user chose path 2 of 3 when offered light-touch vs structural vs defer). Per-project `mylearnbase/CLAUDE.md` and `omni-me/CLAUDE.md` no longer duplicate end-of-session steps — they point to `PROJECT_PROCESS.md` § End-of-Session Protocol as the single source of truth. Eliminates the failure mode that left mylearnbase/CLAUDE.md on the old 5-session model (Session 4 = Implementation) while omni-me/CLAUDE.md had moved to 6-session (Session 5 = Implementation). Parent `productive_learning/CLAUDE.md` "Sessions 1-5" → "Sessions 1-6".
+- Published `content/posts/workflows/project-development-process.md` via `workflows publish setup_files/PROJECT_PROCESS.md`. Zola check clean.
+
+**Remaining Cycle 2 scaffolding queue:** Task 14 sub-items (tagging strategy doc, home-page navigation), POST_SYSTEM.md v1 deletion, Phase 8 verification sweep + archive plan.
+
+### Cycle 2 Session F (cont'd): Task 14 sub-items shipped (2026-05-16)
+
+**Tagging strategy doc + homepage navigation.**
+
+- `editorial/tagging.md` (148 lines): style conventions, decision rules, anti-patterns. Cross-form (not per-form), so lighter than logbook.md (950 lines) but heavier than concepts.md v0 (200 lines). Two user-driven design corrections during drafting:
+  1. **No canonical aliases table.** Initial draft included an aliases table for tracking resolved synonyms. User pushed back: that creates an update treadmill (every new tag triggers a doc edit + workflow republish). Resolved by dropping the table entirely — ambiguity gets resolved in conversation at post-creation time, no central catalog.
+  2. **Opinion-form caveat on the 3-7 tag bar.** User flagged that opinion posts can legitimately span many tags (short prose, wide-reaching take). Per-post bar reframed: 3-7 is a default scope-matched count, not a length-matched constraint.
+- Discovery hooks: `/create-post` Phase 4 references `editorial/tagging.md` first, then the existing grep. `PROJECT_PROCESS.md` § Post System lists `tagging.md` in the editorial source-of-truth list (cross-form companion to the five per-form docs).
+- Published as `content/posts/workflows/tagging-strategy.md`. PROJECT_PROCESS.md republished from `setup_files/` (tags `["post-system", "meta", "process"]` preserved by `workflows publish` republish path; `updated = 2026-05-16` set automatically).
+- **Bulk tag fixes** (3 posts; user shifted to fix-now after seeing the small scope): `ui-development` → `ui` in `autonomous-ui-development-with-playwright-mcp.md` (real drift); `authoring-a-workflows-post.md` got tags `["post-system", "meta"]`; `project-development-process.md` got `["post-system", "meta", "process"]`. Two suspected drifts (`apis` and `dev-setup`) turned out to be phantoms — `apis` was a code-block example in the resources authoring post, `dev-setup` vs `project-setup` is a legitimate distinction.
+- **Homepage navigation v1:** `zola.toml` `[extra].sections` expanded from 1 to 6 entries (`posts` first, then forms in cadence order: logbook → workflows → resources → opinions → concepts).
+- **Homepage iteration (after local preview review):** user caught that the concepts nav link 404'd (orphan cookbook section never renamed during 2026-05-11 redesign) and that the home recent-posts widget surfaced only pre-Cycle-2 archive posts as "recent" (theme default pulls only top-level pages). Five fixes landed in sequence:
+  1. Created `content/posts/concepts/_index.md`; removed orphan `content/posts/cookbook/` section.
+  2. Overrode `templates/home.html` to aggregate recent posts across all subsections (top-level + form sections + one nested level for `logbook/<project>/`).
+  3. Added form-badge `[<form>]` after each post title on home recent list so post type is visible at-a-glance.
+  4. Moved 9 pre-Cycle-2 top-level posts to `content/posts/archive/` via `git mv`; added `aliases = ["/posts/<slug>/"]` to each (Zola generates JS+meta-refresh redirect pages, preserving original URLs). Internal cross-links between archived posts rewritten from `@/posts/<file>.md` to `@/posts/archive/<file>.md` (sed; 10 link rewrites across 5 posts).
+  5. Rebuilt `/posts/` as a split aggregator (`templates/posts_aggregator.html`) — shows recent posts grouped by form (logbook / concepts / workflows / opinions / resources / archive), each section heading linking to its section page, with empty-form noting when there's no content yet.
+- Final site state: 15 pages, 8 sections, 0 orphans, `zola check` clean. Old URLs resolve via aliases. Home + /posts/ both show meaningful recent-activity surfaces.
+
+**Remaining Cycle 2 scaffolding queue:** POST_SYSTEM.md v1 deletion, Phase 8 verification sweep + archive plan.
+
+### Cycle 2 Session F (cont'd): cycle close (2026-05-16)
+
+**POST_SYSTEM.md v1 deletion + Phase 8 final sweep + plan archive.**
+
+- `editorial/POST_SYSTEM.md` deleted (30 KB, 512 lines). Six editorial docs supersede it: 5 per-form (`logbook`, `concepts`, `workflows`, `opinions`, `resources`) + 1 cross-form (`tagging`). The v1 seed served its purpose as reference material for the per-form authoring sweep; per-form docs are now the source of truth.
+- `POST_SYSTEM_PLAN.md` moved to `.archive/post-system-reset/POST_SYSTEM_PLAN.md` via `git mv` (preserves history).
+- **Phase 8 verification passes:**
+  - `zola build` clean: 15 pages, 7 sections, 0 orphans
+  - `zola check --skip-external-links` clean: 0 broken links
+  - All originally-published top-level posts (pre-Cycle-2-reset) resolve at original URLs (7 confirmed; the plan's "9" was off by 2 due to the 3 deleted in Phase 1 leaving 7, plus the MVP post = 7 still present at original paths)
+  - `/create-post` (no args) prompts for form selection — verified in skill Phase 1
+
+**Cycle 2 closed.**
+
+Cycle 2 summary across all sessions:
+- Phases 1-8 complete (section migration → theme additions → tools scaffold → core capture tools → smoke test → remaining per-form tools → editorial sweep → cycle close)
+- Cookbook form redesigned as concepts mid-cycle (2026-05-11) — first major form definition pivot
+- Six editorial docs shipped (5 per-form + tagging)
+- 7-step end-of-session protocol consolidated into PROJECT_PROCESS.md (single source of truth) with curiosity-log + parent-sync integration
+- `/create-post` skill rewritten as a router
+- Five tools (`cite`, `logbook`, `cookbook`, `workflows`) shipped, cross-project, plus showboat integration
+- Homepage navigation surfaces all five forms
+
+Cycle 3 entry point: open. Likely candidates per memory: real-content validation (the deferred Task 10 omni-me logbook entry; first concepts post hash-demo) once the user has lived use of the system, or omni-me work continues with the new post system in play.

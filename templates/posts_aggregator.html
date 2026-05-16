@@ -1,0 +1,62 @@
+{% extends "_base.html" %}
+
+{% block page %}blog{% endblock page %}
+{% block lang %}{% if section.extra.lang %}{{ section.extra.lang }}{% else %}{{ section.lang }}{% endif %}{% endblock lang %}
+{% block title %}{{ section.title }}{% endblock title %}
+{% block desc %}
+  {% if section.description %}
+    {% set desc = section.description %}
+  {% else %}
+    {% set desc = config.description %}
+  {% endif %}
+  <meta name="description" content="{{ desc }}">
+{% endblock desc %}
+
+{% block content %}
+<div id="wrapper">
+  <header>
+    <nav>
+      <a id="back-link" href="{{ get_url(path="/") }}">← Home</a>
+    </nav>
+  </header>
+  {% include "_section_title.html" %}
+  <main class="layout-list">
+    {# Aggregator: list recent posts per form, with archive at the bottom.
+       Each form's recent posts come from its own subsection of /posts/.
+       Form ordering matches config.extra.sections (logbook first by cadence). #}
+    {% set forms = ["logbook", "concepts", "workflows", "opinions", "resources", "archive"] %}
+    {% set per_form_limit = 10 %}
+    {% for form in forms %}
+      {% set form_section = get_section(path="posts/" ~ form ~ "/_index.md") %}
+      {% set_global form_pages = form_section.pages %}
+      {# Handle one level of nesting (e.g. logbook/omni-me/) #}
+      {% for nested_path in form_section.subsections %}
+        {% set nested = get_section(path=nested_path) %}
+        {% set_global form_pages = form_pages | concat(with=nested.pages) %}
+      {% endfor %}
+      {% set sorted_form_pages = form_pages | sort(attribute="date") | reverse %}
+      <section class="form-group">
+        <h2 class="form-heading"><a class="instant" href="{{ form_section.permalink }}">{{ form_section.title }}</a></h2>
+        {% if sorted_form_pages | length == 0 %}
+          <p class="empty-form-note"><em>No posts in this form yet.</em></p>
+        {% else %}
+          <div class="post-list">
+            {% for post in sorted_form_pages | slice(end=per_form_limit) %}
+            <a class="post instant {% if post.extra.featured %}featured{% endif %}" href="{{ post.permalink }}">
+              <span>{{ post.title }}</span>
+              <span class="date">{{ post.date | date(format=section.extra.date_format) }}</span>
+            </a>
+            {% endfor %}
+          </div>
+          {% if sorted_form_pages | length > per_form_limit %}
+          <div class="read-more">
+            <a class="instant" href="{{ form_section.permalink }}">all {{ form_section.title | lower }} posts »</a>
+          </div>
+          {% endif %}
+        {% endif %}
+      </section>
+    {% endfor %}
+  </main>
+  {% include "_footer.html" %}
+</div>
+{% endblock content %}

@@ -1,6 +1,6 @@
 +++
-title = "Cookbook"
-description = "Patterns and principles worth reusing — abstracted from concrete work into reusable form"
+title = "Concepts"
+description = "Interactive demos built to come to understand concepts — each post centers a runnable artifact"
 sort_by = "date"
 template = "blog.html"
 page_template = "post.html"
@@ -8,8 +8,8 @@ insert_anchor_links = "right"
 
 [extra]
 lang = "en"
-title = "Cookbook"
-subtitle = "Patterns and principles worth reusing — abstracted from concrete work into reusable form"
+title = "Concepts"
+subtitle = "Interactive demos built to come to understand concepts — each post centers a runnable artifact"
 date_format = "%b %-d, %Y"
 categorized = false
 back_to_top = true

@@ -1,6 +1,7 @@
 +++
 title = "Building My Learn Base - MVP"
 slug = "building-my-learnbase-mvp"
+aliases = ["/posts/building-my-learnbase-mvp/"]
 date = 2026-02-11
 draft = false
 

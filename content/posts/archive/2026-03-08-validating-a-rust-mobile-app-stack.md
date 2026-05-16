@@ -1,6 +1,7 @@
 +++
 title = "Validating a Rust Mobile App Stack: Tauri + Dioxus + SurrealDB + CodeMirror"
 slug = "validating-a-rust-mobile-app-stack"
+aliases = ["/posts/validating-a-rust-mobile-app-stack/"]
 date = 2026-03-08
 draft = false
 

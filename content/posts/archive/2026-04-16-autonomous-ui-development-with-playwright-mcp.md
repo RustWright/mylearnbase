@@ -1,11 +1,12 @@
 +++
 title = "Autonomous UI Development with Playwright MCP"
 slug = "autonomous-ui-development-with-playwright-mcp"
+aliases = ["/posts/autonomous-ui-development-with-playwright-mcp/"]
 date = 2026-04-18
 draft = false
 
 [taxonomies]
-tags = ["rust", "tauri", "dioxus", "wasm", "playwright", "ui-development"]
+tags = ["rust", "tauri", "dioxus", "wasm", "playwright", "ui"]
 +++
 
 ## Reflections

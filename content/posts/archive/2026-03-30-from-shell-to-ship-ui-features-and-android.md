@@ -1,6 +1,7 @@
 +++
 title = "From Shell to Ship: UI, Features, and Android"
 slug = "from-shell-to-ship-ui-features-and-android"
+aliases = ["/posts/from-shell-to-ship-ui-features-and-android/"]
 date = 2026-04-11
 draft = false
 
@@ -14,7 +15,7 @@ series_order = 4
 
 ## Reflections
 
-I'm writing this shortly after the reflection for the [companion post](@/posts/2026-03-30-event-sourcing-sync-and-llm-pipeline.md), so I'll try not to repeat myself. What I do want to call out is how it felt to have a working MVP on my phone. I'd already built an app during the POC phase and verified it ran, but this was different — something buggy but *operational*, able to create notes, edit them, manage tasks, and sync it all between my phone and laptop. A very vague idea I've had for a long time is starting to feel real and achievable.
+I'm writing this shortly after the reflection for the [companion post](@/posts/archive/2026-03-30-event-sourcing-sync-and-llm-pipeline.md), so I'll try not to repeat myself. What I do want to call out is how it felt to have a working MVP on my phone. I'd already built an app during the POC phase and verified it ran, but this was different — something buggy but *operational*, able to create notes, edit them, manage tasks, and sync it all between my phone and laptop. A very vague idea I've had for a long time is starting to feel real and achievable.
 
 I still have a long way to go before I'd actually switch from my current Obsidian journaling habit to this. But over the next couple of months, I should be able to add the features I care about and polish them enough to feel comfortable making the switch. I was ambitious when defining the full scope, but ultimately there are three bare minimum things I need before I'd be happy switching over:
 
@@ -34,7 +35,7 @@ For any major project I'm working on, I'd love to have a single page dedicated t
 
 ## Tutorial: Building the Visible Product — Dioxus UI, Journal, Routines, and Android Deployment
 
-The [first post](@/posts/2026-03-08-validating-a-rust-mobile-app-stack.md) in this series validated the technology stack. The [second post](@/posts/2026-03-27-building-the-foundation-rust-workspace-and-infrastructure.md) built the infrastructure: workspace, database layer, server, and CI/CD. The [companion post](@/posts/2026-03-30-event-sourcing-sync-and-llm-pipeline.md) covers the event sourcing engine, sync protocol, and LLM pipeline that sit underneath everything described here.
+The [first post](@/posts/archive/2026-03-08-validating-a-rust-mobile-app-stack.md) in this series validated the technology stack. The [second post](@/posts/archive/2026-03-27-building-the-foundation-rust-workspace-and-infrastructure.md) built the infrastructure: workspace, database layer, server, and CI/CD. The [companion post](@/posts/archive/2026-03-30-event-sourcing-sync-and-llm-pipeline.md) covers the event sourcing engine, sync protocol, and LLM pipeline that sit underneath everything described here.
 
 This post covers Phases 4 through 7 — the part where the project goes from a headless backend to something you can actually tap on. Four phases, completed across several working sessions:
 
@@ -47,10 +48,10 @@ By the end, all 38 tasks from the cycle 1 task list are complete. The app runs o
 
 ### Assumptions
 
-- **Previous posts:** You have read the [second post](@/posts/2026-03-27-building-the-foundation-rust-workspace-and-infrastructure.md) and [companion post](@/posts/2026-03-30-event-sourcing-sync-and-llm-pipeline.md) or are at least familiar with the workspace structure, SurrealDB schema, event store, and sync protocol.
+- **Previous posts:** You have read the [second post](@/posts/archive/2026-03-27-building-the-foundation-rust-workspace-and-infrastructure.md) and [companion post](@/posts/archive/2026-03-30-event-sourcing-sync-and-llm-pipeline.md) or are at least familiar with the workspace structure, SurrealDB schema, event store, and sync protocol.
 - **Operating system:** Linux (Ubuntu, kernel 6.8, x86_64). macOS works for desktop; Android builds require the NDK.
 - **Tooling:** Rust 1.85+, `wasm32-unknown-unknown` target, Dioxus CLI 0.7+, Tauri CLI 2.10+, Node.js 18+ (for CodeMirror bundling).
-- **Android (Phase 7 only):** Java 17, Android SDK platform 35+, build-tools 35.0.1, NDK r28. See the [first post](@/posts/2026-03-08-validating-a-rust-mobile-app-stack.md) for setup details.
+- **Android (Phase 7 only):** Java 17, Android SDK platform 35+, build-tools 35.0.1, NDK r28. See the [first post](@/posts/archive/2026-03-08-validating-a-rust-mobile-app-stack.md) for setup details.
 
 ---
 
@@ -518,7 +519,7 @@ pub async fn create_note(
 }
 ```
 
-The pattern of "append event, apply to projections, query projection" repeats across every write command in the app. The [companion post](@/posts/2026-03-30-event-sourcing-sync-and-llm-pipeline.md) explains why this design was chosen.
+The pattern of "append event, apply to projections, query projection" repeats across every write command in the app. The [companion post](@/posts/archive/2026-03-30-event-sourcing-sync-and-llm-pipeline.md) explains why this design was chosen.
 
 #### Note Editing
 
@@ -606,7 +607,7 @@ if !is_new {
 }
 ```
 
-The server handles all LLM communication (Gemini Flash via tool calling), extracts tags, mood, tasks, dates, and expenses, then returns the structured result. The `LlmResultsDisplay` component renders each category with appropriate styling. All LLM calls go through the server — the Tauri client never talks to Gemini directly. This is a deliberate architectural decision explained in the [companion post](@/posts/2026-03-30-event-sourcing-sync-and-llm-pipeline.md).
+The server handles all LLM communication (Gemini Flash via tool calling), extracts tags, mood, tasks, dates, and expenses, then returns the structured result. The `LlmResultsDisplay` component renders each category with appropriate styling. All LLM calls go through the server — the Tauri client never talks to Gemini directly. This is a deliberate architectural decision explained in the [companion post](@/posts/archive/2026-03-30-event-sourcing-sync-and-llm-pipeline.md).
 
 #### Search
 

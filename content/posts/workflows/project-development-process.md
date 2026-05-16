@@ -1,6 +1,13 @@
-# Project Development Process
++++
+title = "Project Development Process"
+slug = "project-development-process"
+date = 2026-05-16
+updated = 2026-05-16
+draft = false
 
-> **MIRROR FILE — KEEP IN SYNC.** The canonical version of this document lives at `setup_files/PROJECT_PROCESS.md`. **Any edit made here must be propagated to the canonical (and vice versa).** If you only update one copy, the two will drift — Cycle 2 Session 6 hit this when the project copy was stale at process-revision time. Treat this banner as a tripwire: if you touched the doc, also update the other one before you finish the session.
+[taxonomies]
+tags = ["post-system", "meta", "process"]
++++
 
 This document describes the structured process for developing projects in this learning repository, with heavy AI collaboration throughout.
 
@@ -140,7 +147,7 @@ AI (Claude Code) serves as collaborative partner throughout all sessions:
 - Define high-level phases for current scope
 - Break work into atomic chunks (≤10 lines of code where possible)
 - Identify opportunities for parallel development (worktree-friendly file boundaries)
-- **Identify post-system triggers within the cycle** (see [Post System](#post-system) below): flag tasks likely to land a public-facing **logbook entry** — explicit "this is logbook-worthy" annotation in the task list so the question is settled at planning time, not at write-up time. Also flag features that may warrant a **portfolio demo** (`{{ demo() }}` shortcode in §6 of the logbook entry).
+- **Identify post-system triggers within the cycle** (see [Post System](#post-system) below): flag tasks likely to land a public-facing **logbook entry** — explicit "this is logbook-worthy" annotation in the task list so the question is settled at planning time, not at write-up time. Also flag features that may warrant a **portfolio demo** (`{{/* demo() */}}` shortcode in §6 of the logbook entry).
 - Create `tasks.md` with detailed task list
 
 **Output:**
@@ -203,7 +210,7 @@ Findings use Critical / Warning / Info priority buckets with `file:line` referen
 A separate phase from the review-and-resolve loop. Two pulls:
 
 1. **Cycle-close curiosity review.** Walk `<project-repo>/.curiosities/<cycle-id>.md` end-to-end (see `~/.claude/CLAUDE.md` § Curiosity Capture for how the file gets populated). For each entry, ask: still hold attention? still feel unfinished? lend itself to interactive demo? Survivors become candidates for **concepts posts** on mylearnbase. Most won't survive — resolved during work, interest faded — and that's expected. A cycle with zero survivors is normal.
-2. **Portfolio-demo identification.** Review which features from the cycle warrant a `{{ demo() }}` shortcode demo as logbook §6 evidence. Pick on coolness + implementability (static-site + WASM-islands constraints from `architecture.md`).
+2. **Portfolio-demo identification.** Review which features from the cycle warrant a `{{/* demo() */}}` shortcode demo as logbook §6 evidence. Pick on coolness + implementability (static-site + WASM-islands constraints from `architecture.md`).
 
 Both pulls feed into post drafting **outside** the cycle process — they're surfacing work, not write work. Post drafting happens via `/create-post` when the author has time, not as part of Code Review.
 
