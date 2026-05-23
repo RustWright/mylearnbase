@@ -1,10 +1,11 @@
-"""logbook: capture (init/what/why/scope/note/exec/screenshot) and publish.
+"""logbook: capture (init/title/tags/exec/screenshot) and publish.
 
 Captures are showboat documents structured into 7 sections (logbook owns the
 section discipline; showboat handles title block, exec/image blocks, and
-verify). Captures live at `<repo-root>/logbook/_drafts/<slug>.md`.
-Publish converts a capture to a Zola post under
-`<mylearnbase>/content/posts/logbook/<project>/<slug>.md`.
+verify). Prose sections are filled by direct-editing the capture file.
+Captures live at `<repo-root>/logbook/_drafts/<slug>.md`. Publish converts
+a capture to a Zola post under
+`<mylearnbase>/content/posts/logbook/<project>/<slug>/index.md`.
 """
 
 from __future__ import annotations
@@ -118,7 +119,8 @@ def _project_section_template(project: str) -> str:
         'sort_by = "date"\n'
         'template = "blog.html"\n'
         'page_template = "post.html"\n'
-        'insert_anchor_links = "right"\n\n'
+        'insert_anchor_links = "right"\n'
+        'transparent = true\n\n'
         "[extra]\n"
         'lang = "en"\n'
         f'title = "{title}"\n'
@@ -168,6 +170,7 @@ def cmd_init(args: argparse.Namespace) -> int:
         f.write(_post_init_additions(args.project, slug))
 
     print(str(capture))
+    print(f"  title: {title}")
     return 0
 
 
@@ -207,6 +210,39 @@ def _relocate_appended_to_section(capture: Path, pre_line_count: int, target_sec
     return 0
 
 
+_CARGO_NOISE_RE = re.compile(r"^\s*(Compiling|Finished|Running unittests|warning:|\s+--> )")
+
+
+def _strip_cargo_noise_from_appended(capture: Path, pre_line_count: int) -> None:
+    """Drop cargo's compile/finished noise from the just-appended output fence.
+
+    Targets the lines between ``` ```output ``` and its closing ``` ``` ``` that
+    were just written by `showboat exec`. Compile-time and warning lines vary
+    between runs and break `showboat verify`'s exact-match diffing; the test
+    results themselves are deterministic and worth keeping.
+    """
+    lines = capture.read_text(encoding="utf-8").splitlines()
+    appended = lines[pre_line_count:]
+    in_output = False
+    cleaned: list[str] = []
+    for line in appended:
+        if line.startswith("```output"):
+            in_output = True
+            cleaned.append(line)
+            continue
+        if in_output and line.startswith("```"):
+            in_output = False
+            cleaned.append(line)
+            continue
+        if in_output and _CARGO_NOISE_RE.match(line):
+            continue
+        cleaned.append(line)
+    new_lines = lines[:pre_line_count] + cleaned
+    text = "\n".join(new_lines)
+    original = capture.read_text(encoding="utf-8")
+    capture.write_text(text + ("\n" if original.endswith("\n") else ""), encoding="utf-8")
+
+
 def cmd_run(args: argparse.Namespace) -> int:
     """Run a code block via showboat and embed it into the target section."""
     capture = _resolve_capture_arg(args.capture_file)
@@ -230,6 +266,9 @@ def cmd_run(args: argparse.Namespace) -> int:
         sys.stdout.write(result.stdout)
     if result.stderr:
         sys.stderr.write(result.stderr)
+
+    if args.strip_cargo_noise:
+        _strip_cargo_noise_from_appended(capture, pre_line_count)
 
     target = args.section or SECTION_EVIDENCE
     relocate_rc = _relocate_appended_to_section(capture, pre_line_count, target)
@@ -264,6 +303,31 @@ def cmd_screenshot(args: argparse.Namespace) -> int:
     return _relocate_appended_to_section(capture, pre_line_count, target)
 
 
+def cmd_title(args: argparse.Namespace) -> int:
+    capture = _resolve_capture_arg(args.capture_file)
+    if not capture.exists():
+        print(f"logbook: capture does not exist: {capture}", file=sys.stderr)
+        return 1
+
+    text = capture.read_text(encoding="utf-8")
+    new_h1 = f"# {args.title}"
+    new_lines: list[str] = []
+    replaced = False
+    for line in text.splitlines():
+        if not replaced and line.startswith("# "):
+            new_lines.append(new_h1)
+            replaced = True
+        else:
+            new_lines.append(line)
+    if not replaced:
+        print("logbook: capture has no `# ` title line", file=sys.stderr)
+        return 1
+
+    capture.write_text("\n".join(new_lines) + ("\n" if text.endswith("\n") else ""), encoding="utf-8")
+    print(new_h1)
+    return 0
+
+
 def cmd_tags(args: argparse.Namespace) -> int:
     capture = _resolve_capture_arg(args.capture_file)
     if not capture.exists():
@@ -289,21 +353,47 @@ def cmd_tags(args: argparse.Namespace) -> int:
     return 0
 
 
-def _section_cmd(section_header: str) -> callable:
-    def handler(args: argparse.Namespace) -> int:
-        capture = _resolve_capture_arg(args.capture_file)
-        text = _shared.read_text_arg(args.text)
-        if not text.strip():
-            print("logbook: refusing to write empty text", file=sys.stderr)
-            return 1
-        try:
-            _capture.append_to_section(capture, section_header, text)
-        except (FileNotFoundError, ValueError) as exc:
-            print(f"logbook: {exc}", file=sys.stderr)
-            return 1
-        return 0
+_CROSSPOST_LINK_RE = re.compile(r"@/(posts/[^)\s\"#]+)")
 
-    return handler
+
+def _normalize_crosspost_links(body: str, mb_root: Path) -> tuple[str, list[str], list[str]]:
+    """Normalize `@/posts/...` refs to whichever shape the destination actually uses.
+
+    Zola is strict: a `<slug>.md` ref doesn't match a `<slug>/index.md` target
+    or vice-versa. Authors shouldn't have to track which prior posts have been
+    bundle-restructured. This walks every `@/posts/...` ref and rewrites it to
+    whichever of the two shapes resolves on disk.
+
+    Returns (rewritten_body, rewrites, unresolved):
+      - rewrites: list of "old → new" strings for stdout
+      - unresolved: list of refs that didn't match either shape (for stderr warnings)
+    """
+    content_root = mb_root / "content"
+    rewrites: list[str] = []
+    unresolved: list[str] = []
+    seen_unresolved: set[str] = set()
+
+    def _replace(match: re.Match) -> str:
+        ref = match.group(1)
+        target = content_root / ref
+        if target.is_file():
+            return match.group(0)
+        if ref.endswith(".md"):
+            bundle_ref = f"{ref[:-3]}/index.md"
+            if (content_root / bundle_ref).is_file():
+                rewrites.append(f"@/{ref} → @/{bundle_ref}")
+                return f"@/{bundle_ref}"
+        elif ref.endswith("/index.md"):
+            flat_ref = f"{ref[:-len('/index.md')]}.md"
+            if (content_root / flat_ref).is_file():
+                rewrites.append(f"@/{ref} → @/{flat_ref}")
+                return f"@/{flat_ref}"
+        if ref not in seen_unresolved:
+            seen_unresolved.add(ref)
+            unresolved.append(f"@/{ref}")
+        return match.group(0)
+
+    return _CROSSPOST_LINK_RE.sub(_replace, body), rewrites, unresolved
 
 
 def cmd_publish(args: argparse.Namespace) -> int:
@@ -362,10 +452,16 @@ def cmd_publish(args: argparse.Namespace) -> int:
         return 2
 
     project_dir = mb_root / "content" / "posts" / "logbook" / project
-    dest = project_dir / f"{slug}.md"
+    slug_dir = project_dir / slug
+    dest = slug_dir / "index.md"
     if dest.exists() and not args.force:
         print(f"logbook: destination already exists at {dest} (use --force to overwrite)", file=sys.stderr)
         return 1
+
+    is_republish = dest.exists()
+    preserved: dict[str, object] = {}
+    if is_republish:
+        preserved = _frontmatter.read_keys(dest, ("date", "draft"))
 
     project_index = project_dir / "_index.md"
     project_index_created = False
@@ -374,26 +470,34 @@ def cmd_publish(args: argparse.Namespace) -> int:
         project_index.write_text(_project_section_template(project), encoding="utf-8")
         project_index_created = True
 
+    today = dt.date.today().isoformat()
     fields: dict[str, object] = {
         "title": title,
         "slug": slug,
-        "date": dt.date.today().isoformat(),
-        "draft": True,
+        "date": preserved.get("date", today),
+        "draft": preserved.get("draft", True),
     }
+    if is_republish:
+        fields["updated"] = today
     if tags:
         fields["taxonomies"] = {"tags": tags}
 
-    dest.parent.mkdir(parents=True, exist_ok=True)
+    slug_dir.mkdir(parents=True, exist_ok=True)
+    body_with_images, images_copied = _shared.copy_and_rewrite_referenced_images(
+        body_clean, capture.parent, slug_dir
+    )
+    body_rewritten, link_rewrites, unresolved_links = _normalize_crosspost_links(
+        body_with_images, mb_root
+    )
+
     dest.write_text("", encoding="utf-8")
     _frontmatter.write(dest, fields)
 
     with dest.open("a", encoding="utf-8") as f:
         f.write("\n")
-        f.write(body_clean)
-        if not body_clean.endswith("\n"):
+        f.write(body_rewritten)
+        if not body_rewritten.endswith("\n"):
             f.write("\n")
-
-    images_copied = _shared.copy_referenced_images(body_clean, capture.parent, dest.parent)
 
     rc, output = _shared.zola_check(mb_root, skip_external_links=not args.full_check)
     if rc != 0:
@@ -403,7 +507,10 @@ def cmd_publish(args: argparse.Namespace) -> int:
     check_label = "clean (full)" if args.full_check else "clean (internal links only)"
     verify_label = "skipped" if args.skip_verify else "clean"
     print(str(dest))
-    print(f"  draft = true (review, then flip to false in frontmatter)")
+    if is_republish:
+        print(f"  republished: date = {fields['date']}, updated = {today}, draft = {fields['draft']}")
+    else:
+        print(f"  draft = true (review, then flip to false in frontmatter)")
     print(f"  tags = {tags or '(none — pass --tags or edit frontmatter)'}")
     print(f"  showboat verify: {verify_label}")
     print(f"  zola check: {check_label}")
@@ -411,6 +518,10 @@ def cmd_publish(args: argparse.Namespace) -> int:
         print(f"  copied {len(images_copied)} image(s): {', '.join(images_copied)}")
     if project_index_created:
         print(f"  created {project_index} (review title/description if desired)")
+    for rewrite in link_rewrites:
+        print(f"  normalized cross-post link: {rewrite}")
+    for link in unresolved_links:
+        print(f"  warning: unresolved cross-post link {link!r} (no matching .md or /index.md under content/)", file=sys.stderr)
     return 0
 
 
@@ -419,7 +530,7 @@ def main(argv: list[str] | None = None) -> int:
         prog="logbook",
         description="Capture and publish logbook entries (per-feature implementation logs).",
     )
-    sub = parser.add_subparsers(dest="cmd", required=True, metavar="{init,what,why,scope,note,exec,screenshot,tags,publish}")
+    sub = parser.add_subparsers(dest="cmd", required=True, metavar="{init,title,tags,exec,screenshot,publish}")
 
     p_init = sub.add_parser("init", help="Template a fresh capture file with the 7-section structure.")
     p_init.add_argument("project")
@@ -428,22 +539,16 @@ def main(argv: list[str] | None = None) -> int:
     p_init.add_argument("--force", action="store_true", help="Overwrite an existing capture.")
     p_init.set_defaults(handler=cmd_init)
 
-    for verb, header in [
-        ("what", SECTION_WHAT),
-        ("why", SECTION_WHY),
-        ("scope", SECTION_SCOPE),
-        ("note", SECTION_NEXT),
-    ]:
-        p = sub.add_parser(verb, help=f"Append text to the '{header}' section.")
-        p.add_argument("capture_file", help="Capture path or bare slug (resolves under logbook/_drafts/).")
-        p.add_argument("text", nargs="?", help="Text to write (reads from stdin if omitted).")
-        p.set_defaults(handler=_section_cmd(header))
-
     p_run = sub.add_parser("exec", help="Run code via showboat and embed it as runnable evidence in the target section (default: section 6).")
     p_run.add_argument("capture_file", help="Capture path or bare slug.")
     p_run.add_argument("lang", help="Language identifier (bash, python, etc.) — passed through to showboat.")
     p_run.add_argument("code", nargs="?", help="Code to run (reads from stdin if omitted).")
     p_run.add_argument("--section", help="Target section header text (default: 'How do we know it works?').", default=None)
+    p_run.add_argument(
+        "--strip-cargo-noise",
+        action="store_true",
+        help="Drop Compiling/Finished/Running-unittests/warning lines from the captured output. Use with `cargo test` execs so `showboat verify` stops failing on cache-state noise.",
+    )
     p_run.set_defaults(handler=cmd_run)
 
     p_shot = sub.add_parser("screenshot", help="Embed an existing image file via showboat into the target section (default: section 6).")
@@ -473,6 +578,11 @@ def main(argv: list[str] | None = None) -> int:
     p_tags.add_argument("capture_file", help="Capture path or bare slug.")
     p_tags.add_argument("tags", help='Comma-separated tags (e.g., "rust, dioxus, ui").')
     p_tags.set_defaults(handler=cmd_tags)
+
+    p_title = sub.add_parser("title", help="Rewrite the title (`# ` line) in a capture.")
+    p_title.add_argument("capture_file", help="Capture path or bare slug.")
+    p_title.add_argument("title", help="New title text (no leading `# `).")
+    p_title.set_defaults(handler=cmd_title)
 
     args = parser.parse_args(argv)
     return args.handler(args)

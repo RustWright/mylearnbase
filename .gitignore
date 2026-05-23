@@ -28,6 +28,10 @@ __pycache__/
 logbook/_drafts/
 cookbook/_drafts/
 
+# Per-form feedback queues — working-tree-only scratch; promote into the
+# editorial doc when ready (see editorial/_feedback/<form>.md Meta section).
+editorial/_feedback/
+
 # Session conversation logs
 .log/
 

@@ -165,7 +165,12 @@ def cmd_publish(args: argparse.Namespace) -> int:
         preserved = _frontmatter.read_keys(dest, _PRESERVED_KEYS)
 
     fields = _build_fields(title, final_slug, today, is_republish, args.draft, preserved)
-    new_text = _render_post(fields, body_escaped)
+
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    body_rewritten, images_copied = _shared.copy_and_rewrite_referenced_images(
+        body_escaped, source.parent, dest.parent
+    )
+    new_text = _render_post(fields, body_rewritten)
 
     if args.dry_run:
         existing = dest.read_text(encoding="utf-8") if dest.exists() else ""
@@ -182,10 +187,7 @@ def cmd_publish(args: argparse.Namespace) -> int:
             print(f"\n(supersession would also add `extra.superseded_by = \"posts/workflows/{final_slug}.md\"` to {old_dest})")
         return 0
 
-    dest.parent.mkdir(parents=True, exist_ok=True)
     dest.write_text(new_text, encoding="utf-8")
-
-    images_copied = _shared.copy_referenced_images(body_escaped, source.parent, dest.parent)
 
     if args.supersede_from and old_dest is not None:
         old_fields = _frontmatter.read_all(old_dest)

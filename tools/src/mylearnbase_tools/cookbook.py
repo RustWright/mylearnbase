@@ -218,16 +218,18 @@ def cmd_publish(args: argparse.Namespace) -> int:
         fields["taxonomies"] = {"tags": tags}
 
     dest.parent.mkdir(parents=True, exist_ok=True)
+    body_rewritten, images_copied = _shared.copy_and_rewrite_referenced_images(
+        body_clean, capture.parent, dest.parent
+    )
+
     dest.write_text("", encoding="utf-8")
     _frontmatter.write(dest, fields)
 
     with dest.open("a", encoding="utf-8") as f:
         f.write("\n")
-        f.write(body_clean)
-        if not body_clean.endswith("\n"):
+        f.write(body_rewritten)
+        if not body_rewritten.endswith("\n"):
             f.write("\n")
-
-    images_copied = _shared.copy_referenced_images(body_clean, capture.parent, dest.parent)
 
     rc, output = _shared.zola_check(mb_root, skip_external_links=not args.full_check)
     if rc != 0:

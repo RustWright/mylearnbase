@@ -59,26 +59,80 @@ def read_text_arg(text: str | None) -> str:
 
 
 _IMAGE_REF_RE = re.compile(r"!\[[^\]]*\]\(([^)]+)\)")
+_BASH_IMAGE_BLOCK_RE = re.compile(
+    r"```bash \{image\}\n(?P<path>[^\n]+)\n```\n?", re.MULTILINE
+)
 
 
-def copy_referenced_images(body: str, src_dir: Path, dest_dir: Path) -> list[str]:
-    """Copy local image references from `src_dir` to `dest_dir`.
+def copy_and_rewrite_referenced_images(
+    body: str, src_dir: Path, dest_dir: Path
+) -> tuple[str, list[str]]:
+    """Process showboat-emitted and hand-written image refs for the colocated layout.
 
-    Skips http(s) URLs and absolute paths. Returns the list of relative paths copied.
+    Three passes:
+      1. Strip ` ```bash {image}\\n<path>\\n``` ` blocks; record the absolute path.
+         These are showboat's leading-code-fence-for-images, useless in the post.
+      2. For each stripped block, find the next `![alt](<tracking-id>.png)` ref and
+         rewrite it to `![alt](./<basename-of-recorded-path>)`, copying the source.
+      3. For remaining hand-written `![alt](<rel>)` refs, resolve <rel> against
+         src_dir, copy source to dest_dir/<basename>, and rewrite to `./<basename>`.
+
+    Leaves http/https and absolute paths alone.
+
+    Returns (rewritten_body, list_of_copied_basenames).
     """
     copied: list[str] = []
+
+    # Pass 1 + 2: process bash {image} blocks and their paired refs.
+    pending_sources: list[Path] = []
+
+    def _strip_block(match: re.Match) -> str:
+        pending_sources.append(Path(match.group("path").strip()))
+        return ""
+
+    body = _BASH_IMAGE_BLOCK_RE.sub(_strip_block, body)
+
+    # Walk forward through image refs, consuming pending_sources in order.
+    out_parts: list[str] = []
+    last_end = 0
+    pending_iter = iter(pending_sources)
+    next_pending = next(pending_iter, None)
+
     for match in _IMAGE_REF_RE.finditer(body):
         ref = match.group(1).strip().split()[0]
+        out_parts.append(body[last_end:match.start()])
+
         if ref.startswith(("http://", "https://", "/")):
+            out_parts.append(match.group(0))
+            last_end = match.end()
             continue
-        src = src_dir / ref
+
+        if next_pending is not None and next_pending.is_file():
+            basename = next_pending.name
+            shutil.copy2(next_pending, dest_dir / basename)
+            copied.append(basename)
+            alt = match.group(0).split("](", 1)[0]
+            out_parts.append(f"{alt}](./{basename})")
+            last_end = match.end()
+            next_pending = next(pending_iter, None)
+            continue
+
+        src = (src_dir / ref).resolve()
         if not src.is_file():
+            out_parts.append(match.group(0))
+            last_end = match.end()
             continue
-        dest = dest_dir / ref
-        dest.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(src, dest)
-        copied.append(ref)
-    return copied
+
+        basename = src.name
+        dest_dir.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(src, dest_dir / basename)
+        copied.append(basename)
+        alt = match.group(0).split("](", 1)[0]
+        out_parts.append(f"{alt}](./{basename})")
+        last_end = match.end()
+
+    out_parts.append(body[last_end:])
+    return "".join(out_parts), copied
 
 
 def strip_empty_sections(body: str, required_headers: list[str] | None = None) -> str:

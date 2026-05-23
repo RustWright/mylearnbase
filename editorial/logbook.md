@@ -109,19 +109,21 @@ documenting:
 
 1. **Scaffold the capture** with `logbook init <project> <slug> --title "..."`.
    Writes a structured markdown file at `<repo>/logbook/_drafts/<slug>.md`.
-2. **Fill the prose sections** with `logbook what`, `logbook why`, and
-   optionally `logbook scope`. Each command appends text to the named
-   section.
+2. **Fill the prose sections** by opening the capture file in your
+   editor and writing §3, §4, and optionally §5 directly. The five
+   `##` headers are already scaffolded — fill the bodies underneath
+   them.
 3. **Add evidence** to *"How do we know it works?"* with `logbook exec`
    (runnable code), `logbook screenshot` (existing images), `cite`
    (commit-pinned code citations), and — for interactive features —
    the `{{ demo() }}` shortcode embedded directly in the capture.
-4. **Tag and add tail notes** with `logbook tags "..."` and optional
-   `logbook note "- ..."` calls.
+4. **Tag** with `logbook tags "..."`. Optionally fill §7 tail notes by
+   editing the capture file directly.
 5. **Publish** with `logbook publish <slug>`. Converts the capture to a
-   Zola post under `<mylearnbase>/content/posts/logbook/<project>/<slug>.md`,
-   runs `showboat verify` and `zola check`, and copies any referenced
-   images.
+   Zola post under `<mylearnbase>/content/posts/logbook/<project>/<slug>/index.md`,
+   runs `showboat verify` and `zola check`, copies referenced images
+   alongside `index.md`, and rewrites the markdown image refs to
+   `./<filename>` so they resolve from the colocated page bundle.
 
 The published post is written with `draft = true` — review it, then
 flip to `false` when ready to ship.
@@ -140,13 +142,13 @@ Two locations, one publish boundary:
 │ project repo (e.g., omni-me/)  │     │ mylearnbase repo                │
 │                                │     │                                 │
 │ logbook/_drafts/<slug>.md  ────┼─────┼──►  content/posts/logbook/      │
-│   (the capture; gitignored)    │     │       <project>/<slug>.md       │
-│                                │     │       (the published post)      │
+│   (the capture; gitignored)    │     │       <project>/<slug>/         │
+│                                │     │         index.md + images       │
 │ ↑ capture tools write here     │     │  ↑ logbook publish writes here  │
 └────────────────────────────────┘     └─────────────────────────────────┘
         capture-time tools                       publish-time tool
-        (init, what, why, scope, note,           (publish — the boundary)
-         exec, screenshot, tags, cite)
+        (init, title, tags, exec,                (publish — the boundary)
+         screenshot, cite)
 ```
 
 Capture-time tools run from the project repo's working directory and
@@ -181,35 +183,15 @@ meant for the post's H1, which is rarely the same shape.
 **Failure modes.** Capture already exists (exit 1 unless `--force`); not
 in a git repo (exit 2); `showboat` not on PATH (exit 2).
 
-### Filling prose — `logbook what`, `why`, `scope`, `note`
+### Filling prose — direct-edit the capture
 
-```
-logbook what  <slug-or-path> "<text>"
-logbook why   <slug-or-path> "<text>"
-logbook scope <slug-or-path> "<text>"
-logbook note  <slug-or-path> "<text>"
-```
-
-All four follow one pattern: read text (from arg or stdin), append it
-to the named section's existing body.
-
-| Command | Targets section |
-|---|---|
-| `what` | What does this feature do? |
-| `why` | Why was it added now? |
-| `scope` | What's in scope (and what's not)? |
-| `note` | What's worth remembering or doing next? |
-
-The first argument accepts a *path* (`./logbook/_drafts/foo.md`) or a
-*bare slug* (`foo` — resolves to the standard location). Bare slug is
-the typical usage from a project repo.
-
-Empty text is refused. Calling against a slug whose capture doesn't
-exist errors clearly.
+Open `<repo>/logbook/_drafts/<slug>.md` and write §3, §4, §5, and §7
+directly into the empty bodies under their respective `##` headers.
+There's no CLI for prose because multi-paragraph writing in a CLI
+argument is awkward, and editors are where prose belongs anyway.
 
 Bullet syntax in §5 (scope) and §7 (note) is the author's responsibility
-— pass `- ` as part of the text if the section should render as bullets.
-The tool appends verbatim.
+— write `- ` lines where bullets are wanted.
 
 ### Adding evidence — `cite`, `logbook exec`, `logbook screenshot`
 
@@ -244,13 +226,19 @@ disambiguates.
 **`logbook exec`** — runs code, captures the result as evidence.
 
 ```
-logbook exec <slug-or-path> <lang> [code] [--section "..."]
+logbook exec <slug-or-path> <lang> [code] [--section "..."] [--strip-cargo-noise]
 ```
 
 Wraps `showboat exec`. The exec is re-run at every publish via
 `showboat verify`; non-deterministic content (timestamps, network calls,
 single-use tokens) needs to be pinned or accompanied by `--skip-verify`
 at publish time with a comment explaining why.
+
+`--strip-cargo-noise` opts into dropping `Compiling`, `Finished`,
+`Running unittests`, and `warning:` lines from the captured output.
+Use it with `cargo test` execs — those lines vary between runs
+depending on cache state, which breaks `showboat verify`'s exact-match
+diff. Test results themselves are preserved.
 
 **`logbook screenshot`** — embeds an existing image.
 
@@ -262,15 +250,30 @@ Wraps `showboat image`. The image must already exist on disk; this tool
 is embed-only. Capturing the screenshot is a human-in-the-loop step —
 choosing *which* shot reflects what the feature does.
 
-### Metadata — `logbook tags`
+**Asset location.** Store source images under
+`<repo>/logbook/_assets/<slug>/<filename>`. The publish step copies
+them alongside `index.md` at the destination — it accepts both the
+showboat-emitted absolute-path form (from `logbook screenshot`) and
+the hand-written relative form (`![alt](../_assets/<slug>/foo.png)`)
+and rewrites both to `./<filename>` in the published markdown.
+
+**For UI tasks annotated `(logbook)` in `tasks.md`:** preserve the PNGs
+into `<repo>/logbook/_assets/<slug>/` before development cleanup.
+Playwright accessibility-tree YAML snapshots are not usable as logbook
+evidence — they're trees, not images.
+
+### Metadata — `logbook tags`, `logbook title`
 
 ```
-logbook tags <slug-or-path> "tag1, tag2, tag3"
+logbook tags  <slug-or-path> "tag1, tag2, tag3"
+logbook title <slug-or-path> "<new title>"
 ```
 
-Rewrites the `> Tags:` line in the capture's metadata blockquote. Fails
-if the capture wasn't initialized through `logbook init` (and so has no
-Tags line). Tiny tool, one job.
+`logbook tags` rewrites the `> Tags:` line in the capture's metadata
+blockquote. `logbook title` rewrites the `# <title>` line. Both fail if
+the capture wasn't initialized through `logbook init` (no Tags or title
+line to rewrite). Tiny tools, one job each — use `title` if the title
+you passed to `init` no longer fits as the post takes shape.
 
 ### Publishing — `logbook publish`
 
@@ -287,18 +290,36 @@ The publish-time boundary. Five steps in order:
    `--skip-verify` opts out for documented exceptional cases.
 2. **Parse.** Extracts the metadata blockquote (Project, Slug, Tags),
    the title block, and the section bodies.
-3. **Compute destination.** `<mylearnbase>/content/posts/logbook/<project>/<slug>.md`.
+3. **Compute destination.** `<mylearnbase>/content/posts/logbook/<project>/<slug>/index.md` —
+   a Zola page bundle (slug directory + `index.md` + sibling assets).
    If the project's `_index.md` doesn't exist yet, scaffold it with the
-   standard section frontmatter — this is how new project sub-sections
-   come into existence.
+   standard section frontmatter (including `transparent = true` so its
+   pages aggregate into the parent `/posts/logbook/` listing) — this is
+   how new project sub-sections come into existence.
 4. **Prune empty optional sections** (§5 scope, §7 notes) so they don't
    render as empty headers. The three required sections (§3 *what*,
    §4 *why*, §6 *evidence*) refuse publish if empty — a structural
    integrity check.
-5. **Write the post.** Frontmatter (`title`, `slug`, `date = today`,
-   `draft = true`, optional `taxonomies.tags`) followed by the body.
-   Any locally-referenced images in the body are copied to the
-   destination directory alongside the post.
+5. **Write the post and copy/rewrite images.** Frontmatter
+   (`title`, `slug`, `date`, `draft`, optional `updated`, optional
+   `taxonomies.tags`) followed by the body. Locally-referenced images
+   are copied alongside `index.md` and their markdown refs are
+   rewritten to `./<filename>` (the colocation form Zola resolves
+   cleanly). Showboat's ` ```bash {image} ` leading code-fences get
+   stripped.
+
+   - **First publish** (no existing post at the destination):
+     `date = today`, `draft = true`, no `updated`.
+   - **Republish** (post already at the destination, `--force` given):
+     preserves `date` and `draft` from the existing post (so a manual
+     `draft = false` flip survives, and the original ship date doesn't
+     bump just because the tool was rerun); sets `updated = today` to
+     mark the touch.
+6. **Validate cross-post links.** `@/posts/...` references in the body
+   are checked against the destination tree. Both the flat-file form
+   (`<slug>.md`) and the page-bundle form (`<slug>/index.md`) resolve;
+   unresolved refs print a warning (`zola check` would also catch them,
+   but the warning is louder and runs earlier).
 
 Then `zola check` (skipping external links by default for speed;
 `--full-check` includes them).
@@ -306,6 +327,11 @@ Then `zola check` (skipping external links by default for speed;
 **Reviewing the draft.** Preview with `zola serve --drafts` from inside
 the mylearnbase repo, then flip the frontmatter to `draft = false` when
 ready to ship.
+
+**If your draft includes cite blocks**, push the cite-anchor commit to
+`origin` before running `logbook publish`. The no-push-during-cycle
+rule's explicit-request carve-out covers this — the cite permalinks
+404 until the SHA is reachable on the public remote.
 
 **One rough edge worth knowing:** `zola check` runs *after* the
 destination file is written. If `zola check` fails (broken internal
@@ -822,27 +848,11 @@ cd ~/projects/omni-me
 logbook init omni-me oauth-login-google \
   --title "OAuth login via Google"
 
-# 2. Fill §3 — What does this feature do?
-logbook what oauth-login-google \
-  "Users can log in to omni-me using their Google account. The first
-   time someone authenticates, a user record is created and a JWT is
-   issued; subsequent logins return a JWT for the existing record.
-   The JWT identifies the user on every request to /me."
+# 2. Fill §3, §4, §5, §7 by opening the capture in your editor:
+#    ~/projects/omni-me/logbook/_drafts/oauth-login-google.md
+#    Write the prose directly under each ## header.
 
-# 3. Fill §4 — Why was it added now?
-logbook why oauth-login-google \
-  "Multi-device sync was the goal for this stretch of work — laptops
-   and phones needed to converge on the same data. That required a
-   stable per-user identity, which the standalone-mode app didn't
-   have. OAuth was the smallest step that gave us per-user identity
-   without taking on password storage ourselves."
-
-# 4. Fill §5 — Scope
-logbook scope oauth-login-google \
-  "In: Google OAuth flow, JWT issuance, /me endpoint.
-   Not in: refresh tokens, account deletion, other providers, session revocation."
-
-# 5. Fill §6 — Evidence (exec + paired cite + cite + screenshot)
+# 3. Add §6 evidence: runnable exec + commit-pinned cites + screenshot
 logbook exec oauth-login-google bash "cargo test auth::"
 
 cite logbook/_drafts/oauth-login-google.md tests/auth.rs:1 \
@@ -855,19 +865,10 @@ cite logbook/_drafts/oauth-login-google.md src/auth.rs:42 \
 
 logbook screenshot oauth-login-google ~/Pictures/login-screen.png
 
-# 6. Fill §7 — Notes (bullets passed as text)
-logbook note oauth-login-google \
-  "- Considered passwordless email magic-links instead. Rejected — more
-     infra (email sender, link expiry, abuse prevention) for marginally
-     better UX. Revisit if Google's terms become a problem."
-
-logbook note oauth-login-google \
-  "- JWT signature verification could be a concepts demo — visualizing what makes a signed token valid vs forged."
-
-# 7. Metadata
+# 4. Tag
 logbook tags oauth-login-google "rust, auth, oauth"
 
-# 8. Publish
+# 5. Publish
 logbook publish oauth-login-google
 ```
 
@@ -930,7 +931,7 @@ Not in: refresh tokens, account deletion, other providers, session revocation.
 
 ### The published post
 
-`~/projects/mylearnbase/content/posts/logbook/omni-me/oauth-login-google.md`:
+`~/projects/mylearnbase/content/posts/logbook/omni-me/oauth-login-google/index.md`:
 
 ```toml
 +++
@@ -946,8 +947,11 @@ tags = ["rust", "auth", "oauth"]
 
 The body is the capture's §3 through §7, in order. Two side effects:
 
-- `login-screen.png` is copied alongside the post at
-  `content/posts/logbook/omni-me/login-screen.png`.
+- `login-screen.png` is copied alongside `index.md` at
+  `content/posts/logbook/omni-me/oauth-login-google/login-screen.png`,
+  and its markdown ref is rewritten to `![alt](./login-screen.png)`.
 - If `content/posts/logbook/omni-me/_index.md` didn't exist, it's
-  auto-created with the standard section frontmatter — first-time
-  setup for a new project's logbook sub-section.
+  auto-created with the standard section frontmatter (including
+  `transparent = true` so the project's posts aggregate up into the
+  parent `/posts/logbook/` listing) — first-time setup for a new
+  project's logbook sub-section.
