@@ -3,7 +3,7 @@ title = "Capture a transaction with its receipt"
 slug = "capture-transaction-with-receipt"
 date = 2026-05-17
 updated = 2026-05-23
-draft = true
+draft = false
 
 [taxonomies]
 tags = ["dioxus", "tauri", "multimodal", "ux"]

@@ -3,7 +3,7 @@ title = "Browse, view, and edit recorded transactions"
 slug = "browse-view-edit-transactions"
 date = 2026-05-23
 updated = 2026-05-23
-draft = true
+draft = false
 
 [taxonomies]
 tags = ["dioxus", "tauri", "surrealdb", "ux"]
