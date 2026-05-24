@@ -519,6 +519,12 @@ doing its job.
 
 ### §5 — What's in scope (and what's not)?
 
+Scope is for **permanent non-goals** — things this feature, by design,
+isn't meant to do. Timeline-bound items (deferrals, postponed
+sub-features, "we'll add it later") belong in §7, not here. §5 sets
+the feature's *shape* for the reader; §7 sets the feature's
+*trajectory*.
+
 Three expression shapes, each picked by how much each item needs to
 carry:
 
@@ -531,7 +537,7 @@ carry:
 **✓ Good — inline (the default for simple lists):**
 
 > In: Google OAuth flow, JWT issuance, /me endpoint.
-> Not in: refresh tokens, account deletion, other providers, session revocation.
+> Not in: enterprise SSO, MFA, SAML — different identity scope entirely.
 
 **✓ Good — bulleted (when items need clauses):**
 
@@ -541,17 +547,17 @@ carry:
 > - /me endpoint for current-user identity
 >
 > **Not in:**
-> - Refresh tokens — deferred; 24h is acceptable for the multi-device use case
-> - Account deletion — no flow yet
-> - Other providers (Apple, Microsoft) — postponed; the pattern validates with one
+> - Enterprise SSO — different identity surface; the login layer isn't meant to grow into it
+> - MFA — changes the auth model rather than extends it; treated as a separate feature
+> - Compliance reporting — lives one layer up in the identity story
 
 **✓ Good — prose (when reasoning is the substance):**
 
 > This covers the Google OAuth code-grant flow, JWT issuance, and the
 > /me endpoint that uses the JWT to identify the requester. It
-> deliberately skips refresh tokens (the 24h JWT life is acceptable
-> here), other providers (one is enough to validate the pattern), and
-> session revocation (JWT expiry serves the same role for now).
+> deliberately stops short of enterprise SSO and MFA — both would
+> change the auth model rather than extend it — and of compliance
+> reporting, which lives one layer up in the identity story.
 
 **✗ Bad (too vague to head off questions):**
 
@@ -904,7 +910,7 @@ taking on password storage ourselves.
 ## What's in scope (and what's not)?
 
 In: Google OAuth flow, JWT issuance, /me endpoint.
-Not in: refresh tokens, account deletion, other providers, session revocation.
+Not in: enterprise SSO, MFA, SAML — different identity scope entirely.
 
 ## How do we know it works?
 
@@ -925,6 +931,10 @@ Not in: refresh tokens, account deletion, other providers, session revocation.
 ## What's worth remembering or doing next?
 
 - Considered passwordless email magic-links instead. Rejected — more infra (email sender, link expiry, abuse prevention) for marginally better UX. Revisit if Google's terms become a problem.
+
+- Refresh tokens deferred — 24h JWT lifetime is acceptable for the multi-device use case. Revisit if re-auth friction surfaces.
+
+- Other providers (Apple, Microsoft) postponed — the pattern validates with one. Revisit if a non-Google user actually asks.
 
 - JWT signature verification could be a concepts demo — visualizing what makes a signed token valid vs forged.
 ```
