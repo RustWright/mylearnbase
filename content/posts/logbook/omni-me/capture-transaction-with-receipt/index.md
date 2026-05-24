@@ -2,7 +2,7 @@
 title = "Capture a transaction with its receipt"
 slug = "capture-transaction-with-receipt"
 date = 2026-05-17
-updated = 2026-05-23
+updated = 2026-05-24
 draft = false
 
 [taxonomies]
@@ -30,8 +30,8 @@ Persisting the captured file alongside the transaction was the last sub-step bef
 - `AttachmentRef` ride-along on the recorded transaction event
 
 **Not in:**
-- **Browsing the saved transactions.** Save commits the event, but no list view exists yet — captured transactions "vanish" until that ships.
-- **Thumbnail rendering in the confirm form.** The form shows "Attachment saved · filename · N bytes," not the image; rendering ships with the transaction detail view.
+- **Browsing the saved transactions.** Save commits the event, but no [list view](@/posts/logbook/omni-me/browse-view-edit-transactions/index.md) exists yet — captured transactions "vanish" until that ships.
+- **Thumbnail rendering in the confirm form.** The form shows "Attachment saved · filename · N bytes," not the image; rendering ships with the [transaction detail view](@/posts/logbook/omni-me/browse-view-edit-transactions/index.md).
 - **Android share-sheet integration.** Sharing an image or PDF to omni-me from another app's share menu doesn't work yet — the manifest declaration and Rust glue are both partial. Deferred to a focused Android-build session.
 
 ## How do we know it works?

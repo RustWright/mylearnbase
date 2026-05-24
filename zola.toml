@@ -18,6 +18,12 @@ external_links_no_referrer = true
 smart_punctuation = false
 github_alerts = true
 
+[link_checker]
+# GitHub renders #L<N> line anchors via JavaScript; the static HTML only carries
+# id="LC<N>" markers. Zola's link checker can't see the JS-handled anchor and
+# false-positives on every cite-block URL. Page existence is still verified.
+skip_anchor_prefixes = ["https://github.com/"]
+
 [markdown.highlighting]
 style = "class"
 light_theme = "github-light"

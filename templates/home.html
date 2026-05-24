@@ -83,16 +83,12 @@
       {{ section.content | trim | safe }}
     </section>
     {% if section.extra.recent %}
-    {# Project-level override: aggregate recent posts across all subsections of /posts/ (logbook, concepts, workflows, opinions, resources, plus nested logbook/<project>/) instead of only the top-level posts directory. Theme default only shows top-level pages, which after the Cycle 2 post-system reset means only the pre-reset archive posts. #}
+    {# Project-level override: aggregate recent posts across all form subsections of /posts/. Project subsections (e.g. logbook/omni-me/) use transparent = true, so Zola already bubbles their pages into the parent form's section.pages — no recursion needed. #}
     {% set blog_section = get_section(path="posts/_index.md") %}
     {% set_global all_pages = blog_section.pages %}
     {% for sub_path in blog_section.subsections %}
       {% set sub = get_section(path=sub_path) %}
       {% set_global all_pages = all_pages | concat(with=sub.pages) %}
-      {% for nested_path in sub.subsections %}
-        {% set nested = get_section(path=nested_path) %}
-        {% set_global all_pages = all_pages | concat(with=nested.pages) %}
-      {% endfor %}
     {% endfor %}
     {% set sorted_pages = all_pages | sort(attribute="date") | reverse %}
     <section class="layout-list">

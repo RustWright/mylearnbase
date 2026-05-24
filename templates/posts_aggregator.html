@@ -28,13 +28,8 @@
     {% set per_form_limit = 10 %}
     {% for form in forms %}
       {% set form_section = get_section(path="posts/" ~ form ~ "/_index.md") %}
-      {% set_global form_pages = form_section.pages %}
-      {# Handle one level of nesting (e.g. logbook/omni-me/) #}
-      {% for nested_path in form_section.subsections %}
-        {% set nested = get_section(path=nested_path) %}
-        {% set_global form_pages = form_pages | concat(with=nested.pages) %}
-      {% endfor %}
-      {% set sorted_form_pages = form_pages | sort(attribute="date") | reverse %}
+      {# Project subsections (e.g. logbook/omni-me/) use transparent = true, so Zola bubbles their pages into form_section.pages — no recursion needed. #}
+      {% set sorted_form_pages = form_section.pages | sort(attribute="date") | reverse %}
       <section class="form-group">
         <h2 class="form-heading"><a class="instant" href="{{ form_section.permalink }}">{{ form_section.title }}</a></h2>
         {% if sorted_form_pages | length == 0 %}

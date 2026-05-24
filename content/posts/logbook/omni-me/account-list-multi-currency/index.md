@@ -2,7 +2,8 @@
 title = "Account list with multi-currency balance aggregation"
 slug = "account-list-multi-currency"
 date = 2026-05-23
-draft = true
+updated = 2026-05-24
+draft = false
 
 [taxonomies]
 tags = ["dioxus", "ledger", "multi-currency", "fx"]
@@ -38,7 +39,7 @@ directives for the major currencies, plus the auto-import review flow
 capturing manual rates for the long-tail currencies at the moment a
 statement arrives. Both wrote the same hledger `P`-directive shape, so
 a single aggregator could fold them in without further infrastructure.
-The financial-health dashboard queued up next would need the same
+The [financial-health dashboard](@/posts/logbook/omni-me/financial-health-dashboard/index.md) queued up next would need the same
 aggregator for net worth, so shipping the Accounts screen first kept
 the surface narrow enough to prove the converging-rate path on a
 useful screen in its own right.
@@ -50,7 +51,7 @@ aggregation, latest reconciliation date and statement balance.
 
 **Not in:**
 
-- Per-account drill-down — the Transactions screen handles that via
+- Per-account drill-down — the [Transactions screen](@/posts/logbook/omni-me/browse-view-edit-transactions/index.md) handles that via
   its account-filter chip.
 - Historical balance trends — the dashboard owns trend.
 - Editing reconciliation status — the screen surfaces what previous

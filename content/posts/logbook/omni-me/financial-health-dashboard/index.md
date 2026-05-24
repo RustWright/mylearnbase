@@ -2,7 +2,8 @@
 title = "Financial-health dashboard"
 slug = "financial-health-dashboard"
 date = 2026-05-23
-draft = true
+updated = 2026-05-24
+draft = false
 
 [taxonomies]
 tags = ["dioxus", "ledger", "mobile-development", "ui", "ux"]
@@ -16,7 +17,7 @@ a few "where do I stand right now?" questions at a glance. A
 currency. An **Unmatched balance** card surfaces the reconciliation
 pending — a non-zero number means transactions are sitting in the
 clearing account waiting to be matched, and tapping it jumps into the
-transaction list filtered to those rows. A **monthly trend** bar chart
+[transaction list](@/posts/logbook/omni-me/browse-view-edit-transactions/index.md) filtered to those rows. A **monthly trend** bar chart
 shows income vs. spending over the last several months. A **recurring
 obligations** card lists the confirmed subscriptions and rent-shaped
 expenses from the user's confirmed recurring-pattern set. And a
@@ -36,7 +37,7 @@ purchase right now?* The Dashboard collapses each into a card so the
 answer is visible without further work. The moment was right because
 the data infrastructure had landed in pieces over the previous weeks:
 the per-account base-currency aggregation came up alongside the
-Accounts screen and made net worth a one-line sum; the auto-import
+[Accounts screen](@/posts/logbook/omni-me/account-list-multi-currency/index.md) and made net worth a one-line sum; the auto-import
 pipeline started writing transactions into the clearing account so the
 Unmatched balance became a real signal; and the recurring-pattern
 table existed in the projection schema with a confirmed slot waiting
