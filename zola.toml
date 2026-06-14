@@ -9,7 +9,7 @@ minify_html = true
 build_search_index = false
 generate_feeds = true
 feed_filenames = ["rss.xml"]
-taxonomies = [{ name = "tags" }, { name = "categories" }, { name = "series" }]
+taxonomies = [{ name = "tags" }, { name = "series" }]
 
 [markdown]
 external_links_target_blank = true
