@@ -6,6 +6,22 @@
    `section` on section/home pages, neither on special pages (404). #}
 <link rel="stylesheet" href="{{ get_url(path='css/custom.css') }}">
 
+{# Reader prefs — apply saved size/typeface BEFORE paint so far-sighted
+   readers never see a flash of default text that then jumps. Mirrors the
+   theme's inline dark-mode script. Keys are shared with js/reader-controls.js;
+   font stacks live only in custom.css (this just toggles the attribute). #}
+<script>
+  (function () {
+    try {
+      var el = document.documentElement;
+      var f = localStorage.getItem("reader-font");
+      var s = localStorage.getItem("reader-size");
+      if (f && f !== "sans") el.setAttribute("data-reader-font", f);
+      if (s) el.style.setProperty("--reader-font-size", s + "px");
+    } catch (e) {}
+  })();
+</script>
+
 {# ── Per-page metadata: canonical + OpenGraph + Twitter cards ─────────── #}
 {%- if page is defined -%}
   {%- set meta_title = page.title -%}

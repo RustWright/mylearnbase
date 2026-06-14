@@ -159,10 +159,38 @@
     {% include "_footer.html" %}
   </main>
 </div>
+
+{# Reader controls — text-size + typeface picker (accessibility / far-sight).
+   Ships [hidden]; js/reader-controls.js reveals it when JS is active. #}
+<div id="reader-controls" hidden>
+  <button id="reader-toggle" type="button" aria-label="Reading options"
+          aria-expanded="false" aria-controls="reader-panel" title="Reading options">Aa</button>
+  <div id="reader-panel" role="group" aria-label="Reading options" hidden>
+    <div class="reader-row">
+      <span class="reader-label">Text size</span>
+      <div class="reader-size">
+        <button id="reader-size-dec" type="button" aria-label="Decrease text size">A&minus;</button>
+        <span id="reader-size-val" aria-live="polite">16px</span>
+        <button id="reader-size-inc" type="button" aria-label="Increase text size">A+</button>
+      </div>
+    </div>
+    <div class="reader-row">
+      <span class="reader-label">Typeface</span>
+      <div class="reader-fonts">
+        <button type="button" data-font="sans" aria-pressed="true">Sans</button>
+        <button type="button" data-font="serif" aria-pressed="false">Serif</button>
+        <button type="button" data-font="mono" aria-pressed="false">Mono</button>
+        <button type="button" data-font="dyslexic" aria-pressed="false">Dyslexic</button>
+      </div>
+    </div>
+    <button id="reader-reset" type="button">Reset to default</button>
+  </div>
+</div>
 {% endblock content %}
 
 {% block script %}
 <script src="/js/lightense.min.js"></script>
+<script src="{{ get_url(path='js/reader-controls.js') }}"></script>
 {% if page.extra.mermaid %}
 <script type="module">
   import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';

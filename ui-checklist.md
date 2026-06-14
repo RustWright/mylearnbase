@@ -5,7 +5,7 @@ Modeled on `omni-me/ui-checklist.md`, content-shifted for a **static content sit
 
 Legend: `[ ]` not yet verified • `[x]` verified pass • `[!]` known issue/gap to fix
 
-Last swept: 2026-06-14 (Sweep 3 — Cycle 3 Phase 2 SEO/AEO + Lighthouse)
+Last swept: 2026-06-14 (Sweep 4 — Cycle 3 reader controls)
 
 ---
 
@@ -43,7 +43,7 @@ Last swept: 2026-06-14 (Sweep 3 — Cycle 3 Phase 2 SEO/AEO + Lighthouse)
 - [ ] **Reading time** displayed (Tier 1 — `page.reading_time`) — _not yet built_
 - [x] **Table of contents** for long posts — **Serene already ships this** (floating `<aside><nav>` of H2 anchors + back-to-top button on wide screens); verify nested H3 handling + mobile behavior, restyle if needed
 - [ ] **Prev/next post navigation** (Tier 2) — _not yet built_
-- [ ] **Reader controls: font-family picker + font-size adjust** (accessibility / far-sightedness) — _not yet built; new Cycle-3 feature_
+- [x] **Reader controls: font-family picker + font-size adjust** (accessibility / far-sightedness) — Sweep 4 (floating "Aa" panel on posts: size 14–28px, Sans/Serif/Mono/OpenDyslexic; `localStorage`-persisted; no-FOUC head script)
 - [ ] Code blocks render with syntax highlighting + copy button
 - [ ] Callouts (`> [!NOTE]` etc.) render correctly
 - [ ] `{{ demo() }}` shortcode iframes render (when present)
@@ -94,8 +94,8 @@ Last swept: 2026-06-14 (Sweep 3 — Cycle 3 Phase 2 SEO/AEO + Lighthouse)
 - [ ] Keyboard navigation reaches all interactive elements
 - [ ] Heading order is logical (single h1, no skipped levels)
 - [ ] Theme toggle + search have accessible labels
-- [ ] Reader font-size control lets low-vision / far-sighted readers scale text without browser zoom (new Cycle-3 feature) — _not yet built_
-- [ ] Font-family picker offers a readable serif/sans/mono/dyslexia-friendly choice, persisted across pages — _not yet built_
+- [x] Reader font-size control lets low-vision / far-sighted readers scale text without browser zoom (new Cycle-3 feature) — Sweep 4 (14–28px, scopes `article.prose`)
+- [x] Font-family picker offers a readable serif/sans/mono/dyslexia-friendly choice, persisted across pages — Sweep 4 (Sans/Serif/Mono + self-hosted OpenDyslexic; `localStorage`, applied site-wide on `.prose`)
 
 ## Performance
 
@@ -134,7 +134,7 @@ Confirmed by Sweep 1 (2026-06-14):
 - `[!]` **Recent-posts list lacks variety/differentiation** — all 5 are `[logbook]`; the concepts differentiator isn't teased; form badges are plain text, not visually distinct. (Phase 1)
 - `[!]` **Reading time absent** on post pages. (Tier 1)
 - `[!]` **Prev/next post nav absent.** (Tier 2)
-- `[!]` **No reader font controls** (family picker + size adjust) — new Cycle-3 accessibility feature.
+- `[x]` ~~**No reader font controls** (family picker + size adjust).~~ **Resolved Sweep 4** — floating "Aa" panel: 14–28px size + Sans/Serif/Mono/OpenDyslexic, `localStorage`-persisted, no-FOUC.
 - `[!]` Favicon files referenced in `_base.html` but absent → **3× 404** (`favicon-16x16.png`, `favicon-32x32.png`, `apple-touch-icon.png`). (Phase 3)
 - `[x]` ~~No OpenGraph/Twitter cards; no JSON-LD; no canonical.~~ **Resolved Phase 2 (Sweep 3)** — all present + verified; `og:image` waits on Phase 3.
 - `[x]` ~~`llms.txt` 404; `robots.txt` is Zola's bare default.~~ **Resolved Phase 2 (Sweep 3)** — custom AI-welcoming `robots.txt` + `llms.txt` both served.
@@ -234,3 +234,35 @@ author/verification keys, new `templates/robots.txt`, new `static/llms.txt`):
 - JSON-LD *schema-field* validity (vs. JSON-parse validity) needs Google Rich Results Test /
   schema.org validator — both require a public URL → Phase 4 post-deploy check.
 - Favicon 404s persist (Phase 3, logo-dependent).
+
+### Sweep 4 — 2026-06-14 (Cycle 3 — reader controls: text size + typeface)
+
+**Changes shipped** (`static/css/custom.css`, `static/js/reader-controls.js`,
+`static/fonts/opendyslexic-{400,700}.woff2`, `templates/_head_extend.html`,
+`templates/post.html`):
+- Floating **"Aa"** control on post pages (bottom-left — the theme's `#back-to-top`
+  owns bottom-right). Toggle button + popover panel with **Text size** (A− / readout /
+  A+, 14–28px, step 2) and **Typeface** (Sans / Serif / Mono / OpenDyslexic, 2×2 grid).
+- Typography scoped to `article.prose` (size via `--reader-font-size`; family via a
+  `data-reader-font` attribute on `<html>` → font stacks live only in CSS, no JS map).
+- Prefs persist in `localStorage`; an inline `_head_extend.html` script applies them
+  **before paint** (no flash of default text), mirroring the theme's dark-mode pattern.
+- **OpenDyslexic** self-hosted (SIL OFL), `font-display: swap`, loaded **on demand** —
+  0 bytes for readers who don't select it.
+- Progressive enhancement: markup ships `[hidden]`; the control reveals itself only
+  when `reader-controls.js` runs. No-JS / no-prefs visitors get the theme default.
+
+**Verification method + results:**
+- `zola build` clean; control present on posts, **absent on home** (correct scoping);
+  post-JS DOM confirms the control is revealed (`hidden` removed).
+- Headless-Chrome screenshots: panel open with Serif @ 24px (light), default "Aa"
+  button in dark mode, and OpenDyslexic @ 22px — all render correctly.
+- Overlap check: scrolled-post screenshot confirmed the "Aa" (bottom-left) and the
+  theme's `#back-to-top` (bottom-right) no longer collide.
+- `scripts/seo-audit.sh` re-run: **ALL PASS**, Lighthouse SEO still 100/100 — no
+  regression from the new inline head script or `@font-face`.
+
+**Open / future:**
+- Italic / bold-italic OpenDyslexic faces not bundled (400 + 700 only); fine for body
+  reading. Add if emphasis-heavy posts need it.
+- Control is post-page only. Lift into a base template if it's wanted site-wide.

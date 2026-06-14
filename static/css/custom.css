@@ -67,3 +67,176 @@
     gap: 0.15em;
   }
 }
+
+/* OpenDyslexic — self-hosted, loaded ON DEMAND. A browser only fetches these
+   when an element actually renders in the family, so the ~235KB costs 0 bytes
+   for readers who never pick "Dyslexic". font-display: swap shows fallback text
+   immediately. (SIL OFL 1.1 — opendyslexic.org) */
+@font-face {
+  font-family: "OpenDyslexic";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/opendyslexic-400.woff2") format("woff2");
+}
+@font-face {
+  font-family: "OpenDyslexic";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/fonts/opendyslexic-700.woff2") format("woff2");
+}
+
+/* ── Reader controls: typography application ─────────────────────
+   Scoped to the article body (the reading surface) so nav/footer
+   layout is never affected. Size is a CSS var set by JS; the family
+   is keyed off a data-attribute on <html> so the font stacks live
+   only here (no duplicate map in JS). Both fall back to the theme
+   default when unset, so a no-JS / no-prefs visitor is unchanged. */
+article.prose {
+  font-size: var(--reader-font-size, var(--font-size));
+}
+html[data-reader-font="serif"] article.prose {
+  font-family: Georgia, "Iowan Old Style", "Palatino Linotype", "Times New Roman", serif;
+}
+html[data-reader-font="mono"] article.prose {
+  font-family: var(--code-font);
+}
+html[data-reader-font="dyslexic"] article.prose {
+  font-family: "OpenDyslexic", sans-serif;
+}
+/* sans = theme default (--main-font); no rule needed */
+
+/* ── Reader controls: floating "Aa" panel ───────────────────────
+   Always-reachable reading-options control. Progressive enhancement:
+   markup ships with [hidden]; js/reader-controls.js reveals it. All
+   colors are theme variables, so light/dark adapt by construction. */
+#reader-controls {
+  position: fixed;
+  left: 1.25rem;   /* bottom-LEFT: the theme's #back-to-top owns bottom-right */
+  bottom: 1.25rem;
+  z-index: 50;
+  font-family: var(--main-font);
+}
+
+#reader-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 50%;
+  border: 1.5px solid var(--primary-color);
+  background: var(--bg-color);
+  color: var(--primary-color);
+  font-size: 1.05rem;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
+}
+#reader-toggle:hover {
+  background: var(--primary-pale-color);
+}
+
+#reader-panel {
+  position: absolute;
+  left: 0;
+  bottom: 3.4rem;
+  width: 15rem;
+  padding: 0.9rem 1rem 1rem;
+  background: var(--bg-color);
+  border: 1.5px solid var(--primary-color);
+  border-radius: 6px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.18);
+}
+#reader-panel[hidden] {
+  display: none;
+}
+
+.reader-row {
+  margin-bottom: 0.9rem;
+}
+.reader-row:last-of-type {
+  margin-bottom: 0.6rem;
+}
+.reader-label {
+  display: block;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-pale-color);
+  margin-bottom: 0.45rem;
+}
+
+.reader-size {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.reader-size button {
+  flex: 0 0 auto;
+  width: 2rem;
+  height: 2rem;
+  border: 1.5px solid var(--text-decoration-color);
+  background: var(--bg-color);
+  color: var(--text-color);
+  border-radius: 4px;
+  cursor: pointer;
+}
+.reader-size button:hover:not(:disabled) {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+.reader-size button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+#reader-size-val {
+  flex: 1 1 auto;
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--text-color);
+}
+
+.reader-fonts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.4rem;
+}
+.reader-fonts button {
+  padding: 0.4rem 0;
+  border: 1.5px solid var(--text-decoration-color);
+  background: var(--bg-color);
+  color: var(--text-color);
+  border-radius: 4px;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+.reader-fonts button[aria-pressed="true"] {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+  background: var(--primary-pale-color);
+}
+.reader-fonts button[data-font="serif"] {
+  font-family: Georgia, "Times New Roman", serif;
+}
+.reader-fonts button[data-font="mono"] {
+  font-family: var(--code-font);
+}
+.reader-fonts button[data-font="dyslexic"] {
+  font-family: "OpenDyslexic", sans-serif;
+}
+
+#reader-reset {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--text-pale-color);
+  font-size: 0.75rem;
+  text-decoration: underline;
+  cursor: pointer;
+}
+#reader-reset:hover {
+  color: var(--primary-color);
+}
