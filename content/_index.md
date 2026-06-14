@@ -4,6 +4,9 @@ template = "home.html"
 [extra]
 lang = "en"
 name = "My Learn Base"
+# Logo mark as the homepage avatar. favicon.svg (explicit brand blue + dark-mode
+# media query), NOT logo.svg — currentColor renders black when loaded via <img>.
+avatar = "img/favicon.svg"
 bio = "I build things to learn — and write down how."
 links = [
   { name = "GitHub", icon = "github", url = "https://github.com/RustWright" },

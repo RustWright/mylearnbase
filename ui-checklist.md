@@ -31,7 +31,7 @@ Last swept: 2026-06-14 (Sweep 5 — Cycle 3 logo / favicon / OG)
 - [x] Clear value proposition / hero — bold `#name`, tagline, value-prop paragraph — Sweep 2
 - [x] Recent posts surface is scannable (title, form badge, date legible)
 - [x] Social links present — GitHub + LinkedIn (`linkedin.com/in/efe-erhie`) both render in `#right` — Sweep 2
-- [ ] Avatar / logo slot renders (placeholder acceptable until logo lands) — Phase 3
+- [x] Avatar / logo slot renders — Sweep 5 (logo mark via `favicon.svg`; theme circle-crop overridden so the full mark shows)
 - [x] Theme toggle present and works
 - [x] Visual hierarchy: eye lands on the most important thing first — Sweep 2 (hero → value-prop → guide → latest)
 - [x] No awkward empty space / orphaned sections — "What you'll find here" guide fills the page; was sparse — Sweep 2
@@ -291,7 +291,6 @@ emitted `<head>` carries absolute image URLs; `scripts/seo-audit.sh` **ALL PASS*
 SEO still **100/100**.
 
 **Open / future:**
-- Homepage avatar slot (`section.extra.avatar`) still empty — logo now exists, wiring it in
-  is an optional follow-up (decision pending; would change the settled homepage header).
+- Homepage avatar — **added** (logo mark via `favicon.svg`, theme circle-crop overridden).
 - `og:image` is one default card for all pages; per-post share images are a possible later add.
 - Real social-unfurl + Rich Results checks need a public URL → Phase 4 (post-deploy).

@@ -11,6 +11,14 @@
   line-height: 1.2;
 }
 
+/* The avatar is the logo mark, not a photo — the theme crops it to a
+   circle (border-radius:50%), which would clip the tall spark + base.
+   Show it whole instead. */
+#info img {
+  border-radius: 0;
+  object-fit: contain;
+}
+
 /* ── "What you'll find here" forms guide ────────────────────────
    A described map of the post forms — turns the bare nav words into an
    explained orientation, and surfaces `concepts` even while it's empty. */
