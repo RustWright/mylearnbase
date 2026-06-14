@@ -82,6 +82,19 @@
     <section id="brief" class="prose">
       {{ section.content | trim | safe }}
     </section>
+    {% if section.extra.guide %}
+    <section id="guide">
+      <h2 class="guide-title">What you'll find here</h2>
+      <div class="guide-list">
+        {% for item in section.extra.guide %}
+        <a class="guide-item instant" href="{{ get_url(path=item.path) }}">
+          <span class="guide-name">{{ item.name }}</span>
+          <span class="guide-desc">{{ item.desc }}</span>
+        </a>
+        {% endfor %}
+      </div>
+    </section>
+    {% endif %}
     {% if section.extra.recent %}
     {# Project-level override: aggregate recent posts across all form subsections of /posts/. Project subsections (e.g. logbook/omni-me/) use transparent = true, so Zola already bubbles their pages into the parent form's section.pages — no recursion needed. #}
     {% set blog_section = get_section(path="posts/_index.md") %}
@@ -92,6 +105,7 @@
     {% endfor %}
     {% set sorted_pages = all_pages | sort(attribute="date") | reverse %}
     <section class="layout-list">
+      <h2 class="guide-title">Latest</h2>
       <div class="post-list">
         {% for post in sorted_pages | slice(end=section.extra.recent_max) %}
         <a class="post instant {% if post.extra.featured %}featured{% endif %}" href="{{ post.permalink }}">

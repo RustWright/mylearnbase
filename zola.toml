@@ -35,6 +35,15 @@ taxonomies = "on"
 anchors = "on"
 
 [extra]
+# Authorship — used in JSON-LD structured data (templates/_head_extend.html)
+author = "Efe Erhie"
+author_url = "https://www.linkedin.com/in/efe-erhie"
+
+# Search-engine ownership verification — paste the token from each console (Phase 4).
+# Left empty = tag not emitted (empty string is falsy in Tera).
+google_site_verification = ""
+bing_site_verification = ""
+
 sections = [
   { name = "posts", path = "/posts", is_external = false },
   { name = "logbook", path = "/posts/logbook", is_external = false },

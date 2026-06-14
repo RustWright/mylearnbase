@@ -1,0 +1,19 @@
+# My Learn Base
+
+> A personal learning journal and portfolio by Efe Erhie. Logbooks of real
+> software projects, the workflows behind them, opinions on tools and practice,
+> curated resources, and interactive demos of the concepts involved — built in
+> the open while learning.
+
+## Posts
+- [All posts](https://mylearnbase.com/posts/): every entry, grouped by form
+- [Logbook](https://mylearnbase.com/posts/logbook/): build journals from real projects, feature by feature
+- [Concepts](https://mylearnbase.com/posts/concepts/): interactive demos of the ideas behind the work
+- [Workflows](https://mylearnbase.com/posts/workflows/): repeatable processes used across projects
+- [Opinions](https://mylearnbase.com/posts/opinions/): takes on tools, practices, and trade-offs
+- [Resources](https://mylearnbase.com/posts/resources/): curated references worth keeping
+
+## About
+- [GitHub](https://github.com/RustWright)
+- [LinkedIn](https://www.linkedin.com/in/efe-erhie)
+- [RSS feed](https://mylearnbase.com/rss.xml)

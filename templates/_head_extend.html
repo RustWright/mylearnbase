@@ -1,0 +1,83 @@
+{# Project head injection hook (overrides theme's empty _head_extend.html).
+   Included by themes/serene/templates/_base.html inside <head>, after the theme's
+   own CSS — so the stylesheet below wins on equal specificity, and these meta
+   tags sit alongside the theme's <title> / <meta name="description">.
+   Rendered in the child template's context: `page` is defined on post pages,
+   `section` on section/home pages, neither on special pages (404). #}
+<link rel="stylesheet" href="{{ get_url(path='css/custom.css') }}">
+
+{# ── Per-page metadata: canonical + OpenGraph + Twitter cards ─────────── #}
+{%- if page is defined -%}
+  {%- set meta_title = page.title -%}
+  {%- set meta_url = page.permalink -%}
+  {%- set og_type = "article" -%}
+  {%- if page.description -%}
+    {%- set meta_desc = page.description -%}
+  {%- elif page.summary -%}
+    {%- set meta_desc = page.summary | striptags | trim | truncate(length=200) -%}
+  {%- else -%}
+    {%- set meta_desc = config.description -%}
+  {%- endif -%}
+{%- elif section is defined -%}
+  {%- set meta_title = section.title | default(value=config.title) -%}
+  {%- set meta_url = section.permalink -%}
+  {%- set og_type = "website" -%}
+  {%- set meta_desc = section.description | default(value=config.description) -%}
+{%- else -%}
+  {%- set meta_title = config.title -%}
+  {%- set meta_url = config.base_url -%}
+  {%- set og_type = "website" -%}
+  {%- set meta_desc = config.description -%}
+{%- endif -%}
+
+<link rel="canonical" href="{{ meta_url }}">
+
+<meta property="og:site_name" content="{{ config.title }}">
+<meta property="og:title" content="{{ meta_title }}">
+<meta property="og:description" content="{{ meta_desc }}">
+<meta property="og:type" content="{{ og_type }}">
+<meta property="og:url" content="{{ meta_url }}">
+<meta property="og:locale" content="en_US">
+
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="{{ meta_title }}">
+<meta name="twitter:description" content="{{ meta_desc }}">
+
+{# og:image + twitter:image (summary_large_image) get wired in Phase 3,
+   once static/img/og-default.png (the share card) exists. #}
+
+{%- if config.extra.google_site_verification %}
+<meta name="google-site-verification" content="{{ config.extra.google_site_verification }}">
+{%- endif %}
+{%- if config.extra.bing_site_verification %}
+<meta name="msvalidate.01" content="{{ config.extra.bing_site_verification }}">
+{%- endif %}
+
+{# ── JSON-LD structured data (AEO / rich results) ─────────────────────── #}
+{%- if page is defined %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": {{ page.title | json_encode | safe }},
+  "url": {{ page.permalink | json_encode | safe }},
+  "mainEntityOfPage": {{ page.permalink | json_encode | safe }},
+  "datePublished": {{ page.date | json_encode | safe }},
+  "dateModified": {{ page.updated | default(value=page.date) | json_encode | safe }},
+  "description": {{ meta_desc | json_encode | safe }},
+  "author": { "@type": "Person", "name": {{ config.extra.author | json_encode | safe }}, "url": {{ config.extra.author_url | json_encode | safe }} },
+  "publisher": { "@type": "Person", "name": {{ config.extra.author | json_encode | safe }} }
+}
+</script>
+{%- else %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": {{ config.title | json_encode | safe }},
+  "url": {{ config.base_url | json_encode | safe }},
+  "description": {{ config.description | json_encode | safe }},
+  "author": { "@type": "Person", "name": {{ config.extra.author | json_encode | safe }}, "url": {{ config.extra.author_url | json_encode | safe }} }
+}
+</script>
+{%- endif %}

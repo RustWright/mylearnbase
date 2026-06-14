@@ -1,0 +1,21 @@
+User-agent: *
+Allow: /
+
+# AI / LLM crawlers are explicitly welcome — this is a public learning journal,
+# and being readable by AI answer engines is a goal (AEO), not a concern.
+User-agent: GPTBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+Sitemap: {{ get_url(path="sitemap.xml") }}
