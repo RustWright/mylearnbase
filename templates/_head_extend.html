@@ -6,6 +6,10 @@
    `section` on section/home pages, neither on special pages (404). #}
 <link rel="stylesheet" href="{{ get_url(path='css/custom.css') }}">
 
+{# Crisp SVG favicon (modern browsers prefer it; adapts to browser dark mode).
+   PNG fallbacks for older browsers are declared in the theme's _base.html. #}
+<link rel="icon" type="image/svg+xml" href="{{ get_url(path='img/favicon.svg') }}">
+
 {# Reader prefs — apply saved size/typeface BEFORE paint so far-sighted
    readers never see a flash of default text that then jumps. Mirrors the
    theme's inline dark-mode script. Keys are shared with js/reader-controls.js;
@@ -54,13 +58,15 @@
 <meta property="og:type" content="{{ og_type }}">
 <meta property="og:url" content="{{ meta_url }}">
 <meta property="og:locale" content="en_US">
+<meta property="og:image" content="{{ get_url(path='img/og-default.png') }}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="{{ config.title }} — {{ config.description }}">
 
-<meta name="twitter:card" content="summary">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="{{ meta_title }}">
 <meta name="twitter:description" content="{{ meta_desc }}">
-
-{# og:image + twitter:image (summary_large_image) get wired in Phase 3,
-   once static/img/og-default.png (the share card) exists. #}
+<meta name="twitter:image" content="{{ get_url(path='img/og-default.png') }}">
 
 {%- if config.extra.google_site_verification %}
 <meta name="google-site-verification" content="{{ config.extra.google_site_verification }}">

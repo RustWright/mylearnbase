@@ -5,7 +5,7 @@ Modeled on `omni-me/ui-checklist.md`, content-shifted for a **static content sit
 
 Legend: `[ ]` not yet verified • `[x]` verified pass • `[!]` known issue/gap to fix
 
-Last swept: 2026-06-14 (Sweep 4 — Cycle 3 reader controls)
+Last swept: 2026-06-14 (Sweep 5 — Cycle 3 logo / favicon / OG)
 
 ---
 
@@ -108,10 +108,10 @@ Last swept: 2026-06-14 (Sweep 4 — Cycle 3 reader controls)
 ## SEO / Social surface (cross-checks Phase 2/3)
 
 - [x] `<title>` + `<meta name="description">` present and per-page correct — Sweep 3 (Lighthouse SEO `document-title` + `meta-description` pass)
-- [x] **OpenGraph + Twitter cards** render — Sweep 3 (text-only: og:site_name/title/description/type/url/locale + twitter:card/title/description; `og:image` deferred to Phase 3)
+- [x] **OpenGraph + Twitter cards** render — Sweep 3 (og:site_name/title/description/type/url/locale + twitter:card/title/description); **og:image + twitter:image wired Sweep 5** (1200×630 card, `summary_large_image`)
 - [x] **JSON-LD** structured data present + parses — Sweep 3 (`BlogPosting` on leaf posts, `WebSite` on home/sections; all valid JSON). _Schema-field validity pending external validator — see below._
 - [x] `<link rel="canonical">` present — Sweep 3 (per-page `page.permalink` / `section.permalink`)
-- [ ] Favicon resolves (no 404) — `[!]` currently missing (Phase 3)
+- [x] Favicon resolves (no 404) — Sweep 5 (SVG favicon + 16/32/180 PNGs + apple-touch; all 200)
 - [x] `sitemap.xml`, `robots.txt`, `llms.txt` reachable at root — Sweep 3 (`robots.txt` now custom AI-welcoming + production `Sitemap:`; `llms.txt` served)
 - [ ] **Privacy analytics** snippet present (Tier 2) — _not yet built_
 
@@ -266,3 +266,32 @@ author/verification keys, new `templates/robots.txt`, new `static/llms.txt`):
 - Italic / bold-italic OpenDyslexic faces not bundled (400 + 700 only); fine for body
   reading. Add if emphasis-heavy posts need it.
 - Control is post-page only. Lift into a base template if it's wanted site-wide.
+
+### Sweep 5 — 2026-06-14 (Cycle 3 Phase 3 — logo, favicon, OG image)
+
+**Logo design (process recorded):** brief = curiosity/learning (primary) + technology/
+creativity (secondary) + a "base" nod (stretch); *not* developer-coded. Diverged across
+3 directions (spark / orbit / arc), converged on the **spark**, refined 4 ways to fix
+"generic," landed on **rising spark grounded on a base** ("spark of curiosity rising
+from a base" / reads as a spinning top — "stability in motion"). Judged at 16px and in
+a browser-tab + OG-card mock before committing any files.
+
+**Assets shipped** (`static/img/`): `logo.svg` (canonical, `currentColor` → theme-adaptive
+for inline use), `favicon.svg` (explicit brand blue + `prefers-color-scheme` dark variant),
+`favicon-16x16.png` / `favicon-32x32.png` (transparent), `apple-touch-icon.png` (180, opaque
+white bg per iOS), `og-default.png` (1200×630 share card: mark + wordmark + tagline + URL).
+Rasterized via headless Chrome (no system rasterizer present).
+
+**Wiring** (`templates/_head_extend.html`): SVG favicon `<link>` added (PNG fallbacks already
+in theme `_base.html`); `og:image` (+ width/height/alt) and `twitter:image` wired to the
+share card; `twitter:card` upgraded `summary` → `summary_large_image`.
+
+**Verification:** `zola build` clean; all six assets resolve **200** (favicon 404s gone);
+emitted `<head>` carries absolute image URLs; `scripts/seo-audit.sh` **ALL PASS**, Lighthouse
+SEO still **100/100**.
+
+**Open / future:**
+- Homepage avatar slot (`section.extra.avatar`) still empty — logo now exists, wiring it in
+  is an optional follow-up (decision pending; would change the settled homepage header).
+- `og:image` is one default card for all pages; per-post share images are a possible later add.
+- Real social-unfurl + Rich Results checks need a public URL → Phase 4 (post-deploy).
