@@ -1,8 +1,8 @@
 # Personal Website Project
 
-**Status:** Active — **Cycle 2 closed 2026-05-16**
+**Status:** Active — **Cycle 3 closed 2026-06-14**
 **Started:** 2026-01-31
-**Current Phase:** Cycle 2 Session 4 — Per-form authoring sweep **COMPLETE** (5/5); resources landed 2026-05-14. `editorial/resources.md` written + published as `authoring-a-resources-post`. Walkthrough refinements: job statement sharpened to "future-you can find them in one place when the need arises"; author contribution framed as **implicit by curation-by-act** (not prose-per-bullet); sub-types collapsed 3 → 2 (question-driven dropped); Topic 4 (writing-well) skipped as standalone section — third consecutive form to do so. **Curiosity-log mechanism + Task 13 (`/create-post` skill rewrite) shipped 2026-05-15** — instructions in global `~/.claude/CLAUDE.md`; mylearnbase seeded with `cycle-2.md`; create-post skill is now a routing skill that prompts for form first and reads the relevant `editorial/<form>.md` as source of truth. Remaining Cycle 2 work: Task 15 (PROJECT_PROCESS + CLAUDE.md sync with cycle-close review pass), Task 14 sub-items (tagging strategy doc, home-page navigation), POST_SYSTEM.md v1 deletion, Phase 8 cycle close. Task 10 (real omni-me logbook entry) + first concepts post (hash demo) deferred — user opted for full scaffolding build over real-content validation.
+**Current Phase:** Cycle 3 (Discoverability & UX) **CLOSED** 2026-06-14 — site is public-ready. Shipped: homepage rework (hero + value-prop + forms guide + social links), full SEO/AEO plumbing (per-page canonical / OpenGraph / Twitter card / JSON-LD, custom `robots.txt` + `llms.txt`, **Lighthouse SEO 100/100** via the new `scripts/seo-audit.sh` harness), reader accessibility controls (text size 14–28px + Sans/Serif/Mono/**OpenDyslexic**, `localStorage`-persisted, no-FOUC), an intentional **logo / favicon / OG share card** (spark-rising-from-a-base mark), and search-engine **registration** (GSC + Bing + ahrefs + LinkedIn). First ahrefs audit **67 → 98%** after fixing taxonomy canonicals (47 pages, via Tera's `current_url`), removing the unused `categories` taxonomy, and the user's Cloudflare **www→apex + http→https** redirect rules. **Next-cycle entry point (for Cycle 4 Planning):** Pagefind site search + reading-time + prev/next nav + privacy analytics (deferred Tier 1/2); portfolio-demo candidate = the live reader controls; concepts hash-demo + mylearnbase meta-logbook still queued from Cycle 2.
 **Domain:** mylearnbase.com
 
 ---
@@ -90,6 +90,7 @@
 - [x] Session 5: Testing/Catchup (Cycle 1) (2026-02-11)
 - [x] Session 6: Tooling (out-of-cycle) (2026-02-18)
 - [x] Cycle 2 Session 4: Implementation — Phases 1-8 complete (2026-05-09 to 2026-05-16). Per-form **5/5** (logbook + concepts-v0 + workflows + opinions + resources) + cross-form tagging editorial (2026-05-16). Session F (2026-05-15 → 2026-05-16) shipped the entire scaffolding closeout: **curiosity-log mechanism**, **Task 13 `/create-post` skill rewrite**, **Task 15 PROJECT_PROCESS + CLAUDE.md structural sync** (re-canonicalized to `setup_files/`, all 4 mirrors synced, per-project CLAUDE.md restructured to point at PROJECT_PROCESS), **Task 14 sub-items** (tagging strategy doc + homepage navigation), **POST_SYSTEM.md v1 deletion**, **Phase 8 final verification + plan archive**. Task 10 + first concepts post (hash demo) deferred per user — editorial docs will validate on first organic use.
+- [x] Cycle 3: Discoverability & UX — Phases R/0–4 complete (2026-06-14). Homepage rework, SEO/AEO plumbing (Lighthouse SEO 100/100 + `scripts/seo-audit.sh`), reader controls (size + Sans/Serif/Mono/OpenDyslexic), logo / favicon / OG share card, search-engine registration (GSC + Bing + ahrefs + LinkedIn). ahrefs **67 → 98%** after canonical (`current_url`) + `categories`-removal + Cloudflare www/http redirect fixes. Tracked via the plan-mode plan + `ui-checklist.md` Sweeps 1–6 (no `tasks.md` rewrite this cycle). **Cycle 3 closed.**
 
 ---
 
@@ -592,3 +593,41 @@ Cycle 2 summary across all sessions:
 - Homepage navigation surfaces all five forms
 
 Cycle 3 entry point: open. Likely candidates per memory: real-content validation (the deferred Task 10 omni-me logbook entry; first concepts post hash-demo) once the user has lived use of the system, or omni-me work continues with the new post system in play.
+
+### Cycle 3 — Discoverability & UX (2026-06-14)
+
+**Goal:** Make the site publicly discoverable (SEO/AEO + search-engine registration) now that real content is landing ("SEO indexing takes time — start the clock early"), and improve reader-facing UX, driven by a UI review checklist. Plan archived at `.archive/cycle-3-discoverability-ux/PLAN.md` (phased, each phase independently shippable; logo decoupled as a non-blocking leaf).
+
+**Tracking note:** Cycle 3 was tracked via the plan-mode plan + `ui-checklist.md` verification sweeps (Sweeps 1–6) rather than a `tasks.md` rewrite. `tasks.md` still holds the Cycle 2 list and will be reset at Cycle 4 Planning.
+
+**Phases shipped:**
+
+- **Phase R / 0 — Research + UI checklist (Sweep 1 baseline).** Created `ui-checklist.md` (content-site adaptation of omni-me's app-oriented one). Baseline sweep: build clean (22 pages), responsive verified, **TOC confirmed already shipped by Serene** (reclassified build → verify); identified homepage thinness, missing favicon/OG/JSON-LD/`llms.txt`, no reader controls. **Decided against Pagefind search this cycle** (deferred to next).
+- **Phase 1 — Homepage rework (Sweep 2).** Bold hero (`#name`, which had no theme rule) + tagline + value-prop; data-driven **"What you'll find here"** forms guide (`section.extra.guide`, surfaces empty `concepts`); "Latest" recent-posts heading; GitHub + LinkedIn social links wired. New `templates/_head_extend.html` override (loads `custom.css`; later hosts the SEO tags).
+- **Phase 2 — SEO/AEO plumbing (Sweep 3).** `_head_extend.html`: per-page `<link rel=canonical>`, OpenGraph, Twitter card, JSON-LD (`BlogPosting` on leaf posts / `WebSite` on home+sections), gated GSC/Bing verification meta slots. Custom `templates/robots.txt` (AI-crawler-welcoming + production `Sitemap:`) + `static/llms.txt`. **Objective audit:** new `scripts/seo-audit.sh` one-command harness (build + check + root resources + JSON-LD parse/`@type` + head surface + Lighthouse SEO vs. a temp `zola serve`; optional `--online` schema.org). **Lighthouse SEO = 100/100.**
+- **Reader controls (Sweep 4).** Floating "Aa" panel on post pages (bottom-left — theme's `#back-to-top` owns bottom-right): text size 14–28px + typeface Sans/Serif/Mono/**OpenDyslexic** (self-hosted SIL OFL, loaded **on demand** = 0 bytes unless selected). Scoped to `article.prose` (size via `--reader-font-size`; family via `data-reader-font` on `<html>` so font stacks live only in CSS). `localStorage`-persisted; no-FOUC inline head script mirrors the theme's dark-mode pattern. Progressive enhancement (ships `[hidden]`, JS reveals).
+- **Phase 3 — Logo / favicon / OG (Sweep 5).** Intentional design process (user wanted to understand the reasoning before committing): brief = curiosity/learning (primary) + technology/creativity (secondary) + a "base" nod (stretch), *not* developer-coded → 3 directions (spark / orbit / arc) → converge on the **spark** → refine 4 ways → **rising spark grounded on a base** (reads as a spinning top, "stability in motion"). Judged at 16px + browser-tab + OG-card mock before committing files. Assets: `logo.svg` (currentColor, theme-adaptive), `favicon.svg` (explicit blue + `prefers-color-scheme` dark), 16/32/180 PNGs, `og-default.png` (1200×630). Rasterized via headless Chrome (no system rasterizer present). Wired og:image/twitter:image + `summary_large_image`; homepage avatar (`favicon.svg`, theme circle-crop overridden). Favicon 404s gone.
+- **Phase 4 — Registration & promotion + ahrefs triage (Sweep 6).** User completed GSC (URL-prefix property, HTML-tag verify, sitemap submitted → success), Bing (GSC import), ahrefs (GSC verify), LinkedIn (OG card rendered correctly on a real unfurl). First ahrefs audit **= 67**; user exported red-triangle issues for triage.
+
+**ahrefs triage — root-cause analysis (the load-bearing engineering of the cycle):**
+
+- **47 non-canonical pages (dominant issue).** Every `/tags/*` and `/series/*` canonicalized to `/posts/`. Root cause: the custom taxonomy templates (`templates/tags|series/*.html`) set a local `section` var for layout, which made `_head_extend`'s `section.permalink` resolve to `/posts/`. **Fix:** prefer Tera's **`current_url`** global — the authoritative rendered URL, *not* shadowed by the local `set` — for canonical + og:url. One-line universal fix; all page types now self-canonical. Verified live.
+- **`/categories/` 404.** Vestigial `categories` taxonomy declared but unused (the apparent "uses" were post *prose*, not frontmatter). **Fix:** removed from `zola.toml [taxonomies]`.
+- **www 522 + http→https.** The `www` CNAME was proxied through Cloudflare but attached to nothing (not a Pages custom domain, no redirect) → the edge received the request, found no origin, and timed out (522); the apex worked because it *is* a Pages custom domain. **Fix (user, Cloudflare dashboard):** two template Redirect Rules — http→https and www→apex — which fire at the edge before any origin lookup. `www` now 301s to the apex; 522 gone.
+- **Accepted residue (user opted not to fix):** Cloudflare email-obfuscation (`/cdn-cgi/l/email-protection`) flagged as a broken link; one orphan `/posts/logbook/omni-me/`. Cloudflare-layer artifacts / minor; canonical tags already force the apex.
+
+**Result:** repo fixes deployed via Cloudflare CI/CD; **second ahrefs crawl = 98%**, most real issues cleared. `validator.schema.org` returns 0 errors / 0 warnings on the live JSON-LD. Site live, discoverable, registered, and LinkedIn-shareable with a correct OG card.
+
+**Phase D — Post-system pulls:**
+
+1. **Curiosity review (`.curiosities/cycle-3.md`):** 1 entry (logo design process). **No survivors** — resolved in-session (the curiosity *was* the motivation for the structured Phase-3 walkthrough, so it was answered by doing the work) and it doesn't lend itself to an interactive demo, so it's not a concepts candidate. Noted as possible future opinions/workflows material (outside the cycle process). Annotated in the file. (Zero survivors is expected.)
+2. **Portfolio-demo candidate (for Cycle 4 Planning):** the **reader controls** (live font / size / typeface toggle) are genuinely interactive and would make a strong `{{ demo() }}` portfolio demo as logbook §6 evidence — picked on coolness + implementability (fits the static-site constraint, it's just client-side JS/CSS).
+
+**Deferred → carried to Cycle 4 Planning:**
+
+- Pagefind site search (Tier 1 — directly serves the founding "if I can find my own content, others can too" criterion).
+- Reading time + prev/next post nav (Tier 1/2).
+- Privacy analytics snippet (Tier 2).
+- mylearnbase meta-logbook + first concepts post (hash demo) — still deferred from Cycle 2 (trigger: after the first concept demo ships).
+
+**Cycle 3 closed.**

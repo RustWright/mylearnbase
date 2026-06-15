@@ -5,7 +5,7 @@ Modeled on `omni-me/ui-checklist.md`, content-shifted for a **static content sit
 
 Legend: `[ ]` not yet verified • `[x]` verified pass • `[!]` known issue/gap to fix
 
-Last swept: 2026-06-14 (Sweep 5 — Cycle 3 logo / favicon / OG)
+Last swept: 2026-06-14 (Sweep 6 — Cycle 3 Phase 4 registration + ahrefs triage + www fix)
 
 ---
 
@@ -109,7 +109,7 @@ Last swept: 2026-06-14 (Sweep 5 — Cycle 3 logo / favicon / OG)
 
 - [x] `<title>` + `<meta name="description">` present and per-page correct — Sweep 3 (Lighthouse SEO `document-title` + `meta-description` pass)
 - [x] **OpenGraph + Twitter cards** render — Sweep 3 (og:site_name/title/description/type/url/locale + twitter:card/title/description); **og:image + twitter:image wired Sweep 5** (1200×630 card, `summary_large_image`)
-- [x] **JSON-LD** structured data present + parses — Sweep 3 (`BlogPosting` on leaf posts, `WebSite` on home/sections; all valid JSON). _Schema-field validity pending external validator — see below._
+- [x] **JSON-LD** structured data present + parses — Sweep 3 (`BlogPosting` on leaf posts, `WebSite` on home/sections; all valid JSON). Schema-field validity confirmed Sweep 6 — `validator.schema.org` returns **0 errors / 0 warnings** against the live site.
 - [x] `<link rel="canonical">` present — Sweep 3 (per-page `page.permalink` / `section.permalink`)
 - [x] Favicon resolves (no 404) — Sweep 5 (SVG favicon + 16/32/180 PNGs + apple-touch; all 200)
 - [x] `sitemap.xml`, `robots.txt`, `llms.txt` reachable at root — Sweep 3 (`robots.txt` now custom AI-welcoming + production `Sitemap:`; `llms.txt` served)
@@ -294,3 +294,40 @@ SEO still **100/100**.
 - Homepage avatar — **added** (logo mark via `favicon.svg`, theme circle-crop overridden).
 - `og:image` is one default card for all pages; per-post share images are a possible later add.
 - Real social-unfurl + Rich Results checks need a public URL → Phase 4 (post-deploy).
+
+### Sweep 6 — 2026-06-14 (Cycle 3 Phase 4 — registration, promotion + ahrefs triage)
+
+**Registration & promotion (user-driven, browser/dashboard side):**
+- Google Search Console — URL-prefix property, HTML-tag verification (token in
+  `zola.toml [extra].google_site_verification`, emitted via `_head_extend.html`),
+  `sitemap.xml` submitted → **success** (indexing will take time, as expected).
+- Bing Webmaster Tools — imported from GSC, smooth.
+- ahrefs — site added, verified via GSC.
+- LinkedIn — OG card **rendered correctly** when the URL was shared (validates the
+  Phase-3 `og:image` + Phase-2 OG tags end-to-end on a real unfurl).
+
+**First ahrefs audit = 67.** User exported every red-triangle issue; triaged to root causes:
+
+- `[x]` **47 non-canonical pages** (the dominant issue) — every `/tags/*` and `/series/*`
+  canonicalized to `/posts/`. Root cause: the custom taxonomy templates set a local
+  `section` var for layout, which made `_head_extend`'s `section.permalink` resolve to
+  `/posts/`. **Fix:** prefer Tera's `current_url` global (authoritative rendered URL, not
+  shadowed by the local `set`) for canonical + og:url. One-line universal fix; all page
+  types now self-canonical. Verified live.
+- `[x]` **`/categories/` 404** — vestigial `categories` taxonomy declared but unused
+  (apparent "uses" were post *prose*, not frontmatter). **Fix:** removed from `zola.toml`.
+- `[x]` **www 522 + http→https** — the `www` CNAME was proxied through Cloudflare but
+  attached to nothing (no Pages custom domain, no redirect) → edge got the request, found
+  no origin, timed out (522). **Fix (user, Cloudflare dashboard):** two template Redirect
+  Rules — http→https and www→apex. `www` now 301s to the apex; 522 gone.
+- `[~]` **Accepted residue (user opted not to fix):** Cloudflare email-obfuscation
+  (`/cdn-cgi/l/email-protection`) flagged as a broken link; one orphan
+  `/posts/logbook/omni-me/`. Cloudflare-layer artifacts / minor; canonical tags already
+  force the apex.
+
+**Result:** repo fixes deployed via Cloudflare CI/CD; **second ahrefs crawl = 98%**, most
+real issues cleared. `validator.schema.org` returns 0 errors / 0 warnings on the live JSON-LD.
+
+**Verdict → Cycle 3 closed.** Site is public-ready and discoverable: registered across
+GSC / Bing / ahrefs, LinkedIn-shareable with a correct OG card, Lighthouse SEO 100/100,
+self-canonical on every page type.
