@@ -17,7 +17,7 @@ omni-me accepts a transaction through four entry points: a photo, a PDF, the bod
 
 The budget pipeline existed end-to-end on the backend before any of this work began: 16 event types, 12 Tauri commands, and three auto-import sources running server-side. None of it had a UI inbound path. The commands were orphan code, reachable only from DevTools — usable on paper, unreachable from the app.
 
-Automatic import — Wise, WealthSimple, and an email IMAP poller — was the foreground work for the preceding stretch; the previous personal-finance tracking attempt collapsed when manual sync became tedious enough to abandon, which is why automation got priority. But automatic import only covers what the user's banks export. Everything else — paper receipts, photo receipts, ad-hoc cash transactions, statements from accounts without an API — still needs a hand-driven entry path. Capture is that path.
+Automatic import — Globepay, Northwind, and an email IMAP poller — was the foreground work for the preceding stretch; the previous personal-finance tracking attempt collapsed when manual sync became tedious enough to abandon, which is why automation got priority. But automatic import only covers what the user's banks export. Everything else — paper receipts, photo receipts, ad-hoc cash transactions, statements from accounts without an API — still needs a hand-driven entry path. Capture is that path.
 
 Persisting the captured file alongside the transaction was the last sub-step before *capture* meant what it sounded like. Without it, the receipt is discarded the moment the transaction is saved, and the auto-import-vs-manual distinction collapses into "either way the source document disappears."
 
@@ -63,7 +63,7 @@ running 0 tests
 test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
 ```
 
-[`tauri-app/src-tauri/src/commands/attachments.rs:1`](https://github.com/RustWright/omni-me/blob/3bde328e748d6113586f9059fc186b1b26c5b2b0/tauri-app/src-tauri/src/commands/attachments.rs#L1) at `3bde328`
+[`tauri-app/src-tauri/src/commands/attachments.rs:1`](https://github.com/RustWright/omni-me/blob/baf3fd48e9d6ea5cebad9590eaaf7de1c2750a11/tauri-app/src-tauri/src/commands/attachments.rs#L1) at `baf3fd4`
 > `//! Local attachment cache (Phase 3.7).`
 >
 > The cache module — the five tests at the bottom `#[cfg(test)] mod tests` block exercise the LRU in isolation, no Tauri runtime involved.
@@ -80,7 +80,7 @@ Picking a file kicks off the extract round trip. The confirm form lands pre-popu
 
 ![TransactionForm pre-populated with extracted draft and the Attachment saved indicator](./03-transaction-form-with-attachment.png)
 
-[`server/src/routes/documents.rs:46`](https://github.com/RustWright/omni-me/blob/3bde328e748d6113586f9059fc186b1b26c5b2b0/server/src/routes/documents.rs#L46) at `3bde328`
+[`server/src/routes/documents.rs:46`](https://github.com/RustWright/omni-me/blob/baf3fd48e9d6ea5cebad9590eaaf7de1c2750a11/server/src/routes/documents.rs#L46) at `baf3fd4`
 > `async fn extract_handler(`
 >
 > The `extract_handler` — when `?attach=true` is set on the query, the same body bytes that get extracted are hashed and stored into the blob dir; the response carries the `AttachmentRef` back in one round trip.

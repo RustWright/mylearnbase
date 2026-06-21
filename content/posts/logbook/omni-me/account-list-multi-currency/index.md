@@ -28,7 +28,7 @@ converts.
 ## Why was it added now?
 
 The user holds money in several currencies, at multiple banks. A
-typical mix today spans CAD, USD, EUR, and NGN, and that set tends to
+typical mix today spans CAD, USD, EUR, and AED, and that set tends to
 grow as new activities come up. Without a surface that converts those
 holdings into one figure, "how much do I have right now" requires
 re-doing the FX math across banking apps or a spreadsheet. The
@@ -92,23 +92,23 @@ splicing** — joining the reconciliation date and statement balance
 onto the computed balance so the screen can show "last reconciled
 through X · statement Y."
 
-[`core/src/balances.rs:93`](https://github.com/RustWright/omni-me/blob/a43610db99545c992aebb9917387449a358a5bae/core/src/balances.rs#L93) at `a43610d`
+[`core/src/balances.rs:83`](https://github.com/RustWright/omni-me/blob/baf3fd48e9d6ea5cebad9590eaaf7de1c2750a11/core/src/balances.rs#L83) at `baf3fd4`
 > `pub fn account_summaries(`
 >
 > Pure-function entry point — takes journal content + declared accounts + base currency, returns one summary per surfaced account with per-commodity rows and a base-currency total.
 
-[`core/src/balances.rs:180`](https://github.com/RustWright/omni-me/blob/a43610db99545c992aebb9917387449a358a5bae/core/src/balances.rs#L180) at `a43610d`
+[`core/src/balances.rs:257`](https://github.com/RustWright/omni-me/blob/baf3fd48e9d6ea5cebad9590eaaf7de1c2750a11/core/src/balances.rs#L257) at `baf3fd4`
 > `mod tests {`
 >
 > Test module — fixtures + the 8 test cases that exercise the three buckets above.
 
 The rendered screen shows the multi-commodity row in context — the
-Wise account folds CAD, EUR, and USD into a single CAD total, and the
-Standard Chartered NGN account shows the `—` badge where no rate is
+Globepay account folds CAD, EUR, and USD into a single CAD total, and the
+Meridian AED account shows the `—` badge where no rate is
 available to convert the native amount:
 
 
-![Accounts screen showing five cards — the Wise row folds CAD, EUR, and USD into a single CAD total; the Standard Chartered NGN row shows the `—` badge where no rate is available to convert the native amount.](./01-accounts-multi-currency.png)
+![Accounts screen showing five cards — the Globepay row folds CAD, EUR, and USD into a single CAD total; the Meridian AED row shows the `—` badge where no rate is available to convert the native amount.](./01-accounts-multi-currency.png)
 
 ## What's worth remembering or doing next?
 

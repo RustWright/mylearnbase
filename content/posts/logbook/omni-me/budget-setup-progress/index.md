@@ -87,12 +87,12 @@ skipped silently. **Posting flatten** (4 tests): non-expense legs
 drop, foreign legs without a Prices entry drop, base-currency legs
 pass through, malformed rows skip.
 
-[`core/src/budget.rs:27`](https://github.com/RustWright/omni-me/blob/55421b3ed61f2d5b4df308a94810c0e7c68b7615/core/src/budget.rs#L27) at `55421b3`
+[`core/src/budget.rs:27`](https://github.com/RustWright/omni-me/blob/baf3fd48e9d6ea5cebad9590eaaf7de1c2750a11/core/src/budget.rs#L27) at `baf3fd4`
 > `pub fn period_to_days(period: &str) -> Option<u32> {`
 >
 > period_to_days — the cadence parser. `custom:N` is the forward-compat hook the dropdown doesn't yet expose; the test bucket above covers its positive-integer / zero / non-numeric branches.
 
-[`core/src/budget.rs:266`](https://github.com/RustWright/omni-me/blob/55421b3ed61f2d5b4df308a94810c0e7c68b7615/core/src/budget.rs#L266) at `55421b3`
+[`core/src/budget.rs:266`](https://github.com/RustWright/omni-me/blob/baf3fd48e9d6ea5cebad9590eaaf7de1c2750a11/core/src/budget.rs#L266) at `baf3fd4`
 > `pub fn compute_budget_progress(`
 >
 > compute_budget_progress — the aggregator entry point. Takes the budget set, the flattened postings, and an `as_of` date; per budget, resolves the current window via `current_period_window`, sums matching postings, and returns the `BudgetProgress` rows the screen renders.
@@ -121,7 +121,7 @@ and falls back to the raw string for unknowns — so a hand-crafted
 being silently downgraded. **Bar color** (3 tests): the three-band
 policy picks green under 75%, amber up to 100%, red over budget.
 
-[`tauri-app/frontend/src/pages/finances.rs:3239`](https://github.com/RustWright/omni-me/blob/55421b3ed61f2d5b4df308a94810c0e7c68b7615/tauri-app/frontend/src/pages/finances.rs#L3239) at `55421b3`
+[`tauri-app/frontend/src/pages/finances.rs:3843`](https://github.com/RustWright/omni-me/blob/baf3fd48e9d6ea5cebad9590eaaf7de1c2750a11/tauri-app/frontend/src/pages/finances.rs#L3843) at `baf3fd4`
 > `fn progress_color_class(percent_used: f64, over_budget: bool) -> &'static str {`
 >
 > progress_color_class — the bar-color policy. Takes the percent-used and an over-budget flag; returns the Tailwind class for the bar fill. The three-band cutoffs visible in the screenshots below land in this function.
@@ -130,7 +130,7 @@ The screen's entry point lives in the Finances tab's *Plan +
 reconcile* section, alongside Recurring and Import statement:
 
 
-![The Finances home with the Plan + reconcile section showing three entries: Budgets, Recurring, and Import statement.](./finances-home-plan-reconcile-section.png)
+![The Finances home scrolled to the Plan + reconcile section, with Budgets listed alongside Recurring, Import statement, and the other reconcile entries.](./finances-home-plan-reconcile-section.png)
 
 Inside, the screen carries the add form at the top and one progress
 row per saved budget. Three rows here illustrate the three color

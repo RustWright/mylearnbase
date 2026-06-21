@@ -68,13 +68,13 @@ test reconciliation::tests::rejects_amount_mismatch ... ok
 test reconciliation::tests::rejects_outside_days_window ... ok
 test reconciliation::tests::rejects_currency_mismatch ... ok
 test reconciliation::tests::rejects_same_sign_pairs ... ok
-test statement_csv::tests::parse_cibc_chequing_empty_input_errors ... ok
-test statement_csv::tests::parse_cibc_chequing_handles_zero_amount_as_skip ... ok
-test statement_csv::tests::parse_cibc_chequing_accepts_legacy_us_date_format ... ok
-test statement_csv::tests::parse_cibc_chequing_rejects_both_debit_and_credit_populated ... ok
-test statement_csv::tests::parse_cibc_chequing_basic ... ok
-test statement_csv::tests::parse_cibc_chequing_skips_blank_blank_row ... ok
-test statement_csv::tests::parse_cibc_chequing_skips_header_row ... ok
+test statement_csv::tests::parse_chequing_csv_empty_input_errors ... ok
+test statement_csv::tests::parse_chequing_csv_handles_zero_amount_as_skip ... ok
+test statement_csv::tests::parse_chequing_csv_accepts_legacy_us_date_format ... ok
+test statement_csv::tests::parse_chequing_csv_rejects_both_debit_and_credit_populated ... ok
+test statement_csv::tests::parse_chequing_csv_basic ... ok
+test statement_csv::tests::parse_chequing_csv_skips_blank_blank_row ... ok
+test statement_csv::tests::parse_chequing_csv_skips_header_row ... ok
 
 test result: ok. 22 passed; 0 failed; 0 ignored; 0 measured; 347 filtered out; finished in 0.00s
 
@@ -95,17 +95,17 @@ statement source; output stable in score-descending order.
 positive discrepancy when cleared exceeds statement; negative when
 cleared falls short.
 
-[`core/src/statement_csv.rs:75`](https://github.com/RustWright/omni-me/blob/55421b3ed61f2d5b4df308a94810c0e7c68b7615/core/src/statement_csv.rs#L75) at `55421b3`
-> `pub fn parse_cibc_chequing(csv: &str) -> Result<Vec<ParsedStatementRow>, CsvParseError> {`
+[`core/src/statement_csv.rs:75`](https://github.com/RustWright/omni-me/blob/baf3fd48e9d6ea5cebad9590eaaf7de1c2750a11/core/src/statement_csv.rs#L75) at `baf3fd4`
+> `pub fn parse_chequing_csv(csv: &str) -> Result<Vec<ParsedStatementRow>, CsvParseError> {`
 >
-> parse_cibc_chequing — the CSV parser entry. Returns a format-agnostic ParsedStatementRow shape (date, description, amount + sign direction); the caller layers on the source-account + Unmatched-leg construction at the Tauri-command boundary.
+> parse_chequing_csv — the CSV parser entry. Returns a format-agnostic ParsedStatementRow shape (date, description, amount + sign direction); the caller layers on the source-account + Unmatched-leg construction at the Tauri-command boundary.
 
-[`core/src/reconciliation.rs:69`](https://github.com/RustWright/omni-me/blob/55421b3ed61f2d5b4df308a94810c0e7c68b7615/core/src/reconciliation.rs#L69) at `55421b3`
+[`core/src/reconciliation.rs:69`](https://github.com/RustWright/omni-me/blob/baf3fd48e9d6ea5cebad9590eaaf7de1c2750a11/core/src/reconciliation.rs#L69) at `baf3fd4`
 > `pub fn find_match_candidates(`
 >
 > find_match_candidates — the matching engine entry. Walks Unmatched-touching transactions pairwise, gates on amount-cancels-out + same-commodity + within-days-window, scores survivors by day-decay + description-similarity, and returns pairs in score-descending order (lex-stable so the same input yields the same output).
 
-[`core/src/budget.rs:208`](https://github.com/RustWright/omni-me/blob/55421b3ed61f2d5b4df308a94810c0e7c68b7615/core/src/budget.rs#L208) at `55421b3`
+[`core/src/budget.rs:208`](https://github.com/RustWright/omni-me/blob/baf3fd48e9d6ea5cebad9590eaaf7de1c2750a11/core/src/budget.rs#L208) at `baf3fd4`
 > `pub fn balance_check(`
 >
 > balance_check — sums the cleared postings on the supplied account up through the as-of date, then subtracts the statement's reported closing balance. Zero is balanced; any non-zero is the discrepancy the verdict card surfaces.
@@ -143,11 +143,11 @@ When the workflow is done, Balance check audits the result against
 the statement's reported total:
 
 
-![The Balance check form filled in for Assets:CIBC:Chequing with a statement balance of 1500.00 CAD; below, an amber verdict card reads "Discrepancy: -20.00 CAD (1480.00 cleared vs 1500.00 on statement)".](./balance-check-discrepancy-verdict.png)
+![The Balance check form filled in for Assets:Summit:Chequing with a statement balance of 1500.00 CAD; below, an amber verdict card reads "Discrepancy: -20.00 CAD (1480.00 cleared vs 1500.00 on statement)".](./balance-check-discrepancy-verdict.png)
 
 ## What's worth remembering or doing next?
 
 - The matching engine is a concepts-demo candidate: a pure-transform WASM island taking fake `Unmatched`-touching transactions, surfacing ranked candidates, and rendering the merge. Teaches the balance-zero invariant interactively.
 - Cross-commodity matching is deferred (same-commodity gate today). Workaround: merge cross-currency pairs manually. Revisit when FX-pair patterns are common enough to make the manual path painful.
 - A balancing-posting affordance for hidden fees (wire fees, FX spread) is deferred. Workaround: record a separate manual fee transaction. Revisit if reconciliation often needs a third leg.
-- CSV format variants deferred — credit-card layout adds a column the chequing parser doesn't read; non-CIBC banks need their own parser. Sign convention already covers Asset and Liability accounts uniformly.
+- CSV format variants deferred — credit-card layout adds a column the chequing parser doesn't read; non-Summit banks need their own parser. Sign convention already covers Asset and Liability accounts uniformly.

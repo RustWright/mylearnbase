@@ -100,12 +100,12 @@ headroom; no when balance lands exactly at zero (the strict-`>` rule
 from the policy decision); no when net worth is unavailable; negative
 amounts treated as refunds.
 
-[`core/src/dashboard.rs:90`](https://github.com/RustWright/omni-me/blob/a68b2ee706090cbed2ba498ac30484fbb4e41329/core/src/dashboard.rs#L90) at `a68b2ee`
+[`core/src/dashboard.rs:101`](https://github.com/RustWright/omni-me/blob/baf3fd48e9d6ea5cebad9590eaaf7de1c2750a11/core/src/dashboard.rs#L101) at `baf3fd4`
 > `pub fn dashboard_summary(`
 >
 > Pure-function entry point — produces the four-widget payload (net worth, Unmatched, monthly trend, recurring) from a parsed journal, declared accounts, and confirmed recurring patterns.
 
-[`core/src/dashboard.rs:312`](https://github.com/RustWright/omni-me/blob/a68b2ee706090cbed2ba498ac30484fbb4e41329/core/src/dashboard.rs#L312) at `a68b2ee`
+[`core/src/dashboard.rs:348`](https://github.com/RustWright/omni-me/blob/baf3fd48e9d6ea5cebad9590eaaf7de1c2750a11/core/src/dashboard.rs#L348) at `baf3fd4`
 > `pub fn can_i_afford(amount: Decimal, summary: &DashboardSummary) -> AffordVerdict {`
 >
 > The Can-I-Afford policy — strict-`>` boundary so a balance landing exactly at zero reads as can't-afford.

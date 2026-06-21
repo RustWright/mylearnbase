@@ -66,7 +66,7 @@ test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 5 filtered out; fini
 
 ```
 
-[`core/src/events/budget_projection.rs:1148`](https://github.com/RustWright/omni-me/blob/c3a3f893e64bfe6690b332261a0175bb50985328/core/src/events/budget_projection.rs#L1148) at `c3a3f89`
+[`core/src/events/budget_projection.rs:1242`](https://github.com/RustWright/omni-me/blob/baf3fd48e9d6ea5cebad9590eaaf7de1c2750a11/core/src/events/budget_projection.rs#L1242) at `baf3fd4`
 > `    async fn list_transactions_filter_by_date_range() {`
 >
 > Filter test block — six tests against a tempfile::tempdir + real BudgetProjection fixture cover all four filter axes (date range, account substring case-insensitive, category exact, tag membership) plus blank-string normalization plus the empty-filter pass-through. This first test is one of the six; the rest follow immediately below.
@@ -76,7 +76,7 @@ The list view drives the filter from the frontend side. The screenshot below app
 
 ![Transaction list with tag:food filter applied — two of four mock-fixture rows pass](./01-transaction-list-filtered.png)
 
-[`tauri-app/frontend/src/pages/finances.rs:1732`](https://github.com/RustWright/omni-me/blob/c3a3f893e64bfe6690b332261a0175bb50985328/tauri-app/frontend/src/pages/finances.rs#L1732) at `c3a3f89`
+[`tauri-app/frontend/src/pages/finances.rs:2145`](https://github.com/RustWright/omni-me/blob/baf3fd48e9d6ea5cebad9590eaaf7de1c2750a11/tauri-app/frontend/src/pages/finances.rs#L2145) at `baf3fd4`
 > `fn TransactionListView(`
 >
 > The list view's two-state filter — `draft_filter` for what the FilterBar inputs hold, `active_filter` for what the current page reflects. Typing into a field doesn't fire a query; only Apply copies draft → active, and the `use_effect` re-runs on `active_filter` change. Load-more pagination defaults to 50 rows per page.
@@ -102,7 +102,7 @@ test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 28 filtered out; fin
 
 ```
 
-[`tauri-app/frontend/src/pages/finances.rs:2416`](https://github.com/RustWright/omni-me/blob/c3a3f893e64bfe6690b332261a0175bb50985328/tauri-app/frontend/src/pages/finances.rs#L2416) at `c3a3f89`
+[`tauri-app/frontend/src/pages/finances.rs:5360`](https://github.com/RustWright/omni-me/blob/baf3fd48e9d6ea5cebad9590eaaf7de1c2750a11/tauri-app/frontend/src/pages/finances.rs#L5360) at `baf3fd4`
 > `mod tests {`
 >
 > Pure-fn tests for the attachment-helper layer — `classify_attachment` over image, PDF, and "other" MIME variants (including case-insensitivity), plus `extract_attachment_meta` over complete and missing-required-field refs.
@@ -114,7 +114,7 @@ The image-render branch is what the next screenshot shows. The mock backend serv
 
 What revokes the URL when the user navigates away?
 
-[`tauri-app/frontend/src/pages/finances.rs:2127`](https://github.com/RustWright/omni-me/blob/c3a3f893e64bfe6690b332261a0175bb50985328/tauri-app/frontend/src/pages/finances.rs#L2127) at `c3a3f89`
+[`tauri-app/frontend/src/pages/finances.rs:2956`](https://github.com/RustWright/omni-me/blob/baf3fd48e9d6ea5cebad9590eaaf7de1c2750a11/tauri-app/frontend/src/pages/finances.rs#L2956) at `baf3fd4`
 > `impl Drop for ObjectUrlGuard {`
 >
 > Object-URL lifetime guard. The `Drop` impl calls `URL.revokeObjectURL` so the WebView doesn't accumulate orphaned blob URLs across navigations. The detail view holds the guard in a `Signal<Option<ObjectUrlGuard>>`, so unmount drops the guard and revokes the URL automatically.
@@ -124,7 +124,7 @@ Inline edit happens on both surfaces and uses the same component pair. The scree
 
 ![Inline tag edit caught mid-state — a tag input has replaced the +tag affordance, the wrapping row did not navigate to detail](./03-inline-edit-mid-edit.png)
 
-[`tauri-app/frontend/src/pages/finances.rs:1540`](https://github.com/RustWright/omni-me/blob/c3a3f893e64bfe6690b332261a0175bb50985328/tauri-app/frontend/src/pages/finances.rs#L1540) at `c3a3f89`
+[`tauri-app/frontend/src/pages/finances.rs:1953`](https://github.com/RustWright/omni-me/blob/baf3fd48e9d6ea5cebad9590eaaf7de1c2750a11/tauri-app/frontend/src/pages/finances.rs#L1953) at `baf3fd4`
 > `fn EditableCategoryChip(`
 >
 > The inline-edit chip. Click swaps the chip for an input; Enter saves and the chip updates in place, Escape cancels. Every internal click calls `stop_propagation` so the wrapping list-row button doesn't navigate to detail mid-edit — that's the load-bearing engineering claim of inline editing on a clickable row. Same pattern (click-to-input, Enter saves, Escape cancels, `stop_propagation` on every internal click) drives the tag-list editor too.

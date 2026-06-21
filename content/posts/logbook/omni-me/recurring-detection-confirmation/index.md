@@ -82,17 +82,17 @@ otherwise-clean rhythm. **Determinism** (1 test): the pattern id
 derived from the vendor/amount/cadence shape is stable across runs —
 what lets the user's Confirm or Dismiss survive a re-scan.
 
-[`core/src/recurring.rs:57`](https://github.com/RustWright/omni-me/blob/55421b3ed61f2d5b4df308a94810c0e7c68b7615/core/src/recurring.rs#L57) at `55421b3`
+[`core/src/recurring.rs:57`](https://github.com/RustWright/omni-me/blob/baf3fd48e9d6ea5cebad9590eaaf7de1c2750a11/core/src/recurring.rs#L57) at `baf3fd4`
 > `pub fn classify_cadence(gaps_days: &[u32]) -> Option<u32> {`
 >
 > classify_cadence — takes the sorted day-gaps between occurrences and returns the median cadence if every gap falls inside that median's tolerance bucket (7-day, 14-day, 30-day, or pass-through). The all-gaps-must-agree check is what keeps a few coincidentally-spaced charges from being labeled a pattern.
 
-[`core/src/recurring.rs:97`](https://github.com/RustWright/omni-me/blob/55421b3ed61f2d5b4df308a94810c0e7c68b7615/core/src/recurring.rs#L97) at `55421b3`
+[`core/src/recurring.rs:97`](https://github.com/RustWright/omni-me/blob/baf3fd48e9d6ea5cebad9590eaaf7de1c2750a11/core/src/recurring.rs#L97) at `baf3fd4`
 > `pub fn detect_patterns(txn_rows: &[TxnPostingsRow]) -> Vec<DetectedPattern> {`
 >
 > detect_patterns — the scanner entry. Groups transactions by (category, signed amount, commodity), drops groups below MIN_OCCURRENCES, sorts each group's dates, computes day-gaps, calls classify_cadence, and emits one DetectedPattern per accepted group.
 
-[`tauri-app/src-tauri/src/recurring_scanner.rs:25`](https://github.com/RustWright/omni-me/blob/55421b3ed61f2d5b4df308a94810c0e7c68b7615/tauri-app/src-tauri/src/recurring_scanner.rs#L25) at `55421b3`
+[`tauri-app/src-tauri/src/recurring_scanner.rs:25`](https://github.com/RustWright/omni-me/blob/baf3fd48e9d6ea5cebad9590eaaf7de1c2750a11/tauri-app/src-tauri/src/recurring_scanner.rs#L25) at `baf3fd4`
 > `pub fn spawn(`
 >
 > spawn — the boot-spawned nightly task. 60-second warm-up so the first scan doesn't compete with app startup, then a 24-hour cadence indefinitely. Each tick calls detect_patterns over the current journal and emits RecurringTransactionDetected events for pattern ids that aren't already in the recurring_patterns table.
