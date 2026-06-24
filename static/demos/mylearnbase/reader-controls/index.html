@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reader controls — interactive demo</title>
+<!--
+  Self-contained sandbox demo for the mylearnbase "reader controls" feature.
+  Embedded via the {{ demo() }} shortcode (templates/shortcodes/demo.html).
+
+  It reproduces the production mechanism faithfully:
+    - text size  -> a --reader-font-size CSS var on the document root
+    - typeface   -> a data-reader-font attribute on <html>, with the font
+                    stacks living in CSS (no font map in JS)
+  (mirrors static/css/custom.css + static/js/reader-controls.js).
+
+  Two deliberate, minor adaptations for the sandbox:
+    1. The panel is rendered inline-and-expanded, not behind the site's
+       floating "Aa" toggle, so the knobs are visible immediately.
+    2. No localStorage — toggling is ephemeral, so playing in the demo
+       never overwrites the reader's real site-wide preference.
+  The control logic itself is identical to production.
+-->
+<style>
+  :root {
+    --bg: #ffffff;
+    --text: #2b2b2b;
+    --pale: #6b6b6b;
+    --primary: #2563eb;
+    --primary-pale: #eaf0fe;
+    --border: #d9d9d9;
+
+    --main-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                 Helvetica, Arial, sans-serif;
+    --code-font: "SF Mono", "Cascadia Code", "JetBrains Mono", Menlo,
+                 Consolas, "Liberation Mono", monospace;
+
+    /* Defaults the controls drive. Mirrors production: body text falls back
+       to --base-size when --reader-font-size is unset. */
+    --base-size: 16px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1b1b1d;
+      --text: #e7e7e7;
+      --pale: #9a9a9a;
+      --primary: #6ea8ff;
+      --primary-pale: #1f2f4d;
+      --border: #3a3a3c;
+    }
+  }
+
+  /* OpenDyslexic — self-hosted at the site root, loaded ON DEMAND. A browser
+     only fetches it when the "Dyslexic" typeface is actually selected, so it
+     costs 0 bytes otherwise. (SIL OFL 1.1 — opendyslexic.org) */
+  @font-face {
+    font-family: "OpenDyslexic";
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url("/fonts/opendyslexic-400.woff2") format("woff2");
+  }
+  @font-face {
+    font-family: "OpenDyslexic";
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+    src: url("/fonts/opendyslexic-700.woff2") format("woff2");
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--main-font);
+    line-height: 1.6;
+    padding: 1.1rem 1.25rem 1.5rem;
+  }
+
+  /* ── The control panel (inline-expanded in the sandbox) ───────────── */
+  .panel {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1.25rem;
+    padding: 0.8rem 1rem;
+    margin-bottom: 1.25rem;
+    border: 1.5px solid var(--primary);
+    border-radius: 8px;
+    background: var(--bg);
+  }
+  .row { display: flex; align-items: center; gap: 0.55rem; }
+  .label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--pale);
+    margin-right: 0.15rem;
+  }
+  .size button {
+    width: 2rem; height: 2rem;
+    border: 1.5px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+    border-radius: 4px;
+    cursor: pointer;
+    font: inherit;
+  }
+  .size button:hover:not(:disabled) { border-color: var(--primary); color: var(--primary); }
+  .size button:disabled { opacity: 0.4; cursor: default; }
+  #size-val { min-width: 3.2rem; text-align: center; font-size: 0.9rem; }
+
+  .fonts { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+  .fonts button {
+    padding: 0.4rem 0.7rem;
+    border: 1.5px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+    border-radius: 4px;
+    font-size: 0.85rem;
+    cursor: pointer;
+  }
+  .fonts button[aria-pressed="true"] {
+    border-color: var(--primary);
+    color: var(--primary);
+    background: var(--primary-pale);
+  }
+  .fonts button[data-font="serif"]    { font-family: Georgia, "Times New Roman", serif; }
+  .fonts button[data-font="mono"]     { font-family: var(--code-font); }
+  .fonts button[data-font="dyslexic"] { font-family: "OpenDyslexic", sans-serif; }
+
+  #reset {
+    margin-left: auto;
+    background: none; border: none; padding: 0;
+    color: var(--pale);
+    font-size: 0.78rem;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+  #reset:hover { color: var(--primary); }
+
+  /* ── The reading surface the controls act on ─────────────────────── */
+  /* In production the same rules are scoped to `article.prose`. */
+  .prose {
+    font-size: var(--reader-font-size, var(--base-size));
+    max-width: 38rem;
+  }
+  .prose h2 { font-size: 1.4em; margin: 0 0 0.5em; }
+  .prose p { margin: 0 0 1em; }
+
+  html[data-reader-font="serif"]    .prose { font-family: Georgia, "Iowan Old Style", "Palatino Linotype", "Times New Roman", serif; }
+  html[data-reader-font="mono"]     .prose { font-family: var(--code-font); }
+  html[data-reader-font="dyslexic"] .prose { font-family: "OpenDyslexic", sans-serif; }
+  /* sans = default (--main-font); no rule needed */
+
+  .hint {
+    margin-top: 1.5rem;
+    font-size: 0.82rem;
+    color: var(--pale);
+  }
+</style>
+</head>
+<body>
+
+  <div class="panel" role="group" aria-label="Reading options">
+    <div class="row size">
+      <span class="label">Text size</span>
+      <button id="size-dec" type="button" aria-label="Decrease text size">A&minus;</button>
+      <span id="size-val" aria-live="polite">16px</span>
+      <button id="size-inc" type="button" aria-label="Increase text size">A+</button>
+    </div>
+    <div class="row">
+      <span class="label">Typeface</span>
+      <div class="fonts">
+        <button type="button" data-font="sans" aria-pressed="true">Sans</button>
+        <button type="button" data-font="serif" aria-pressed="false">Serif</button>
+        <button type="button" data-font="mono" aria-pressed="false">Mono</button>
+        <button type="button" data-font="dyslexic" aria-pressed="false">Dyslexic</button>
+      </div>
+    </div>
+    <button id="reset" type="button">Reset</button>
+  </div>
+
+  <article class="prose">
+    <h2>A reading surface you can tune</h2>
+    <p>
+      Adjust the controls above and watch this text respond. The text-size
+      buttons step the body type between 14&nbsp;and&nbsp;28&nbsp;pixels; the
+      typeface buttons swap the whole reading surface between a sans-serif, a
+      serif, a monospace face, and <strong>OpenDyslexic</strong> — a typeface
+      whose weighted letterforms help some dyslexic readers track a line.
+    </p>
+    <p>
+      Nothing here touches the page chrome — only the article body changes,
+      exactly as it does on a real post. Size is applied through a single CSS
+      custom property on the document root; the typeface is selected by a data
+      attribute, so the font stacks stay in CSS and the script never carries a
+      font map.
+    </p>
+    <p>
+      On the live site your choice is remembered across pages and browser
+      restarts, because an accessibility preference should be sticky. This
+      sandbox deliberately forgets — so you can experiment freely without
+      changing how the rest of mylearnbase looks to you.
+    </p>
+  </article>
+
+  <p class="hint">This is a sandboxed copy of the feature. On a real post the
+    same controls live behind the floating &ldquo;Aa&rdquo; button.</p>
+
+<script>
+  // Trimmed copy of static/js/reader-controls.js — same apply logic, no
+  // persistence (the sandbox is intentionally ephemeral).
+  (function () {
+    "use strict";
+    var MIN = 14, MAX = 28, STEP = 2, DEFAULT = 16;
+    var root = document.documentElement;
+    var size = DEFAULT;
+
+    var dec = document.getElementById("size-dec");
+    var inc = document.getElementById("size-inc");
+    var val = document.getElementById("size-val");
+    var reset = document.getElementById("reset");
+    var fontBtns = document.querySelectorAll(".fonts button");
+
+    function clamp(n) { return Math.min(MAX, Math.max(MIN, n)); }
+
+    function applySize(n) {
+      root.style.setProperty("--reader-font-size", n + "px");
+      val.textContent = n + "px";
+      dec.disabled = n <= MIN;
+      inc.disabled = n >= MAX;
+    }
+    function applyFont(key) {
+      if (key === "sans") root.removeAttribute("data-reader-font");
+      else root.setAttribute("data-reader-font", key);
+      fontBtns.forEach(function (b) {
+        b.setAttribute("aria-pressed", b.dataset.font === key ? "true" : "false");
+      });
+    }
+
+    applySize(size);
+
+    dec.addEventListener("click", function () { size = clamp(size - STEP); applySize(size); });
+    inc.addEventListener("click", function () { size = clamp(size + STEP); applySize(size); });
+    fontBtns.forEach(function (b) {
+      b.addEventListener("click", function () { applyFont(b.dataset.font); });
+    });
+    reset.addEventListener("click", function () {
+      size = DEFAULT;
+      root.style.removeProperty("--reader-font-size");
+      applySize(size);
+      applyFont("sans");
+    });
+  })();
+</script>
+</body>
+</html>
