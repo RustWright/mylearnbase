@@ -248,3 +248,141 @@ html[data-reader-font="dyslexic"] article.prose {
 #reader-reset:hover {
   color: var(--primary-color);
 }
+
+/* ── Site header ─────────────────────────────────────────────────
+   Persistent slim bar (templates/_base.html) on every page. Sticky at
+   the top; static/js/header.js tucks it on scroll-down and reveals it on
+   scroll-up via the .is-hidden modifier. All colors are theme variables,
+   so light/dark adapt by construction. Several rules explicitly reset
+   margin/padding because the theme's generic `header`/`header a` rules
+   (main.scss) otherwise inflate the bar's links. */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  padding: 0;                 /* override theme `header { padding: 0 15px }` */
+  font-size: 1em;             /* reset theme `header { font-size: 0.8em }` so the inner
+                                 em below measures against the body, not 0.8× it (the nav
+                                 was compounding to ~0.68em) */
+  background: var(--bg-color);
+  border-bottom: 1px solid var(--primary-pale-color);
+  transition: transform 0.25s ease;
+}
+.site-header.is-hidden {
+  transform: translateY(-100%);
+}
+
+.site-header__inner {
+  max-width: var(--main-max-width);   /* line up with the content column */
+  margin: 0 auto;
+  padding: 0 15px;
+  height: 3rem;
+  display: flex;
+  align-items: center;
+  gap: 1.1em;
+  font-family: var(--main-font);
+  font-size: 0.95em;          /* ~0.95× body; no longer compounds with the theme header */
+}
+
+.site-header__brand {
+  margin: 0;                  /* override theme `header a` */
+  padding: 0;
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--text-color);
+  text-decoration: none;
+}
+.site-header__brand:hover {
+  color: var(--primary-color);
+}
+
+.site-header__nav {
+  display: flex;
+  align-items: center;
+  gap: 1.1em;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.site-header__nav a {
+  margin: 0;                  /* override theme `header a` */
+  padding: 0;
+  color: var(--text-pale-color);
+  text-decoration: none;
+}
+.site-header__nav a:hover {
+  color: var(--primary-color);
+}
+
+.site-header__actions {
+  margin-left: auto;          /* push the icon cluster to the right edge */
+  display: flex;
+  align-items: center;
+  gap: 0.4em;
+}
+.site-header__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.3rem;
+  border: none;
+  background: none;
+  color: var(--text-pale-color);
+  cursor: pointer;
+  line-height: 0;
+}
+.site-header__icon:hover {
+  color: var(--primary-color);
+}
+.site-header__icon svg {
+  display: block;
+  width: 1.15rem;
+  height: 1.15rem;
+}
+
+/* Sticky header offsets in-page anchor jumps (TOC, heading links) so a
+   target heading isn't hidden behind the bar. */
+html {
+  scroll-padding-top: 3.75rem;
+}
+
+/* Reduced-motion: no slide — the bar simply stays put. */
+@media (prefers-reduced-motion: reduce) {
+  .site-header {
+    transition: none;
+  }
+  .site-header.is-hidden {
+    transform: none;
+  }
+}
+
+@media (max-width: 425px) {
+  .site-header__inner {
+    height: 2.75rem;
+    gap: 0.8em;
+    font-size: 0.85em;
+  }
+  .site-header__nav {
+    gap: 0.8em;
+  }
+}
+
+/* ── Homepage profile: social icons ──────────────────────────────
+   GitHub/LinkedIn icons moved out of the retired #links row into the
+   profile block (templates/home.html), under the bio. */
+#info #profile-links {
+  display: flex;
+  gap: 0.7em;
+  line-height: 0;
+}
+#info #profile-links a {
+  color: var(--text-pale-color);
+}
+#info #profile-links a:hover {
+  color: var(--primary-color);
+}
+#info #profile-links a svg {
+  display: block;
+  width: 1.2rem;
+  height: 1.2rem;
+}

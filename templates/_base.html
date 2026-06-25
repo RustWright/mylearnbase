@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+
+<html lang="{% block lang %}{% endblock lang %}">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  {% block desc %}{% endblock desc %}
+  <title>{% block title %}{% endblock title %}</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="{{ get_url(path='img/favicon-32x32.png') }}">
+  <link rel="icon" type="image/png" sizes="16x16" href="{{ get_url(path='img/favicon-16x16.png') }}">
+  <link rel="apple-touch-icon" sizes="180x180" href="{{ get_url(path='img/apple-touch-icon.png') }}">
+  {% include "_custom_font.html" %}
+  {% include "_custom_css.html" %}
+  <link rel="stylesheet" href="{{ get_url(path='main.css') }}">
+  {% block head %}{% endblock head %}
+  {% include "_head_extend.html" %}
+</head>
+
+<body class="{% block page %}{% endblock page%}{% if config.extra.force_theme == "dark" %} dark{% endif %}">
+  {% if not config.extra.force_theme %}
+  <script>
+    const theme = sessionStorage.getItem('theme');
+    const match = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    if ((theme && theme == 'dark') || (!theme && match)) {
+      document.body.classList.add('dark');
+      const hl = document.querySelector('link#hl');
+      if (hl) hl.href = '{{ get_url(path="giallo-dark.css") }}';
+    }
+  </script>
+  {% endif %}
+
+  {#- ── Persistent site header (project addition; not in the Serene base). ──
+      Slim sticky bar that reveals on scroll-up and tucks on scroll-down via
+      static/js/header.js. Holds the canonical #theme-toggle — moved here from
+      the footer/homepage so exactly one exists site-wide (main.js binds the
+      single #theme-toggle it finds) — and a search-toggle stub revealed and
+      wired by static/js/search.js in a later step. -#}
+  <header id="site-header" class="site-header">
+    <nav class="site-header__inner" aria-label="Primary">
+      <a class="site-header__brand instant" href="{{ get_url(path='/') }}">{{ config.title }}</a>
+      <ul class="site-header__nav">
+        {% for item in config.extra.nav %}
+        <li><a class="instant" href="{{ get_url(path=item.path) }}">{{ item.name }}</a></li>
+        {% endfor %}
+      </ul>
+      <div class="site-header__actions">
+        <button id="search-toggle" class="site-header__icon" type="button" aria-label="Search" hidden>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="7"></circle>
+            <line x1="16.65" y1="16.65" x2="21" y2="21"></line>
+          </svg>
+        </button>
+        {% if not config.extra.force_theme %}
+        {% set moon_icon = load_data(path="icon/moon.svg") %}
+        {% set sun_icon = load_data(path="icon/sun.svg") %}
+        <button id="theme-toggle" class="site-header__icon" aria-label="theme switch">
+          <span class="moon-icon">{{ moon_icon | safe }}</span>
+          <span class="sun-icon">{{ sun_icon | safe }}</span>
+        </button>
+        {% endif %}
+      </div>
+    </nav>
+  </header>
+
+  {% block content %}{% endblock content %}
+  {% block script %}{% endblock script %}
+  <script src="{{ get_url(path='js/main.js') }}"></script>
+  <script src="{{ get_url(path='js/header.js') }}"></script>
+</body>
+
+</html>

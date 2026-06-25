@@ -1,0 +1,48 @@
+{#- Project override of the Serene footer. Identical to the theme's _footer.html
+    except the #theme-toggle button is removed: the canonical toggle now lives in
+    the site header (templates/_base.html), and keeping one here too would create a
+    duplicate #theme-toggle id on every page that includes the footer (main.js binds
+    only the first). RSS + copyright + the rss-mask dialog are unchanged. -#}
+{% if config.extra.blog_section_path is defined %}
+{% set blog_section_path = config.extra.blog_section_path %}
+{% endif %}
+<footer>
+  <div class="left">
+    <div class="copyright">
+      {{ config.extra.footer_copyright }}
+      {% if config.extra.footer_credits %}
+      <span>|</span>
+      Built with <a href="https://www.getzola.org" rel="noreferrer" target="_blank">zola</a> and <a href="https://github.com/isunjn/serene" rel="noreferrer" target="_blank">serene</a>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="right">
+    {% if blog_section_path is defined and section.path is starting_with(blog_section_path) %}
+    {% if section.generate_feeds %}
+      {% set_global rss_path = blog_section_path ~ "/" ~ config.feed_filenames.0 %}
+    {% elif config.generate_feeds %}
+      {% set_global rss_path = "/" ~ config.feed_filenames.0 %}
+    {% endif %}
+    {% if section.generate_feeds or config.generate_feeds %}
+    <a id="rss-btn" href="{{ get_url(path=rss_path) }}">RSS</a>
+    {% endif %}
+    {% endif %}
+  </div>
+</footer>
+
+{% if blog_section_path is defined and section.path is starting_with(blog_section_path) %}
+{% if section.generate_feeds or config.generate_feeds %}
+{% set link = get_url(path=rss_path) %}
+<dialog id="rss-mask">
+  <div>
+    <a href="{{ link }}">{{ link }}</a>
+    {% set copy_icon = load_data(path="icon/copy.svg") %}
+    {% set check_icon = load_data(path="icon/check.svg") %}
+    <button autofocus aria-label="copy" data-link="{{ link }}" data-copy-icon="{{ copy_icon }}" data-check-icon="{{ check_icon }}" >
+      {{ copy_icon | safe }}
+    </button>
+  </div>
+</dialog>
+{% endif %}
+{% endif %}

@@ -23,7 +23,7 @@
   <main class="layout-list">
     {# Aggregator: list recent posts per form, with archive at the bottom.
        Each form's recent posts come from its own subsection of /posts/.
-       Form ordering matches config.extra.sections (logbook first by cadence). #}
+       Form ordering: logbook first (most active cadence), then the rest, archive last. #}
     {% set forms = ["logbook", "concepts", "workflows", "opinions", "resources", "archive"] %}
     {% set per_form_limit = 10 %}
     {% for form in forms %}

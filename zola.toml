@@ -44,13 +44,13 @@ author_url = "https://www.linkedin.com/in/efe-erhie"
 google_site_verification = "lVCWcpiroGyahah4QBMEOkCFFj9TFedrUItIU87WYN8"
 bing_site_verification = ""
 
-sections = [
-  { name = "posts", path = "/posts", is_external = false },
-  { name = "logbook", path = "/posts/logbook", is_external = false },
-  { name = "workflows", path = "/posts/workflows", is_external = false },
-  { name = "resources", path = "/posts/resources", is_external = false },
-  { name = "opinions", path = "/posts/opinions", is_external = false },
-  { name = "concepts", path = "/posts/concepts", is_external = false },
+# Header nav (templates/_base.html) — slim, kept to active/populated surfaces.
+# Empty forms (concepts/opinions/resources) are intentionally left off the
+# follow-you-everywhere header; they stay linked on the homepage guide cards.
+nav = [
+  { name = "Posts", path = "/posts" },
+  { name = "Logbook", path = "/posts/logbook" },
+  { name = "Tags", path = "/tags" },
 ]
 blog_section_path = "/posts"
 
