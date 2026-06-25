@@ -16,12 +16,18 @@ The site is deployed on Cloudflare Pages, connected to the GitHub repository. Ev
 ### Build Command
 
 ```bash
-curl -sL https://github.com/getzola/zola/releases/download/v0.22.1/zola-v0.22.1-x86_64-unknown-linux-gnu.tar.gz | tar xz && ./zola build
+bash build.sh
 ```
 
-Cloudflare Pages no longer pre-installs Zola, so the build command downloads it first. This adds a few seconds but is reliable.
+`build.sh` (repo root) owns the full pipeline: it downloads Zola if it isn't already
+present, runs `zola build`, then indexes the rendered HTML with Pagefind
+(`npx pagefind`), which writes the search index into `public/pagefind/`. Cloudflare's
+build image already includes Node, so `npx` works with no extra setup. A plain
+`zola build` would skip the Pagefind step, so the build command must call the script.
 
-**To update Zola version:** Change the version number in the URL (both the directory name and the tarball name).
+**To update the Zola or Pagefind version:** edit `ZOLA_VERSION` / `PAGEFIND_VERSION` at
+the top of `build.sh` (no dashboard change needed). Test locally with `bash build.sh`
+before pushing.
 
 ## Custom Domain
 
@@ -48,9 +54,9 @@ Cloudflare generates preview URLs for branches (e.g., `abc123.mylearnbase.pages.
 ### Build Failures After Zola Updates
 
 If a new Zola version introduces breaking changes:
-1. Pin to the known-working version in the build command (currently v0.22.1)
-2. Test the new version locally with `zola build` before updating the build command
-3. Update the version in the build command only after local verification
+1. Pin to the known-working version in `build.sh` (currently Zola v0.22.1, Pagefind v1.5.2)
+2. Test the new version locally with `bash build.sh` before pushing
+3. Update the version in `build.sh` only after local verification
 
 ## Monitoring
 

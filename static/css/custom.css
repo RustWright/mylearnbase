@@ -386,3 +386,52 @@ html {
   width: 1.2rem;
   height: 1.2rem;
 }
+
+/* ── Search overlay (Pagefind) ───────────────────────────────────
+   The header trigger opens this; static/js/search.js lazy-loads the
+   Pagefind UI into #search-ui. Pagefind's own tokens are mapped to the
+   site's theme variables, so the results UI adapts to light/dark for
+   free (the theme vars already flip under body.dark). */
+.search-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;               /* above the sticky header (z-index 100) */
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 4rem 1rem 2rem;
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+.search-overlay[hidden] {
+  display: none;
+}
+.search-overlay__dialog {
+  width: 100%;
+  max-width: 34rem;
+  max-height: 80vh;
+  overflow: auto;
+  padding: 1rem;
+  background: var(--bg-color);
+  border: 1.5px solid var(--primary-color);
+  border-radius: 8px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
+}
+
+/* Lock background scroll while the overlay is open. */
+body.search-open {
+  overflow: hidden;
+}
+
+/* Map Pagefind UI tokens onto the site theme. */
+#search-ui {
+  --pagefind-ui-primary: var(--primary-color);
+  --pagefind-ui-text: var(--text-color);
+  --pagefind-ui-background: var(--bg-color);
+  --pagefind-ui-border: var(--text-decoration-color);
+  --pagefind-ui-tag: var(--primary-pale-color);
+  --pagefind-ui-border-width: 1.5px;
+  --pagefind-ui-border-radius: 6px;
+  --pagefind-ui-font: var(--main-font);
+}

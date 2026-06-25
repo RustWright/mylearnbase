@@ -64,10 +64,19 @@
     </nav>
   </header>
 
+  {#- Search overlay. Ships [hidden]; static/js/search.js reveals the header trigger
+      and lazy-loads the Pagefind UI into #search-ui on first open. -#}
+  <div id="search-overlay" class="search-overlay" hidden>
+    <div class="search-overlay__dialog" role="dialog" aria-modal="true" aria-label="Search">
+      <div id="search-ui"></div>
+    </div>
+  </div>
+
   {% block content %}{% endblock content %}
   {% block script %}{% endblock script %}
   <script src="{{ get_url(path='js/main.js') }}"></script>
   <script src="{{ get_url(path='js/header.js') }}"></script>
+  <script src="{{ get_url(path='js/search.js') }}"></script>
 </body>
 
 </html>
