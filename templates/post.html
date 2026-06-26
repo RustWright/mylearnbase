@@ -48,6 +48,12 @@
 {% endblock head %}
 
 {% block content %}
+{# The post's immediate parent section, resolved from its URL components. We do
+   this explicitly rather than via page.earlier/.later because the project
+   sections are `transparent`, which suppresses a child page's sibling links.
+   Drives the prev/next nav below. #}
+{%- set parent_path = page.components | slice(end=-1) | join(sep="/") -%}
+{%- set parent_section = get_section(path=parent_path ~ "/_index.md") -%}
 <div id="wrapper">
   <div id="blank"></div>
   <aside>
@@ -80,12 +86,12 @@
     {% endif %}
   </aside>
   <main>
-    <header>
-      <nav>
-        <a id="back-link" href="{{ get_url(path=section.path) }}">← Posts</a>
-      </nav>
-    </header>
-
+    {# No in-content back-link. The persistent site header (Posts / Logbook /
+       Tags / home wordmark) plus the browser's own Back button cover navigation.
+       The old "← Posts" link was wired to main.js's enableBackLink(), so when you
+       reached a post from elsewhere it history.back()'d off-target (e.g. to the
+       home page) instead of going to /posts — a label that didn't predict its
+       destination. Removed rather than relabelled, since it's now redundant. #}
     <div>
       {% if page.extra.copy is defined %}{% set allow_copy = page.extra.copy %}{% else %}{% set allow_copy = section.extra.copy %}{% endif %}
       {% if allow_copy %}
@@ -102,6 +108,10 @@
             <span>Updated on <span id="updated">{{ page.updated | date(format=section.extra.date_format) }}</span></span>
             {% endif -%}
           </div>
+
+          {% if page.reading_time %}
+          <div id="reading-time">{{ page.reading_time }} min read</div>
+          {% endif %}
 
           {% if page.taxonomies.tags is defined %}
           <div id="tags">
@@ -155,6 +165,40 @@
       {% include "_giscus_script.html" %}
       {% endif %}
     </div>
+
+    {# Adjacent posts within this post's own (transparent) section, walked from
+       the parent section's date-sorted pages — page.earlier/.later are not set
+       for transparent-section pages. Pages are newest-first, so the item just
+       before the current one in iteration is newer, the one just after is
+       older. "Previous" = older (read before); "Next" = newer (read next). #}
+    {%- set_global po_newer = "" -%}
+    {%- set_global po_older = "" -%}
+    {%- set_global po_seen = false -%}
+    {%- set_global po_prev = "" -%}
+    {%- for p in parent_section.pages -%}
+      {%- if po_seen and po_older == "" %}{% set_global po_older = p %}{% endif -%}
+      {%- if p.permalink == page.permalink -%}
+        {%- set_global po_seen = true -%}
+        {%- if not loop.first %}{% set_global po_newer = po_prev %}{% endif -%}
+      {%- endif -%}
+      {%- set_global po_prev = p -%}
+    {%- endfor -%}
+    {%- if po_older or po_newer %}
+    <nav class="post-nav" aria-label="Adjacent posts">
+      {%- if po_older %}
+      <a class="post-nav__link post-nav__prev" rel="prev" href="{{ po_older.permalink }}">
+        <span class="post-nav__dir">← Previous</span>
+        <span class="post-nav__title">{{ po_older.title }}</span>
+      </a>
+      {%- else %}<span class="post-nav__spacer"></span>{%- endif %}
+      {%- if po_newer %}
+      <a class="post-nav__link post-nav__next" rel="next" href="{{ po_newer.permalink }}">
+        <span class="post-nav__dir">Next →</span>
+        <span class="post-nav__title">{{ po_newer.title }}</span>
+      </a>
+      {%- endif %}
+    </nav>
+    {%- endif %}
 
     {% include "_footer.html" %}
   </main>

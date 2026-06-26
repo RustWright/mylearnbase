@@ -1,7 +1,7 @@
 +++
 title = "Site search"
 slug = "site-search"
-date = 2026-06-25
+date = 2026-06-25T12:00:00
 draft = false
 
 [taxonomies]

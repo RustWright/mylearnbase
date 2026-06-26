@@ -15,11 +15,7 @@
 
 {% block content %}
 <div id="wrapper">
-  <header>
-    <nav>
-      <a id="back-link" href="{{ get_url(path=config.extra.blog_section_path) }}">← Posts</a>
-    </nav>
-  </header>
+  {# No in-content back-link — header nav + browser Back cover it (see post.html). #}
   <main class="layout-list">
     <h1 class="title">{{ term.name }}</h1>
     <div class="post-list">

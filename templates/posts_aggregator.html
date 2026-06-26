@@ -14,11 +14,7 @@
 
 {% block content %}
 <div id="wrapper">
-  <header>
-    <nav>
-      <a id="back-link" href="{{ get_url(path="/") }}">← Home</a>
-    </nav>
-  </header>
+  {# No in-content back-link — header nav + browser Back cover it (see post.html). #}
   {% include "_section_title.html" %}
   <main class="layout-list">
     {# Aggregator: list recent posts per form, with archive at the bottom.

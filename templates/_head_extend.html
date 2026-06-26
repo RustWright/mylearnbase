@@ -98,6 +98,36 @@
   "publisher": { "@type": "Person", "name": {{ config.extra.author | json_encode | safe }} }
 }
 </script>
+{# BreadcrumbList — the post's place in the section hierarchy, for rich-result
+   breadcrumbs in search. Built from the immediate parent section (derived from
+   page.components, since the project sections are transparent and drop out of
+   page.ancestors): Home › …ancestors… › parent section › this post. No visible
+   counterpart — purely structured data. #}
+{%- if page.components | length > 1 %}
+{%- set bc_parent_path = page.components | slice(end=-1) | join(sep="/") -%}
+{%- set bc_parent = get_section(path=bc_parent_path ~ "/_index.md", metadata_only=true) -%}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Home", "item": {{ get_url(path="/") | json_encode | safe }} }
+    {%- set_global bc_pos = 1 -%}
+    {%- for ancestor in bc_parent.ancestors -%}
+      {%- if not loop.first -%}
+        {%- set crumb = get_section(path=ancestor, metadata_only=true) -%}
+        {%- set_global bc_pos = bc_pos + 1 -%}
+    ,{ "@type": "ListItem", "position": {{ bc_pos }}, "name": {{ crumb.title | json_encode | safe }}, "item": {{ crumb.permalink | json_encode | safe }} }
+      {%- endif -%}
+    {%- endfor -%}
+    {%- set_global bc_pos = bc_pos + 1 -%}
+    ,{ "@type": "ListItem", "position": {{ bc_pos }}, "name": {{ bc_parent.title | json_encode | safe }}, "item": {{ bc_parent.permalink | json_encode | safe }} }
+    {%- set_global bc_pos = bc_pos + 1 -%}
+    ,{ "@type": "ListItem", "position": {{ bc_pos }}, "name": {{ page.title | json_encode | safe }}, "item": {{ page.permalink | json_encode | safe }} }
+  ]
+}
+</script>
+{%- endif %}
 {%- else %}
 <script type="application/ld+json">
 {

@@ -435,3 +435,59 @@ body.search-open {
   --pagefind-ui-border-radius: 6px;
   --pagefind-ui-font: var(--main-font);
 }
+
+/* ── Post chrome: reading-time + adjacent-post nav ───────────────
+   Two small reader-orientation additions to the post template
+   (templates/post.html). Theme-variable colored, so light/dark adapt
+   by construction. (Breadcrumbs are emitted as BreadcrumbList JSON-LD
+   only — see templates/_head_extend.html — with no visible trail.) */
+
+/* Reading-time — a pale sibling of the publish date in #post-info,
+   set off from the date with a middot. */
+#reading-time {
+  color: var(--text-pale-color);
+  margin: 0 1em 1em 0;
+}
+#reading-time::before {
+  content: "\00B7";           /* · */
+  margin-right: 0.6em;
+}
+
+/* Adjacent-post navigation after the article: previous (older) on the
+   left, next (newer) on the right. A spacer keeps "next" right-aligned
+   when there is no previous. */
+.post-nav {
+  display: flex;
+  justify-content: space-between;
+  gap: 1em;
+  margin: 3em 0 1em;
+  padding-top: 1.5em;
+  border-top: 1px solid var(--primary-pale-color);
+}
+.post-nav__link {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25em;
+  max-width: 45%;
+  text-decoration: none;
+  color: var(--text-color);
+}
+.post-nav__next {
+  margin-left: auto;
+  text-align: right;
+}
+.post-nav__dir {
+  font-size: 0.8em;
+  color: var(--text-pale-color);
+}
+.post-nav__title {
+  font-weight: 600;
+}
+.post-nav__link:hover .post-nav__title {
+  color: var(--primary-color);
+}
+@media (max-width: 425px) {
+  .post-nav__link {
+    max-width: 48%;
+  }
+}
