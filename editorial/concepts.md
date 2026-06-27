@@ -8,9 +8,11 @@ something I didn't understand; here's the demo I built to come to
 understand it; here's what clicked when I did."*
 
 The form is new and still finding its shape. This doc is deliberately
-**rough and lightweight** — enough to start authoring with, not
-enough to be prescriptive. Expect substantial revision after the
-first real concepts post exists.
+**rough and lightweight**: enough to author with, not enough to be
+prescriptive. One concepts post now exists, *How indexing can make
+search faster* (`content/posts/concepts/how-search-works.md`). Notes
+below tagged *(first post)* are what building it taught. With n=1,
+treat them as observations, not laws.
 
 ## What concepts is for
 
@@ -85,20 +87,37 @@ curiosity. The post is written around the resulting demo.
 
 ## The shape of a concepts post
 
-These are starting points, not requirements. The first real concepts
-post will pressure-test them:
+These are starting points, not requirements. The first post has
+begun pressure-testing them (see the *(first post)* notes):
 
 | # | Section | What it carries |
 |---|---|---|
-| 1 | Title + one-line stake | The concept; what made you build a demo for it |
-| 2 | The curiosity moment | Where the question came from; link to the logbook entry or project context if applicable |
-| 3 | The demo | Interactive, front and center |
-| 4 | What clicked | What you understood after building it; what misunderstandings you held before |
-| 5 | Where this shows up *(optional)* | Cross-refs — related logbook entries, other concepts posts, external resources |
+| 1 | Title (+ optional stake) | The concept; optionally one personal line on why it was worth a demo |
+| 2 | The curiosity moment | Where the question came from; link the logbook entry or project context if applicable |
+| 3 | The demo | Interactive, front and center, with a line of setup before and a "what to notice" after |
+| 4 | What clicked *(optional)* | What you understood after building it. Include only if something genuinely did; cut it rather than force a takeaway |
+| 5 | Where this shows up *(optional)* | Cross-refs: related logbook entries, other concepts posts, external resources |
 
-Sections 1–4 are required; section 5 is optional. There is no
-"anti-patterns" or "when this breaks down" section like cookbook had
-— concepts posts are educational, not prescriptive.
+The spine is the title, the curiosity moment, and the demo. The
+stake, "what clicked," and "where this shows up" are all optional.
+There is no "anti-patterns" or "when this breaks down" section;
+concepts posts are educational, not prescriptive.
+
+*(first post)* The first post shipped without a stake line and
+without "what clicked." Its honest answer to "what clicked" was *not
+much, about indexing itself* (building the demo was the satisfying
+part), so the section was cut rather than padded. A forced reflection
+reads flat; an absent one reads fine.
+
+**Who drafts which section.** Descriptive and framing prose (the demo
+setup, "where this shows up") the LLM can draft first. The
+voice-bearing sections (the stake, the curiosity moment, what
+clicked) are the author's to draft first; the LLM polishes but never
+invents the author's experience or takeaway. *(first post)* The
+polish pass on the curiosity section quietly introduced claims the
+author hadn't made and a punctuation habit (heavy em-dashes) the
+author wouldn't use. Watch for both: better a plain honest sentence
+than a borrowed one.
 
 ## The demo
 
@@ -117,12 +136,42 @@ Two cross-form notes:
   — that's the part the LLM cannot do, and it's where the intellectual
   ownership lives.
 
+**What the first post taught about making a demo teach** *(first post)*:
+
+- **Pose an objective; don't ship open controls.** An open sandbox has
+  no first move, and a cold reader who lands on the page needs a reason
+  to touch it. The search demo used a mission ladder (find a common
+  word, scale to the whole book, hunt a word that isn't there, then
+  "was the index even worth building?"). The objective also forces the
+  reader to *do the slow way themselves*, which is the only way the
+  payoff lands.
+- **The contrast is the teaching.** Put the naive way and the clever
+  way side by side and let the reader run both. Feeling the slow way is
+  what makes the fast way mean anything. Count the honest cost
+  (operations, not wall-clock seconds) so the comparison stays fair
+  across devices.
+- **Stage freely, but name the staging.** The search demo paces the
+  scan so it's watchable (real JS finishes in milliseconds) and uses a
+  toy index, not Pagefind's real ranking and chunking. The prose says
+  so. A simplification you're honest about teaches; one you hide lies.
+- **Data prep is part of the work.** Sourcing a real public-domain
+  corpus (Project Gutenberg) and verifying the "ghost" word was truly
+  absent (grep returns nothing) was authoring effort, not setup. Real
+  material feels different from toy sentences.
+- **Comparative demos need room and a notice.** A side-by-side demo
+  breaks out wider than the reading column (`demo(wide=true)`) and
+  carries its own "works best on a wider screen" note that the demo
+  detects and shows itself, rather than baking the caveat into the post
+  prose. One-dimensional demos ship universal. The breakout, the
+  TOC-dodging, and the self-sizing-on-mobile mechanics live in
+  `static/css/custom.css` and the demo's own JS.
+
 ## The curiosity log mechanism
 
-Provisional shape (refine when first implemented):
+Shape (shipped 2026-05-15; used to seed the first concepts post):
 
-- **Location.** A project-local file — likely `<project-repo>/.curiosities/<cycle-id>.md`
-  or similar. Gitignored in the project submodule (same pattern as
+- **Location.** A project-local file, `<project-repo>/.curiosities/cycle-<N>.md`.
+  Gitignored in the project submodule (same pattern as
   `.log/`); synced via the parent `productive_learning` repo so it
   survives session resets without ending up in the project's public
   history.
@@ -131,8 +180,10 @@ Provisional shape (refine when first implemented):
 - **Review pass.** A dedicated cycle-close session walks the file
   end-to-end and decides what survives.
 
-This mechanism hasn't shipped yet. The first concepts cycle will
-likely surface refinements to all three points above.
+*(first post)* The trigger model held: a curiosity logged during
+Cycle 4 (Zola search turning out to be more than a switch) survived
+cycle-close review and became this post. The log works as the
+low-cadence on-ramp it was meant to be.
 
 ## Where it lives
 
@@ -147,52 +198,48 @@ built around an earlier form definition that doesn't apply here.
 They're left in place but unused for concepts posts; whether to
 repurpose or retire them is a downstream decision.
 
-## A worked sketch (not yet real)
+## A worked example (the first real post)
 
-The first concepts candidate, identified during the design
-conversation that produced this doc:
+The first concepts post grew from a Cycle-4 curiosity: adding search
+to this site, assuming Zola's built-in search would be a trivial
+switch, and finding out that "built-in search" is really a data
+structure that somebody builds and ships.
 
-> **Title.** What hashes actually do (a demo)
+> **Title.** How indexing can make search faster
 >
-> **Stake.** Built an upload-validation feature for omni-me that
-> hashes a file's bytes with SHA-256 on the client and re-verifies
-> on the server. Realized mid-implementation that "what a hash
-> actually is" wasn't something I understood — just that this is
-> what one does for upload integrity. Built this demo to come to
-> understand them properly.
+> **Concept.** The inverted index, framed as a transferable principle:
+> *pre-arrange your data around the question you'll ask, so future
+> queries are cheap.* Search is just the easiest place to see it; the
+> same shape is a database index, a hash map, a cache, a memoized
+> function.
 >
-> **Demo modes (sketch).**
+> **Demo.** A mission ladder over the real text of *The Adventures of
+> Sherlock Holmes* (one sentence per "document"), racing a
+> top-to-bottom scan against an index lookup: the mechanic on a few
+> lines, then scale on the full book, then a word that isn't there (a
+> paced wait that ends in "nothing found"), then a break-even slider
+> showing when the index's up-front build cost pays off.
 >
-> - An input box where typing produces the live SHA-256 hash.
-> - SHA-256 vs SHA-512 side-by-side on the same input.
-> - The avalanche effect — change one character, watch the whole
->   hash transform.
-> - A simulated client→server handshake mirroring the omni-me
->   upload-validation feature.
->
-> **What clicked (anticipated).** Before the demo, hashes lived in
-> my head as "compression with a checksum vibe." After: a fixed-size
-> summary where small input differences produce uncorrelated
-> outputs, and reversal is not a design goal but the *opposite* of
-> the design goal.
+> **What shipped.** Title, curiosity moment, demo, and "where this
+> shows up." No stake line and no "what clicked," for the reasons in
+> the section table above.
 
-This is a sketch, not a real post. When it gets built, expect this
-editorial doc to update with what the authoring rhythm actually felt
-like — that's the point of having a rough doc rather than a
-prescriptive one.
+Two demo ideas sit in the backlog for future cycles: *what hashes
+actually do* (the original v0 sketch for this doc), and a
+**ranking-by-rarity / relevance** demo that this post's closing
+forward-pointer gestures at (once you've found the matches, which
+come first?). The ranking demo depends on this one having landed
+first.
 
-## What's deliberately rough about this doc
+## What's still rough about this doc
 
-The logbook editorial doc walked six topics in depth — section-by-
+The logbook editorial doc walked six topics in depth: section-by-
 section quality bars, anti-patterns, multiple worked examples,
-practical tests per section. This doc doesn't.
+practical tests per section. This doc still doesn't, on purpose.
 
-The reason: prescriptive editorial assumes the form has been
-authored enough times to know what its rules are. Concepts has been
-authored zero times. Writing detailed rules in the abstract would
-manufacture editorial constraints that may not survive contact with
-the first real post.
-
-The intent of this v0 is to give an LLM in another project session
-enough context to *start* an authoring conversation — not enough to
-constrain it. Iterate after the first hash-demo post is real.
+Concepts has now been authored once. That seeds the *(first post)*
+notes above; it doesn't justify writing detailed rules in the
+abstract that may not survive post two. The intent stays the same:
+give an LLM in another session enough context to *start* an authoring
+conversation, not enough to constrain it. Keep iterating as more
+concepts posts ship.
