@@ -9,11 +9,15 @@
     name     — required. Path under /demos/, typically <project>/<demo-name>.
     height   — optional. Iframe pixel height; defaults to 480.
     caption  — optional. Rendered as a <figcaption>.
+    wide     — optional (bool). When true the demo breaks out wider than the
+               reading column (.demo--wide; see static/css/custom.css) — for
+               comparative/spatial interactives that need the room.
 -#}
 {%- set demo_url = "/demos/" ~ name ~ "/" -%}
 {%- set h = height | default(value=480) -%}
 {%- set cap = caption | default(value="") -%}
-<figure class="demo">
+{%- set is_wide = wide | default(value=false) -%}
+<figure class="demo{% if is_wide %} demo--wide{% endif %}">
   <iframe src="{{ demo_url }}" width="100%" height="{{ h }}" loading="lazy" title="Demo: {{ name }}" style="border: 1px solid var(--text-decoration-color); border-radius: var(--detail-border-radius, 0);"></iframe>
   {%- if cap %}
   <figcaption>{{ cap }}</figcaption>

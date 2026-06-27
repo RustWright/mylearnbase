@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>How search works: the index trick</title>
+  <link rel="stylesheet" href="./demo.css">
+</head>
+<body>
+  <div id="demo">
+    <div id="narrow-note">This demo compares two methods side by side. It works best on a wider screen (tablet, laptop, or desktop).</div>
+
+    <!-- ── pinned: the mission ── -->
+    <header id="mission-bar">
+      <div id="mission-meta">
+        <span id="mission-label">Mission 1 / 4</span>
+        <span id="mission-prompt">…</span>
+      </div>
+      <p id="mission-sub">…</p>
+      <div id="mission-controls">
+        <input id="query" type="text" autocomplete="off" spellcheck="false" placeholder="type a word to find…">
+        <button id="suggest" class="chip" hidden></button>
+        <button id="run">Run both</button>
+        <button id="skip" hidden>let the index finish it →</button>
+        <span id="corpus-size" class="legend"></span>
+      </div>
+    </header>
+
+    <!-- ── middle: the two lanes ── -->
+    <div id="lanes">
+      <section class="lane" id="scan-lane">
+        <h3>Scan <small>(check every document)</small></h3>
+        <div class="metrics">
+          <span>comparisons: <span class="num" id="scan-cmp">0</span></span>
+          <span>time: <span class="num" id="scan-time">0 ms</span> <span class="paced" id="scan-paced"></span></span>
+        </div>
+        <div class="corpus" id="scan-corpus"></div>
+        <div class="result" id="scan-result" hidden></div>
+      </section>
+
+      <section class="lane" id="index-lane">
+        <h3>Index <small>(jump straight to the word)</small></h3>
+        <div class="metrics">
+          <span>comparisons: <span class="num" id="index-cmp">0</span></span>
+          <span>time: <span class="num" id="index-time">0 ms</span></span>
+        </div>
+        <div class="index-view" id="index-view"></div>
+        <div class="result" id="index-result" hidden></div>
+      </section>
+    </div>
+
+    <!-- ── pinned: the visualization ── -->
+    <section id="viz">
+      <svg id="chart" width="240" height="130" role="img" aria-label="cost comparison chart"></svg>
+      <div id="viz-side">
+        <div id="viz-title">…</div>
+        <div id="viz-caption">…</div>
+        <div id="viz-controls"></div>
+      </div>
+    </section>
+
+    <!-- ── pinned: stepper nav ── -->
+    <nav id="stepper-nav">
+      <button id="prev" disabled>← Back</button>
+      <div id="dots"></div>
+      <button id="next">Next →</button>
+    </nav>
+  </div>
+
+  <script src="./demo.js"></script>
+</body>
+</html>

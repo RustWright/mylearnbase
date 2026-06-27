@@ -491,3 +491,40 @@ body.search-open {
     max-width: 48%;
   }
 }
+
+/* ── Wide demos: break an interactive out of the reading column ──────
+   The {{ demo(wide=true) }} shortcode adds .demo--wide. The article is
+   centered in the viewport, so shifting the figure's left edge to the
+   column centre and pulling back half its own width re-centres it on the
+   viewport — letting the demo be wider than the prose measure without JS.
+   Degrades to ~full width (96vw) on small screens. */
+.demo--wide {
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(96vw, 1080px);
+}
+.demo--wide figcaption,
+.demo--wide .demo-standalone-link {
+  max-width: 60ch;
+  margin-left: auto;
+  margin-right: auto;
+}
+/* Above 1024px the post page shows a sticky table-of-contents that fills the
+   entire right gutter (theme: body.post aside). A breakout centred on the
+   viewport runs its right edge into that TOC. So when the TOC is present,
+   re-centre the demo on the *non-TOC* region (empty left gutter + content
+   column) and cap its width so the right edge stops short of the TOC.
+   `100%` here is the article's width; `100vw` the viewport. */
+@media (min-width: 1025px) {
+  .demo--wide {
+    width: min(1080px, calc((100% + 100vw) / 2 - 1.5rem));
+    left: calc((300% - 100vw) / 4);
+  }
+}
+/* A comparative demo stacks its two lanes on mobile, so it needs more vertical
+   room than the desktop height. Give the iframe a taller mobile height: the demo
+   fills it via flex and the page scrolls past it (no nested scrollbar). */
+@media (max-width: 640px) {
+  .demo--wide iframe { height: 1040px; }
+}

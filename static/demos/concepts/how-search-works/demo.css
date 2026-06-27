@@ -1,0 +1,247 @@
+/* ───────────────────────────────────────────────────────────────────────
+   "How search works" — concepts demo
+   Self-contained styles (the demo runs in a sandboxed iframe, so it carries
+   its own minimal theme rather than inheriting the site's CSS).
+   Layout = a fixed-height stepper: pinned mission bar (top), two comparison
+   lanes (middle, the only scrolling region is the scan corpus), pinned
+   visualization + nav (bottom).
+   ─────────────────────────────────────────────────────────────────────── */
+
+:root {
+  --bg: #fbfaf8;
+  --panel: #ffffff;
+  --text: #2c3142;
+  --pale: #8a90a0;
+  --line: #e6e3dd;
+  --scan: #c2562f;     /* warm — the slow, grinding lane */
+  --index: #2f7d72;    /* cool — the fast lane */
+  --accent: #3b5bdb;
+  --hit: #ffe9a8;      /* match highlight */
+  --radius: 8px;
+  --mono: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+  --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1a1c22;
+    --panel: #23262e;
+    --text: #d7dae2;
+    --pale: #8a90a0;
+    --line: #343844;
+    --scan: #e8794f;
+    --index: #4fb3a4;
+    --accent: #7aa2ff;
+    --hit: #5a4f2a;
+  }
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body {
+  font-family: var(--sans);
+  color: var(--text);
+  background: var(--bg);
+  font-size: 15px;
+  line-height: 1.45;
+  overflow: hidden;            /* the demo manages its own scroll regions */
+}
+
+#demo {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  padding: 12px;
+  gap: 10px;
+}
+
+/* ── Narrow-screen notice (self-detecting; see demo.js) ─────────────── */
+#narrow-note {
+  display: none;
+  font-size: 0.82rem;
+  color: var(--pale);
+  background: var(--panel);
+  border: 1px dashed var(--line);
+  border-radius: var(--radius);
+  padding: 6px 10px;
+}
+body.is-narrow #narrow-note { display: block; }
+
+/* ── Mission bar (pinned top) ───────────────────────────────────────── */
+#mission-bar {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  flex: 0 0 auto;
+}
+#mission-meta { display: flex; align-items: baseline; gap: 10px; }
+#mission-label {
+  font: 600 0.72rem/1 var(--mono);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+#mission-prompt { font-weight: 600; }
+#mission-sub { color: var(--pale); font-size: 0.86rem; margin: 4px 0 8px; }
+#mission-controls { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+#query {
+  font: 0.95rem var(--mono);
+  padding: 7px 10px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text);
+  min-width: 170px;
+}
+button {
+  font: 600 0.86rem var(--sans);
+  padding: 7px 12px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--panel);
+  color: var(--text);
+  cursor: pointer;
+}
+button:hover { border-color: var(--accent); }
+button:disabled { opacity: .45; cursor: default; }
+#run { background: var(--accent); color: #fff; border-color: var(--accent); }
+#skip { border-color: var(--index); color: var(--index); }
+.chip { font-size: 0.8rem; padding: 5px 9px; border-style: dashed; color: var(--pale); background: var(--bg); }
+.chip:hover { color: var(--accent); border-color: var(--accent); }
+
+/* ── Lanes (middle, flexible) ───────────────────────────────────────── */
+#lanes {
+  flex: 1 1 auto;
+  min-height: 0;               /* lets the inner corpus scroll, not the page */
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);  /* minmax(0,…) so tracks can shrink, no h-overflow */
+  gap: 10px;
+}
+.lane {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.lane h3 { margin: 0 0 2px; font-size: 0.95rem; }
+.lane h3 small { font-weight: 400; color: var(--pale); }
+#scan-lane h3 { color: var(--scan); }
+#index-lane h3 { color: var(--index); }
+.metrics {
+  display: flex; gap: 14px;
+  font: 0.82rem var(--mono);
+  color: var(--pale);
+  margin-bottom: 8px;
+}
+.metrics .num { color: var(--text); font-weight: 600; }
+.metrics .paced { font-size: 0.7rem; }
+
+/* scan corpus — the one scrolling region */
+.corpus {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;            /* JS drives a windowed view; no manual scroll */
+  border-top: 1px solid var(--line);
+  padding-top: 8px;
+  font-size: 0.86rem;
+}
+.doc {
+  padding: 3px 6px;
+  border-radius: 4px;
+  color: var(--pale);
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;        /* show the sentence; clamp only the rare long one */
+  line-clamp: 2;
+}
+.doc.checking { background: rgba(194,86,47,.14); color: var(--text); }
+.doc.hit { background: var(--hit); color: var(--text); }
+.doc .id { font: 0.72rem var(--mono); color: var(--pale); margin-right: 8px; }
+
+/* index view — term rows + lookup result */
+.index-view { flex: 1 1 auto; min-height: 0; overflow-y: auto; border-top: 1px solid var(--line); padding-top: 8px; }
+.term-row {
+  display: flex; align-items: baseline; gap: 8px;
+  font: 0.84rem var(--mono);
+  padding: 3px 6px; border-radius: 4px;
+}
+.term-row.lit { background: rgba(47,125,114,.16); }
+.term-row .term { color: var(--index); font-weight: 600; min-width: 92px; }
+.term-row .arrow { color: var(--pale); }
+.term-row .postings { color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.index-note { color: var(--pale); font-size: 0.8rem; margin-top: 8px; }
+.flying { transition: transform .5s ease, opacity .5s ease; }
+
+/* result strip shared by both lanes */
+.result {
+  margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--line);
+  font-size: 0.84rem;
+}
+.result.none { color: var(--scan); font-weight: 600; }
+
+/* ── Visualization (pinned bottom) ──────────────────────────────────── */
+#viz {
+  flex: 0 0 auto;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+#viz svg { display: block; flex: 0 0 auto; }
+#viz-side { flex: 1 1 auto; min-width: 0; }
+#viz-title { font-weight: 600; font-size: 0.9rem; }
+#viz-caption { color: var(--pale); font-size: 0.82rem; margin-top: 2px; }
+#viz-controls { margin-top: 8px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+#viz-controls input[type=range] { flex: 1 1 120px; accent-color: var(--accent); }
+.legend { display: inline-flex; align-items: center; gap: 5px; font-size: 0.78rem; color: var(--pale); }
+.legend i { width: 14px; height: 3px; border-radius: 2px; display: inline-block; }
+.legend i.s { background: var(--scan); }
+.legend i.i { background: var(--index); }
+
+/* ── Stepper nav ────────────────────────────────────────────────────── */
+#stepper-nav {
+  flex: 0 0 auto;
+  display: flex; justify-content: space-between; align-items: center;
+}
+#dots { display: flex; gap: 6px; }
+#dots .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--line); }
+#dots .dot.on { background: var(--accent); }
+
+/* ── Responsive: drop the fixed-viewport stepper on narrow screens ──── */
+/* The fixed-height model (100vh + overflow:hidden + windowed corpus) is a
+   desktop conceit: it relies on the two lanes sitting side by side. Stacking
+   them on mobile doubles the vertical demand, which squeezes the corpus into a
+   clipped, fake-scrollable sliver. So on mobile we let the demo flow to its
+   natural height; demo.js sizes the iframe to fit (window.frameElement), so the
+   host *page* scrolls — no nested scroll trap, nothing clipped. */
+@media (max-width: 640px) {
+  html, body { height: auto; }
+  body { overflow: visible; }
+  #demo { height: auto; min-height: 0; }
+
+  #lanes { grid-template-columns: minmax(0, 1fr); }   /* stack the two lanes */
+  .lane { min-width: 0; }
+  .metrics { flex-wrap: wrap; }
+
+  /* corpus + index flow to content height — no squeeze, no false scroll */
+  .corpus, .index-view { flex: 0 0 auto; overflow: visible; }
+
+  /* index rows wrap instead of bleeding off the right edge */
+  .term-row { flex-wrap: wrap; min-width: 0; }
+  .term-row .term { min-width: 0; }
+  .term-row .postings { white-space: normal; overflow: visible; text-overflow: clip; }
+
+  #viz { flex-direction: column; align-items: stretch; }
+  #viz svg { margin: 0 auto; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flying { transition: none; }
+}
