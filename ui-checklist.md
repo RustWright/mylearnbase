@@ -5,7 +5,7 @@ Modeled on `omni-me/ui-checklist.md`, content-shifted for a **static content sit
 
 Legend: `[ ]` not yet verified • `[x]` verified pass • `[!]` known issue/gap to fix
 
-Last swept: 2026-06-14 (Sweep 6 — Cycle 3 Phase 4 registration + ahrefs triage + www fix)
+Last swept: 2026-06-30 (Sweep 7 — Cycle 5: post-Cycle-4 feature catch-up + content-based prev/next verification)
 
 ---
 
@@ -40,70 +40,70 @@ Last swept: 2026-06-14 (Sweep 6 — Cycle 3 Phase 4 registration + ahrefs triage
 ## Post page (`/posts/<form>/<slug>/`)
 
 - [x] Readable line measure + line-height (long-form comfort)
-- [ ] **Reading time** displayed (Tier 1 — `page.reading_time`) — _not yet built_
+- [x] **Reading time** displayed (`page.reading_time`) — Sweep 7 (Cycle 4; "3 min read" on the concepts post, confirmed in browser)
 - [x] **Table of contents** for long posts — **Serene already ships this** (floating `<aside><nav>` of H2 anchors + back-to-top button on wide screens); verify nested H3 handling + mobile behavior, restyle if needed
-- [ ] **Prev/next post navigation** (Tier 2) — _not yet built_
+- [x] **Related-posts navigation** (content-based; replaces arbitrary chronological prev/next) — Sweep 7 (Cycle 5: TF-IDF `related.json` seam; renders "Related" links in browser on both single-section and multi-sibling posts; chronological fallback when the artifact is absent)
 - [x] **Reader controls: font-family picker + font-size adjust** (accessibility / far-sightedness) — Sweep 4 (floating "Aa" panel on posts: size 14–28px, Sans/Serif/Mono/OpenDyslexic; `localStorage`-persisted; no-FOUC head script)
-- [ ] Code blocks render with syntax highlighting + copy button
-- [ ] Callouts (`> [!NOTE]` etc.) render correctly
-- [ ] `{{ demo() }}` shortcode iframes render (when present)
-- [ ] KaTeX math renders (when `extra.math`)
-- [ ] Mermaid diagrams render (when `extra.mermaid`)
-- [ ] Series links + tags links resolve
-- [ ] `superseded_by` banner renders when set
-- [ ] Back-navigation label is descriptive
+- [x] Code blocks render with syntax highlighting + copy button — Sweep 7 (highlight `class` spans + `#copy-cfg` data present; section default `copy = true`)
+- [x] Callouts (`> [!NOTE]` etc.) render correctly — Sweep 7 (`github_alerts`; callout markup on the MVP archive post)
+- [x] `{{ demo() }}` shortcode iframes render — Sweep 7 (same-origin iframe on the concepts + reader-controls posts; loads in browser with 0 console errors)
+- [ ] KaTeX math renders (when `extra.math`) — wiring verified in `post.html`; **unexercised**: no current post sets `extra.math`
+- [ ] Mermaid diagrams render (when `extra.mermaid`) — wiring verified in `post.html`; **unexercised**: no current post sets `extra.mermaid`
+- [x] Series links + tags links resolve — Sweep 7 (49 per-tag pages + 3 series pages + both landings build; `zola check` clean)
+- [ ] `superseded_by` banner renders when set — banner wiring verified in `post.html`; **unexercised**: only documented in workflow prose, no live post sets it
+- [x] Back-navigation — in-content back-link **removed** (Cycle 4); persistent header + browser Back cover navigation (rationale in `post.html` comment)
 
 ## List / aggregator pages
 
-- [ ] `/posts/` split-by-form aggregator groups correctly (logbook / concepts / workflows / opinions / resources / archive)
-- [ ] Each form section heading links to its section page
-- [ ] Empty-form sections note "no content yet" gracefully
-- [ ] Section pages (`/posts/logbook/` etc.) list their posts
-- [ ] Tag landing + per-tag pages work
+- [x] `/posts/` split-by-form aggregator groups correctly (logbook / concepts / workflows / opinions / resources / archive) — Sweep 1, re-confirmed Sweep 7 (builds clean)
+- [x] Each form section heading links to its section page — Sweep 1/7
+- [x] Empty-form sections note "no content yet" gracefully — Sweep 1/7 (opinions + resources still empty; concepts now has 1)
+- [x] Section pages (`/posts/logbook/` etc.) list their posts — Sweep 7 (9 sections build, 0 orphan)
+- [x] Tag landing + per-tag pages work — Sweep 7 (`/tags/` + 49 per-tag pages; `/series/` + 3)
 
 ## Navigation & Search
 
-- [ ] Header/nav links resolve (no 404s) — all 6 `extra.sections` entries
-- [ ] Active section visually distinguished
-- [ ] Instant-nav (`class="instant"`) works without full reload
-- [ ] 404 page renders with recovery link
-- [ ] **Site search (Pagefind)** present, returns results, keyboard-accessible (`/` focus, arrows, enter, esc) — _not yet built_
+- [x] Header/nav links resolve (no 404s) — Sweep 7 (3 nav entries: Posts / Logbook / Tags; `zola check` clean). Slim nav is intentional (empty forms stay off the header, linked on the homepage guide).
+- [ ] Active section visually distinguished — not tested this sweep
+- [ ] Instant-nav (`class="instant"`) works without full reload — not tested this sweep
+- [x] 404 page renders with recovery link — Sweep 7 (`404.html` builds with "back to home")
+- [x] **Site search (Pagefind)** present, keyboard-accessible — Sweep 7 (Cycle 4; `search.js` + UI mount on pages; `bash build.sh` indexes 26 pages → `public/pagefind/`). Result-return requires the built index, so it is a **production / `bash build.sh`** feature, absent under bare `zola serve` (same dev/prod split as related-posts).
 
 ## Theme (light / dark)
 
-- [ ] Light mode: all text meets contrast; brand `--primary-color` legible on bg
-- [ ] Dark mode: parity; no unreadable elements; images dimmed appropriately
-- [ ] No flash of wrong theme (FOUC) on load
-- [ ] Syntax-highlight CSS swaps with theme (giallo-light / giallo-dark)
-- [ ] Toggle persists across navigation
+- [x] Light mode: all text meets contrast; brand `--primary-color` legible on bg — screenshot-verified Sweeps 2–5 (not re-measured Sweep 7: the headless browser emulates `prefers-color-scheme: dark`)
+- [x] Dark mode: parity; no unreadable elements — Sweep 7 (measured: body `#1c1c1c` on `#c1c1c1` text = **9.47:1**, exceeds WCAG AAA)
+- [x] No flash of wrong theme (FOUC) on load — Sweep 4 pre-paint inline script (resolves theme before first paint); unchanged
+- [x] Syntax-highlight CSS swaps with theme (giallo-light / giallo-dark) — Sweep 7 (`<link id=hl>` present; both `giallo-*.css` generated)
+- [x] Toggle persists across navigation — Sweep 7 (`sessionStorage.theme` persisted across a navigation, confirmed in browser; per-session by Serene design)
 
 ## Responsive (folds in mobile-responsivity item)
 
-- [ ] **Mobile (~375px):** no horizontal scroll; nav reflows; tap targets ≥ ~44px
-- [ ] **Tablet (~768px):** layout adapts at `--homepage-max-width` boundary
-- [ ] **Desktop (~1280px):** content max-width sensible, not stretched
-- [ ] Homepage `#info` / `#links` / recent-list reflow cleanly
-- [ ] Code blocks scroll horizontally rather than break layout
-- [ ] Images / demos scale within viewport
+- [x] **Mobile (~375px):** no horizontal scroll — Sweep 7 (home `scrollWidth` 367 ≤ 375; post 1272 ≤ 1280); nav reflows (Sweep 1)
+- [x] **Tablet (~768px):** layout adapts at `--homepage-max-width` boundary — Sweep 1 (not re-tested Sweep 7; between the two measured widths)
+- [x] **Desktop (~1280px):** content max-width sensible, not stretched — Sweep 7 (no overflow at 1280)
+- [x] Homepage `#info` / `#links` / recent-list reflow cleanly — Sweep 1/2 (mobile home no overflow Sweep 7)
+- [ ] Code blocks scroll horizontally rather than break layout — not specifically tested
+- [x] Images / demos scale within viewport — Sweep 7 (demo iframe is `width:100%`; no overflow at 375px)
 
 ## Accessibility
 
-- [ ] Images have meaningful `alt` text
-- [ ] Color contrast passes WCAG AA (text + interactive, both themes)
-- [ ] Visible focus states on links/buttons/inputs
-- [ ] Keyboard navigation reaches all interactive elements
-- [ ] Heading order is logical (single h1, no skipped levels)
-- [ ] Theme toggle + search have accessible labels
+- [x] Images have meaningful `alt` text — Sweep 7 (all 7 image-bearing posts; 0 `<img>` missing `alt`)
+- [x] Color contrast passes WCAG AA (text + interactive) — Sweep 7 (dark mode 9.47:1 measured; light mode screenshot-verified Sweeps 2–5)
+- [ ] Visible focus states on links/buttons/inputs — not tested this sweep (Serene default + `custom.css`)
+- [ ] Keyboard navigation reaches all interactive elements — not tested this sweep
+- [x] Heading order is logical (single h1, no skipped levels) — Sweep 7 (1 `<h1>` per post)
+- [x] Theme toggle + search have accessible labels — Sweep 7 (`aria-label` on toggle, search, and reader-controls "Aa")
 - [x] Reader font-size control lets low-vision / far-sighted readers scale text without browser zoom (new Cycle-3 feature) — Sweep 4 (14–28px, scopes `article.prose`)
 - [x] Font-family picker offers a readable serif/sans/mono/dyslexia-friendly choice, persisted across pages — Sweep 4 (Sans/Serif/Mono + self-hosted OpenDyslexic; `localStorage`, applied site-wide on `.prose`)
 
 ## Performance
 
-- [ ] Images sized appropriately (no oversized assets)
-- [ ] No layout shift on load (CLS)
-- [ ] Fonts load without blocking / FOUT jank
-- [ ] `minify_html` output is clean
-- [ ] No console errors or warnings
+- [ ] Images sized appropriately (no oversized assets) — not measured this sweep
+- [ ] No layout shift on load (CLS) — not measured this sweep (Lighthouse perf category not run)
+- [x] Fonts load without blocking / FOUT jank — Sweep 4 (OpenDyslexic `font-display: swap`, loaded on demand)
+- [x] `minify_html` output is clean — Sweep 7 (build clean with `minify_html = true`)
+- [x] No console errors or warnings — Sweep 7 (concepts post in browser: **0 errors / 0 warnings** with header.js + reader-controls.js + search.js + demo iframe all live)
 
 ## SEO / Social surface (cross-checks Phase 2/3)
 
@@ -113,7 +113,7 @@ Last swept: 2026-06-14 (Sweep 6 — Cycle 3 Phase 4 registration + ahrefs triage
 - [x] `<link rel="canonical">` present — Sweep 3 (per-page `page.permalink` / `section.permalink`)
 - [x] Favicon resolves (no 404) — Sweep 5 (SVG favicon + 16/32/180 PNGs + apple-touch; all 200)
 - [x] `sitemap.xml`, `robots.txt`, `llms.txt` reachable at root — Sweep 3 (`robots.txt` now custom AI-welcoming + production `Sitemap:`; `llms.txt` served)
-- [ ] **Privacy analytics** snippet present (Tier 2) — _not yet built_
+- [ ] **Privacy analytics** snippet present (Tier 2) — _not built_; a privacy/colophon page is Cycle-5 Task 4 (analytics *implementation* remains out of scope, disclosed there only if/when decided)
 
 > **Objective verification, Sweep 3:** Lighthouse SEO category = **100/100** (10/10 auto-checks)
 > against the local `zola serve` build. Lighthouse marks `structured-data` (JSON-LD schema
@@ -331,3 +331,56 @@ real issues cleared. `validator.schema.org` returns 0 errors / 0 warnings on the
 **Verdict → Cycle 3 closed.** Site is public-ready and discoverable: registered across
 GSC / Bing / ahrefs, LinkedIn-shareable with a correct OG card, Lighthouse SEO 100/100,
 self-canonical on every page type.
+
+### Sweep 7 — 2026-06-30 (Cycle 5 — post-Cycle-4 feature catch-up + content-based prev/next)
+
+**Why:** the checklist predated Cycle 4, so it still marked reading-time / prev-next /
+search as "not yet built" though all shipped, and Cycle 5 had just replaced chronological
+prev/next with content-based relatedness (Task 3). This sweep re-verifies the new prev/next,
+catches the checklist up on Cycle-4 features, and runs the standard audit.
+
+**Method:** `zola build` (26 pages / 0 orphan / 9 sections, clean) + `zola check
+--skip-external-links` (clean) + `scripts/seo-audit.sh` + rendered-HTML grep for functional
+markers + a Playwright browser pass (`zola serve`) on the concepts post and homepage at
+1280px and 375px, light/dark, with console capture.
+
+**Audit harness fix (`scripts/seo-audit.sh`):** the JSON-LD check false-failed on 26 valid
+`BreadcrumbList` blocks (added in Cycle 4) because its allowlist was `{BlogPosting, WebSite}`,
+written in Cycle 3. Taught the check `BreadcrumbList`; audit now passes. **116 JSON-LD blocks
+valid** (BlogPosting 26 / WebSite 64 / BreadcrumbList 26), 0 parse failures. **Lighthouse SEO
+still 100/100** on home + a sample post.
+
+**Cycle-4 features verified (flipped to `[x]`):**
+- Reading-time ("3 min read" on the concepts post, in browser).
+- Pagefind search present (`search.js` + UI; `bash build.sh` indexes 26 pages). Result-return
+  is a production/`build.sh` feature, not present under bare `zola serve` (no index).
+- Code copy button, callouts (`github_alerts`), `{{ demo() }}` iframes (load with 0 console errors).
+- Reader controls (from Sweep 4), breadcrumb JSON-LD (the harness fix above).
+
+**Cycle-5 prev/next verified:** the new "Related" nav renders content-based links in a real
+browser — concepts post → "Site search" + "Building the Foundation…"; financial-health post →
+"Account list" + "Budget setup" (each post's true TF-IDF top-2). Chronological fallback renders
+"Adjacent posts" when `related.json` is absent. See `tasks.md` Task 3 + `project.md`.
+
+**Browser pass results (Playwright, my `zola serve`):**
+- Console: **0 errors / 0 warnings** on the concepts post (header.js + reader-controls.js +
+  search.js + demo iframe all live).
+- No horizontal overflow at 1280px (1272 ≤ 1280) or 375px (home 367 ≤ 375).
+- Dark mode contrast **9.47:1** (`#1c1c1c` bg / `#c1c1c1` text), exceeds WCAG AAA.
+- Theme toggle writes `sessionStorage.theme` and persists across navigation.
+- Single `<h1>` per post; all 7 image-bearing posts have `alt` text (0 missing); `aria-label`s
+  on theme toggle / search / reader controls.
+
+**Known-benign:** `bash build.sh` Pagefind warns `"/posts/autonomous-ui-development-with-playwright-mcp/"
+has no <html> element` — that URL is a Zola **redirect-alias stub** (538-byte `<title>Redirect</title>`
+shell), expected to lack `<html>`. The real archive page renders fine.
+
+**Still open (not regressions, just not exercised/measured this sweep):** KaTeX + Mermaid
+(wired in `post.html`, no current post sets `extra.math`/`extra.mermaid`); `superseded_by` banner
+(wired, only documented in workflow prose); active-section highlight + instant-nav; visible
+focus states + keyboard nav; light-mode fresh contrast measurement (headless browser emulates
+dark); CLS / image-sizing (Lighthouse performance category not run).
+
+**Verdict:** site is healthy. All Cycle-4 features confirmed live, the Cycle-5 content-based
+prev/next verified in-browser, the SEO audit is green again (harness drift fixed), and no
+regressions. `ui-checklist.md` is current as of Cycle 5.

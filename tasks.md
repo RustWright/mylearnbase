@@ -1,225 +1,66 @@
-# Tasks - Cycle 2 (Post-System Reset)
+# Tasks — Cycle 5 (Incremental Polish)
 
-**Created:** 2026-05-09 (Session 3)
-**Objective:** Implement the five-form post system and supporting tools per `POST_SYSTEM_PLAN.md`.
-**Source of truth:** `POST_SYSTEM_PLAN.md` — every task below points to a section there for detailed spec; if a task feels under-specified, the answer is in the plan.
+**Created:** 2026-06-30 (Cycle 5 Planning)
+**Objective:** A batch of "little things" that make the site better, no sweeping changes — refresh drifted project docs, give prev/next a content-based basis, ship the parked privacy page, and publish a content batch about the site itself.
+**Source of truth:** the approved plan-mode plan (archived) holds the full rationale; this file is the working tracker. Open knobs get settled at task-execution time, not before.
 
-Sequencing follows the natural dependency chain (later phases assume earlier phases have landed); deviations are fine where the dependency is genuinely absent. Open implementation knobs from the plan get resolved at task-execution time — not before.
+Tasks are independent except where noted. Suggested order: Task 1 (doc, low-risk, warms up) → Task 3 (the design-bearing one) → Task 2 (sweep re-verifies Task 3) → Task 4 → Task 5 (logbook candidates depend on Tasks 3-4 having shipped).
 
 ---
 
-## Phase 1 — Migration & directory setup
+## Task 1 — Refresh `architecture.md` ✅ DONE (2026-06-30)
 
-### 1. Delete superseded drafts
-- [x] Remove `content/posts/2026-04-26-cycle-2-four-perspective-review.md`
-- [x] Remove `content/posts/2026-04-26-cycle-2-implementation-calendar-obsidian-sync-and-auto-save.md`
-- [x] Remove `content/posts/2026-04-26-omni-me-cycle-2-closing-sitting.md`
-- [x] Confirm `grep -rn '@/posts/' content/` — actual: 12 → 10 (tasks.md noted "13 → 11"; drift was in baseline labeling, drop matches expected)
+The doc had drifted badly: untouched since 2026-02-02, it still described the **abandoned Dioxus stack**, a `blog/` + `config.toml` layout, and "search deferred." Rewritten to current reality.
 
-### 2. Create new section structure
-- [x] `content/posts/logbook/_index.md` and `content/posts/logbook/omni-me/_index.md`
-- [x] `content/posts/cookbook/_index.md`
-- [x] `content/posts/workflows/_index.md`
-- [x] `content/posts/opinions/_index.md`
-- [x] `content/posts/resources/_index.md`
-- [x] Each `_index.md` sets `outdate_alert` + `outdate_alert_days` per cross-form starting candidates (logbook 120, cookbook 365, workflows **180** [knob settled — LLM-referenced default; post-only category overrides per-page], opinions `outdate_alert = false` + placeholder days=180, resources 180)
-- [x] `zola build` clean (9 pages, 7 sections, 0 warnings, 626ms); `zola check` clean (no broken links)
+- [x] Stack table: Zola 0.22.1 + Serene v5.6.1 (submodule) + Tera; Pagefind 1.5.2 search; Cloudflare Pages via `bash build.sh`; mdBook docs on GitHub Pages. Dioxus framing kept only in the Revision History.
+- [x] Content organization: `content/posts/<form>/…` five-form post system (logbook nested per project; concepts / workflows / opinions / resources flat), `archive/`, taxonomies `tags` + `series` (`categories` removed in Cycle 3).
+- [x] Template-override surface: documented the **full** owned set — also `blog.html` + `robots.txt` beyond the planned eight. Added `static/` detail (fonts/OpenDyslexic, img/og, llms.txt, generated `giallo-*.css`).
+- [x] Kept the Risk Register (statuses updated) + Revision History; **appended** a Cycle-5 entry rather than deleting history.
+- [x] Verified every claim against actual `zola.toml`, `templates/`, `build.sh`, `static/`, `content/`, `.github/workflows/`, and `.gitmodules`. Replaced the WASM section with an **Interactive Demos** section describing the real `{{ demo() }}` iframe mechanism; fixed the false "Cloudflare auto-detects, no build command" deployment claim.
 
-## Phase 2 — Theme template additions
+## Task 2 — Verification sweep (Sweep 7) → update `ui-checklist.md` ✅ DONE (2026-06-30)
 
-### 3. Superseded-by banner
-- [x] Add render block to `templates/post.html` (project-level override, not theme submodule) for `extra.superseded_by` (banner above outdate_alert, uses `get_page` to resolve to title + permalink). Frontmatter convention: `superseded_by` is a content-relative path like `posts/cookbook/foo.md`.
-- [x] Smoke-test confirmed: banner renders with `callout warning` class, links auto-populate from target post
+The checklist was last swept 2026-06-14 (Cycle 3), so it still marked reading-time / prev-next / search as "not yet built" even though all shipped in Cycle 4. Re-swept and brought current.
 
-### 4. Demo shortcode
-- [x] Create `templates/shortcodes/demo.html` — `<figure>` wrapper, `<iframe>` w/ `loading=lazy` + 1px themed border, optional `<figcaption>`, standalone-link
-- [x] Default iframe height **480** (knob settled — matches plan example; per-call override available)
-- [x] Smoke-tested 3 invocations against `static/demos/test/` placeholder: default-height + figcaption ✓, custom-height (240) + figcaption ✓, custom-height (200) + no figcaption ✓ — all rendered correctly
+- [x] Ran `zola build` (26 pages / 0 orphan / 9 sections, clean), `zola check --skip-external-links` (clean), and `scripts/seo-audit.sh` (**ALL PASS, Lighthouse SEO 100/100**).
+- [x] **Bonus harness fix:** `seo-audit.sh` JSON-LD check false-failed on 26 valid `BreadcrumbList` blocks (added Cycle 4) because its `@type` allowlist predated them. Taught it `BreadcrumbList`; audit green again (116 blocks valid, 0 parse failures). A stale gate trains you to ignore red, so this counts as verification-infrastructure repair.
+- [x] Flipped now-shipped items to `[x]`: reading-time, Pagefind search, reader controls, breadcrumb JSON-LD, and the **Cycle-5 content-based prev/next** (verified in-browser: "Related" links resolve to each post's true TF-IDF top-2; chronological fallback renders when the artifact is absent).
+- [x] Verified the genuinely-unchecked items via rendered-HTML grep + a Playwright browser pass (1280px + 375px, light/dark, console capture): copy button, callouts, demo iframes, series/tags pages (49 tags / 3 series), 404, theme persistence (`sessionStorage`), dark-mode contrast (**9.47:1**, exceeds AAA), no horizontal overflow, single h1, all images `alt`'d, aria-labels, **0 console errors/warnings**. Honestly left unchecked: KaTeX/Mermaid/`superseded_by` (wired but unexercised by content), focus-states/keyboard-nav/active-section/instant-nav, CLS, light-mode fresh measure.
+- [x] Added a **Sweep 7** entry; bumped the "Last swept" line. Noted the benign Pagefind warning (redirect-alias stub).
 
-## Phase 3 — Tools package scaffold
+## Task 3 — Prev/next redesign: content-based relatedness *(design-bearing)* ✅ DONE (2026-06-30)
 
-### 5. `mylearnbase/tools/` Python package
-- [x] `tools/pyproject.toml` with `[project.scripts]` entries for `cite`, `logbook`, `cookbook`, `workflows` (4 entries — knob settled: conversion exposed as `logbook publish` subcommand, not a 5th entry point, mirrors cookbook/workflows convention)
-- [x] `src/mylearnbase_tools/` skeleton: `__init__.py`, `cite.py`, `logbook.py`, `cookbook.py`, `workflows.py` — each with argparse + stub handlers
-- [x] Installed via `uv tool install --editable /home/me/productive_learning/projects/mylearnbase/tools` (4 executables on PATH)
-- [x] Verified `--help` for all 4 top-level commands and subcommands (logbook init/what/why/scope/note/publish, cookbook init/publish, workflows publish)
+Moved off chronological ordering. **Decision (settled):** content similarity behind a `related.json` seam, hand-built TF-IDF. Rejected: shared-tags (tagging is volatile) and author-curated (too manual). **The script uses title + headings + body text ONLY, never tags.**
 
-### 6. Shared frontmatter helper (`_frontmatter.py`)
-- [x] `read_keys(path, keys)` — line-based extraction with dotted-key support (`extra.outdate_alert_days`, `taxonomies.tags`); returns dict, missing keys absent
-- [x] `write(path, fields_dict)` — accepts nested dict; renders top-level keys in canonical order, then `[taxonomies]` + `[extra]` tables; preserves any existing body
-- [x] Round-trip sanity check on `2026-02-11-building-my-learnbase-mvp.md`: 7 keys across 3 sections (string/date/bool/int/array) match byte-for-byte after read→write→read
+- [x] **`scripts/compute-related.py`** (alongside `seo-audit.sh`; mylearnbase-specific, not the cross-project `tools/` package). Pure-Python stdlib, ~190 lines: reads post source under `content/posts/**` (strips frontmatter, code fences, shortcodes, links, HTML), tokenizes (lowercase, stopwords, light plural stemming that protects `-ss/-us/-is` and maps `-ies → -y`), sublinear-tf / smoothed-idf TF-IDF, cosine similarity, writes top-K (=4) neighbours per post → `related.json`. Title up-weighted ×3, headings ×2. Records the shared terms behind each match (interpretable; `--verbose` prints the full report). Skips `_index.md`, dotfiles (e.g. `.frontmatter-template.md`), and `draft = true`.
+- [x] **`related.json` seam:** maps each post's content-relative path (incl. `index.md` for bundles, matching `page.relative_path`) → ranked neighbour list `[{path,title,score,terms}]`. Script speaks only paths + scores; template resolves path → live page via `get_page`, so URL/slug changes need no script change.
+- [x] **Build integration (compute in CI):** added `python3 scripts/compute-related.py` to `build.sh` **before** `zola build`. Order: compute-related → `zola build` (reads `related.json` via `load_data`) → `pagefind`. `related.json` gitignored + regenerated each build (artifact, like the Pagefind index). Verified: full `bash build.sh` exits 0 end-to-end.
+- [x] **Render:** `templates/post.html` now reads `load_data(path="related.json", required=false)`, looks up `page.relative_path`, renders the top 2 neighbours in the existing `<nav class="post-nav">` markup. `required=false` is the hinge that keeps dev (`zola serve`, no artifact) from erroring. **Chronological fallback** (the prior walk, byte-identical) when `related.json` is absent or a post has no entry — verified rendering "Adjacent posts" while related mode renders "Related". Old same-day-tie follow-up is now moot.
+- [x] **Labels:** settled on **"Related"** (dropped the directional ←/→ and `rel="prev/next"` for related links, since relatedness is not sequential; chronological fallback keeps them).
+- [x] **Decision gate:** inspected `related.json` on the real 26-post corpus. **Matches read STRONG, not weak — staying on TF-IDF, NOT upgrading to model2vec.** Evidence: `site-search` ↔ `how-search-works` mutually #1 (shared `pagefind/search/index/indexing`); omni-me financial features, omni-me Rust-dev archive, and workflows authoring posts each cluster correctly as #1/#2. Confirms the single-author / consistent-vocabulary hypothesis (`.curiosities/cycle-5.md` entry 1): little semantic-but-non-lexical signal left for embeddings to recover. model2vec path stays a documented drop-in (swap `vectorize`/`similarity`, flip to precompute-and-commit) if the corpus ever diversifies.
 
-## Phase 4 — Core capture tools
+## Task 4 — Privacy / colophon page ✅ DONE (2026-06-30)
 
-> **Architectural gap surfaced + addressed 2026-05-10:** initial Tasks-8/9 implementation reinvented section-tracking instead of wrapping showboat (plan lines 253, 307). Smoke-test symptom: section 6 was all `cite` blocks, no runnable evidence. **Reworked same day** to use showboat as the substrate: `logbook init` wraps `showboat init`, new `logbook exec` and `logbook screenshot` wrap `showboat exec` / `showboat image` via post-append section relocation, `logbook publish` runs `showboat verify` (with `--skip-verify` escape). `_capture.append_to_section` retained — it's the section-targeting layer logbook adds on top of showboat's structureless append model. See updated Tasks 8 and 9 below.
+The parked Cycle-4 item. Shipped as a single combined **Colophon** page at `/colophon/`.
 
-### 7. `cite` (cross-form, used everywhere)
-- [x] Discover repo via `git rev-parse --show-toplevel`; project context via `git remote get-url origin`; works from any GitHub-hosted repo
-- [x] Capture `file:line` + line content + HEAD SHA + GitHub permalink (markdown citation block format: `[`path:line`](permalink) at `sha7`` + quoted line content)
-- [x] Append to capture file (positional arg); creates parent dirs if needed; preserves prior content with blank-line separator
-- [x] Knob settled: per-file dirty check (only the cited file blocks); `--allow-dirty` override; non-GitHub remotes degrade to no-permalink (file:line + SHA still recorded)
-- [x] Verified end-to-end: clean cite produces real GitHub permalink (`RustWright/mylearnbase`); dirty rejected; `--allow-dirty` succeeds; bad ref formats and out-of-range lines fail with clear messages; **44ms total** (well under <10s budget)
+- [x] `content/colophon/_index.md` — a one-off Serene **prose section** (`template = "prose.html"`, the theme's standalone-page mechanism; `prose.html` keys on `section.*`, so a loose page wouldn't work). Two sections: **"How it's built"** (Zola/Tera, Serene, Pagefind, Cloudflare Pages, the `{{ demo() }}` iframes + TF-IDF "Related" links, mdBook) and **"Privacy"** (no analytics/tracking/cookies; only functional `localStorage`/`sessionStorage` prefs; search runs in-browser; the math/diagram CDN caveat; Cloudflare server logs; no consent banner needed under ePrivacy "strictly necessary").
+- [x] Visible masthead via `[extra] title` + `[extra] subtitle` (Serene's `_section_title.html` renders the on-page `<h1>` from `extra.title`, **not** from the top-level `title` field — that one only feeds `<title>`/meta). Without `extra.title` the page rendered headless.
+- [x] Wired into the **footer** (`templates/_footer.html`, `.left` group) via `get_url(path='@/colophon/_index.md')` so Zola validates the link at build. Appears on every content page's footer; **not** on the home landing (it has `footer = false` by theme design — reversible if home reachability is wanted).
+- [x] Deliberately **no link** to the not-yet-existing Task-5 resources post (would break `zola check`); the page notes a fuller resources post is "in the works." When that post lands, add the link here.
+- [x] Future cookieless-analytics decisions get disclosed here first (implementation still out of scope). Verified: `zola build` + `zola check --skip-external-links` clean; page renders at `/colophon/` with title, subtitle, both sections; footer link resolves; no `post-nav` (correct for a prose page).
 
-### 8. `logbook` thin wrapper (showboat-backed)
-- [x] `logbook init <project> <feature_name>` — invokes `showboat init` for the title block + showboat-id, then appends our metadata blockquote + 7 section headers. Path: `<repo-root>/logbook/_drafts/<slug>.md`.
-- [x] `logbook what/why/scope/note <slug-or-path> [text]` — append plain markdown text to the named section via `_capture.append_to_section`; reads from stdin if text omitted; bare slug resolves under `logbook/_drafts/`.
-- [x] `logbook exec <slug> <lang> [code] [--section <header>]` — wraps `showboat exec` (which appends to end-of-file) and relocates the produced fenced blocks into the target section (default: section 6). Pipes stdout/stderr through. Returns the executed command's exit code.
-- [x] `logbook screenshot <slug> <path> [--section <header>]` — wraps `showboat image`; relocates the showboat-generated image block into the target section. Capture mechanism stays human-driven (memory: `feedback_screenshots_guideline_driven`).
-- [x] `cite --section "How do we know it works?"` still works for code-reference evidence; complements showboat exec/image as a different evidence kind.
-- [x] Smoke test: init → what/why → exec (deterministic block) → screenshot (test PNG) → publish-with-verify clean → 194ms total publish.
+## Task 5 — Content batch
 
-### 9. Conversion tool — implemented as `logbook publish <slug>` subcommand
-- [x] Reads capture, extracts metadata blockquote (Project/Slug/Tags), splits title block from body
-- [x] Generates frontmatter via `_frontmatter.write` (title, slug, date=today, draft=true, tags from metadata if present)
-- [x] Strips literal `TBD` from tags; prunes empty optional sections (e.g., scope when unused) via `_strip_empty_sections`
-- [x] Writes to `<MYLEARNBASE_ROOT>/content/posts/logbook/<project>/<slug>.md` (env var with `~/productive_learning/projects/mylearnbase` fallback); creates dest dir; `--force` to overwrite
-- [x] Runs `zola check` after write; failure aborts and prints output (non-zero exit).
-- [x] **Auto-create per-project `_index.md`** when missing (mirrors `posts/logbook/omni-me/_index.md` shape, with `<project> Logbook` title/description); publish output notes the creation. Removes orphan-warning friction for first-time-per-project publishes.
-- [x] **Friction fixes** (post-Phase-5 findings, applied 2026-05-10):
-  - `--skip-external-links` on internal `zola check` by default (publish: 14.4s → 163ms, ~88× speedup); `--full-check` flag for paranoid mode.
-  - `--tags "a,b,c"` flag on `publish` to fill tags inline at conversion time.
-  - New subcommand `logbook tags <slug> "a,b,c"` to update the metadata blockquote in place.
-- [x] **Showboat verify integrated** (2026-05-10 rework): publish runs `showboat verify` on the capture before writing the dest; verify failure aborts publish with the diff printed. `--skip-verify` flag for intentionally non-deterministic captures. Confirmed working: a `date -u` exec block correctly fails verify (timestamp drift); a `echo` exec block passes.
-- [x] **Image copy at publish** (2026-05-10): `_copy_referenced_images` scans the body for `![alt](path)` markdown image references, copies local files from the capture dir to the dest dir alongside the post. Plan line 308: "copies the capture file + referenced images to mylearnbase/content/posts/logbook/<project>/<slug>.md."
-- [x] Smoke-tested end-to-end on verify-happy-path/showboat-rework captures: 0 orphans, 8 sections after publish, images present in dest, back to 7 sections + 9 pages after cleanup.
+The posts flagged during planning. Route authoring via `/create-post`.
 
-## Phase 5 — End-to-end smoke test
-
-### 10. Author one real logbook entry
-- [ ] Pick whatever omni-me work is current at the time (NOT a Cycle 2 retrospective) — **deferred until showboat rework lands**, since current logbook impl produces structurally wrong evidence sections
-- [ ] Run the full cycle: `logbook init` → capture during work → conversion → `zola check` → flip `draft = false`
-- [ ] Confirm published post renders correctly, links resolve, permalinks valid
-
-#### Findings from initial smoke test (2026-05-10, against Cycle 2 work — partial run, not the canonical entry)
-
-- **Capture friction PASSES the <10s budget** by ~200×: each capture command (`init`, `what`, `why`, `scope`, `cite`, `note`, `tags`) runs in 40-50ms. Multi-cite sessions stay under 1 second cumulative.
-- **Publish friction was 14.4s** (slow path: `zola check` with external link probing). Fixed in Task 9: default-skip external links → 163ms publish.
-- **Architectural gap: showboat not integrated.** Surfaced via the test post's "How do we know it works?" section being all `cite` blocks (code locations) with no runnable evidence (no `showboat exec`, no `showboat image`). Symptom of the broader Tasks-8/9 substrate issue. Blocks completion of Task 10 — re-running the smoke test on real omni-me work has to wait for the showboat rework.
-- **Editorial-standard gap.** The test post made me realize tools alone don't enforce content quality: the prose was full of project-internal jargon ("Cycle 2", "Phase 4") that won't survive process changes or external readers, formatting was wall-of-prose hard-to-scan, and the evidence-section conflated "where the code is" with "how we know it works." Fix: expand Task 14's scope (see Phase 7 below).
-
-This is also the validation that capture commands meet the <10 second friction budget. Mechanical budget passed; real-content quality budget did not, and gets addressed via the showboat rework + editorial standard before Phase 6.
-
-## Phase 6 — Remaining per-form tools
-
-### 11. `cookbook init` and `cookbook publish`
-- [x] `init <title> [--slug SLUG] [--from-logbook PROJECT/SLUG] [--force]` scaffolds `<repo-root>/cookbook/_drafts/<slug>.md` (knob settled: title-primary positional, slug auto-slugified, --slug override — per-form deviation from logbook's slug-primary shape, justified by cookbook titles being public-facing and higher-stakes). Wraps `showboat init` for the title block + showboat-id; appends metadata blockquote (Slug/Tags/optional From-logbook) + summary blockquote + 5 section headers (sections 2-6 of the 6-section structure; section 1 is the title+summary). `--from-logbook` pre-fills section 6 with a Zola-resolvable backlink if value contains `/`, else a TODO placeholder.
-- [x] `publish <capture> [--slug] [--tags] [--draft] [--force] [--full-check] [--skip-verify]` runs `showboat verify` (default on, mirrors logbook), splits metadata/title/body, writes to `<MYLEARNBASE_ROOT>/content/posts/cookbook/<slug>.md` (flat, no per-project subdir — unlike logbook). Default `draft = false` per plan (cookbook captures are polished by publish time); `--draft` opt-in for review. Copies referenced images, strips empty optional sections (5 + 6), runs `zola check`.
-- [x] Shared substrate extracted: `_shared.py` holds `run_showboat`, `repo_root`, `mylearnbase_root`, `zola_check`, `copy_referenced_images`, `strip_empty_sections`, `read_text_arg`. Logbook updated to import from `_shared` (no behavior change; round-trip help + module load verified).
-- [x] `cookbook tags <slug-or-path> "a,b,c"` for in-place tags edit (mirrors logbook).
-- [x] Smoke test end-to-end on a throwaway pattern ("Shared module for cross-form CLI helpers"): init → 4 manual section fills → tags update → publish round-trip in **181ms** (zola check internal-only). Full site build clean (10 → 9 after cleanup, 0 orphans, 519ms). `--draft` flag correctly flips to draft=true. Empty optional section ("When this breaks down") correctly pruned at publish.
-- [x] `.gitignore`: added `logbook/_drafts/` and `cookbook/_drafts/` (plan said "untracked by default" but never gitignored — session-end `git add -A` would otherwise track them; precedent set by Phase-3 `__pycache__` gitignore).
-- [x] Editorial signals collected — see "Editorial signals collected" section below.
-
-### 12. `workflows publish <source-doc-path>`
-- [x] Argument shape settled: `<source-doc-path>` positional (knob), `--slug`/`--title` overrides. Source doc is the input; title from H1, slug auto-slugified. Different from cookbook's title-positional because workflows is a sync operation, not a draft creation.
-- [x] **First publish:** read source, extract H1 as title, strip H1 from body, escape Zola shortcodes, render frontmatter (title, slug, date=today, draft default false), write to `<MYLEARNBASE_ROOT>/content/posts/workflows/<slug>.md`. 163ms.
-- [x] **Republish:** detects existing post; preserves `date` (read via `_frontmatter.read_keys`), sets `updated = today`, preserves `taxonomies.tags` + `extra.outdate_alert_days` if present, replaces body. Confirmed with a backdated date (2026-02-01) — date survives, updated reflects today.
-- [x] **Zola shortcode escape:** `{{ x }}` → `{{/* x */}}`, `{% x %}` → `{%/* x */%}`. Lookahead/lookbehind in regex makes it **idempotent** — already-escaped pairs are skipped on re-runs (verified: a doc with both raw and pre-escaped pairs escapes only the raw ones).
-- [x] **`--dry-run`** prints a unified diff against the current dest (or against empty for first publish). Useful for previewing changes when the source doc is large.
-- [x] **`_frontmatter.render(fields)`** added (factored out of `write`) so workflows can compose frontmatter without round-tripping to disk. Avoided the `/dev/shm` hack from the first draft.
-- [x] Smoke-tested on real `PROJECT_PROCESS.md` (262-line doc, no shortcodes to escape) + synthetic doc with both inline and code-block Tera syntax. Both clean. Site build: 9 → 10 pages → 9 after cleanup, 0 orphans throughout.
-
-## Phase 7 — Skill rewrite & final rules doc
-
-### 13. Rewrite `~/.claude/commands/create-post.md`
-- [x] Prompt for form first — form list updated to **logbook / concepts / workflows / opinions / resources** (cookbook replaced by concepts per 2026-05-11 redesign; original spec was logbook / cookbook / workflows / opinions / resources)
-- [x] Refuse LLM-drafted content for human-only sections per per-form rules (each form section in the skill names what the LLM does NOT draft: opinions' take, logbook §7 voice-bearing content, resources without lived curation backing)
-- [x] Route to the right per-form workflow — skill is now a router: Phase 1 picks form, Phase 2 reads the editorial doc (source of truth), Phase 3 anchors to per-form tools + non-negotiables, Phase 4 surfaces tag-drift awareness, Phase 5 verification + summary. Old subagent-delegation pattern dropped (most forms now run in main conversation, not as one-shot writes).
-
-### 14. Author per-form docs in `editorial/` (POST_SYSTEM.md is the seed)
-- [x] **v1 seed landed 2026-05-10** at `editorial/POST_SYSTEM.md` — 512 lines, all five forms, structured uniformly (*When to use* → *Tools* → *Editorial per section* → *Anti-patterns*). Designed as reference material for the per-form sessions, not as the final destination.
-- [x] **Per-form rollout sequence complete** (separate fresh-context sessions, 2026-05-11 → 2026-05-14):
-  1. `editorial/logbook.md` ✓ (2026-05-11)
-  2. `editorial/concepts.md` ✓ (2026-05-11; **cookbook redesigned to concepts during this session**)
-  3. `editorial/workflows.md` ✓ (2026-05-13)
-  4. `editorial/opinions.md` ✓ (2026-05-14)
-  5. `editorial/resources.md` ✓ (2026-05-14)
-- [x] Each per-form session pulled the corresponding section from `editorial/POST_SYSTEM.md` v1, refined for that form's lived authoring rhythm, and surfaced load-bearing reframes (concepts redesign, binary-category split, provocation reframe, by-act curation). POST_SYSTEM.md v1 deletion now unlocked (user: "don't care; may delete after all per-form editorials are made").
-- [x] Tagging strategy doc shipped 2026-05-16 — `editorial/tagging.md` (148 lines): style conventions, decision rules (reuse-first; ambiguity resolved in conversation, not via canonical aliases catalog), 3-7 tags per post (with opinion-form caveat), anti-patterns. Discovery hooks: `/create-post` Phase 4 references it; `PROJECT_PROCESS.md` § Post System lists it. Published as `content/posts/workflows/tagging-strategy.md`. Bulk-fixed the one real drift (`ui-development` → `ui` in `autonomous-ui-development-with-playwright-mcp.md`); added tags to the 2 previously-tagless workflow posts (`authoring-a-workflows-post`, `project-development-process`). Two suspected drifts (`apis` and `dev-setup`) turned out to be phantoms — `apis` was a code-block example, `dev-setup` vs `project-setup` is a legitimate distinction (dev environment vs project bootstrap).
-- [x] Home-page navigation shipped 2026-05-16 — `zola.toml` `[extra].sections` expanded from 1 to 6 entries (`posts` + the five forms ordered by cadence). Iterated based on local preview review (2026-05-16): (a) created missing `content/posts/concepts/_index.md` and removed orphan `content/posts/cookbook/` section that nav was 404-ing on; (b) overrode `templates/home.html` to aggregate recent posts across all subsections (theme default only pulled top-level posts, surfacing only pre-Cycle-2 archive content as "recent"); (c) added form-badge `[<form>]` next to each title on the home recent-posts list so post type is visible at a glance; (d) moved the 9 pre-Cycle-2 top-level posts to `content/posts/archive/` with Zola `aliases` preserving original URLs; (e) rebuilt `/posts/` as a split aggregator (new `templates/posts_aggregator.html`) showing recent posts grouped by form (logbook/concepts/workflows/opinions/resources/archive), each linking to its section page. Final state: 15 pages, 8 sections, 0 orphans, `zola check` clean.
-
-### 15. Update PROJECT PROCESS to incorporate the new workflows to support content creation
-- [x] Update and sync all project process documents — done 2026-05-16. setup_files/PROJECT_PROCESS.md re-established as canonical; all four copies (setup_files, root, mylearnbase, omni-me) now identical (329-line canonical + 2-line banner on the three mirrors). `.curiosities/` included in Project Documentation Structure section with explicit gitignore/parent-sync semantics for both `.log/` and `.curiosities/`.
-- [x] Add post-system workflow integrations — done 2026-05-16:
-  - Session 4 Planning: new "Identify post-system triggers within the cycle" activity (flag logbook-worthy tasks + portfolio-demo candidates at planning time)
-  - Session 5 Implementation: new "Capture cadence" approach bullet (pause at feature-landing commits to draft §1-5, batch §6 evidence)
-  - Session 6 Code Review: new **Phase D — Post-system pulls** (cycle-close curiosity review + portfolio-demo identification; discovery work, no fix code)
-  - End-of-Session Protocol: new step 7 (sync `.log/` + `.curiosities/` to parent via global CLAUDE.md Step 2)
-  - New top-level **Post System** section: form-to-trigger table, /create-post entry-point reference, editorial-doc-as-source-of-truth principle
-- [x] Decide CLAUDE.md updates — done 2026-05-16. **Structural fix applied** (per user's chosen path): per-project CLAUDE.md files (`mylearnbase/CLAUDE.md`, `omni-me/CLAUDE.md`) now point to `PROJECT_PROCESS.md` for session-end recipe rather than duplicating it. Eliminates the drift class that produced the stale session numbering in mylearnbase/CLAUDE.md (old 5-session) vs omni-me/CLAUDE.md (6-session). Parent `productive_learning/CLAUDE.md` fixed: "Sessions 1-5" → "Sessions 1-6".
-- [x] Publish to mylearnbase website — done 2026-05-16. `workflows publish /home/me/productive_learning/setup_files/PROJECT_PROCESS.md` produced `content/posts/workflows/project-development-process.md`; zola check clean.
-
-## Phase 8 — Cycle close
-
-### 15. Final verification sweep
-- [x] `zola build` zero warnings — clean (15 pages, 7 sections)
-- [x] `zola check` clean (0 broken links, internal only)
-- [x] Originally-published top-level posts resolve at original URLs (7 verified; plan said "9" but actual count was 10 with 3 deleted in Phase 1, leaving 7 — all confirmed present and rendered)
-- [x] `/create-post` (no args) prompts for form selection — confirmed in skill Phase 1 "Determine the form"
-
-### 16. Archive plan
-- [x] Moved `POST_SYSTEM_PLAN.md` → `.archive/post-system-reset/POST_SYSTEM_PLAN.md` (2026-05-16)
-- [x] Deleted `editorial/POST_SYSTEM.md` v1 (superseded by 6 per-form/cross-form editorials: logbook, concepts, workflows, opinions, resources, tagging)
+- [ ] **Resources post (firm) — "Resources used to build mylearnbase".** First post in the empty `resources` section. By-act curation per `editorial/resources.md` (project-derived path): Zola, Serene, Pagefind, Cloudflare Pages, mdBook, OpenDyslexic, KaTeX, Mermaid, giallo highlighting, the `tools/` package + showboat, and the SEO/audit stack (Lighthouse, ahrefs, GSC, Bing).
+- [ ] **Concepts candidate — search-ranking / TF-IDF demo.** Queued in `.curiosities/cycle-4.md`; its dependency (the indexing post) has landed. Strong synergy: Task 3's TF-IDF work dogfoods the very idea this post teaches. Candidate, not a commitment (zero concepts/cycle is normal). Older hash-demo (`.curiosities/cycle-2.md`) is a second candidate.
+- [ ] **Logbook candidate(s).** Reader-facing Cycle-5 work qualifies per the reader-facing-only meta-logbook rule: the **new prev/next relatedness** and the **privacy page** are visitor-observable. Tasks 1 and 2 are dev-internal → not logbook material.
 
 ---
 
 ## Notes
 
-- **Where to start (open):** Phase 1 is the natural first move (cheap, unblocks everything else). Phase 2 and Phase 3 are independent; either can run before the other. Phase 4 depends on Phase 3.
-- **Open knobs:** treat them as decisions made when the task lands, not in advance. Each one is small enough to settle in-session.
-- **Smoke test gate:** Phase 5 is a real go/no-go on the friction budget. If capture is laborious, fix that before cookbook + workflows are built — same friction issue would only get worse.
-- **Cross-project tools:** `cite`, `logbook`, `cookbook`, `workflows` are designed to run from *any* project repo, not just mylearnbase. Test from inside `omni-me/` (or another project repo) before declaring done.
-
----
-
-## Carry-forward to next session
-
-Sequencing decision (user 2026-05-10, corrected): **tooling → docs → real content.** Mechanical tooling first surfaces editorial signals the user couldn't predict up front; the doc gets drafted with those signals in hand; real content follows the doc. Authoring real content before the doc exists would regenerate the same quality issues already identified.
-
-Order:
-
-1. **Phase 6 — cookbook init/publish + workflows publish.** *(2026-05-10: Tasks 11 + 12 both landed ✓. Phase 6 complete.)*
-2. **Phase 7 Task 14 v1 seed — `editorial/POST_SYSTEM.md`.** *(2026-05-10 landed ✓. Single document covering all five forms, designed as reference material for per-form sessions.)*
-3. **Per-form authoring sessions** *(fresh context each; cookbook → concepts redesign happened 2026-05-11):*
-   - Session A: `editorial/logbook.md` *(2026-05-11 ✓ — published as `authoring-a-logbook-entry`)*
-   - Session B: `editorial/concepts.md` *(2026-05-11 ✓ — rough/lightweight v0; **form was redesigned from cookbook during this session**, see project.md log)*
-   - Session C: `editorial/workflows.md` *(2026-05-13 ✓ — published as `authoring-a-workflows-post`; tool extended with `--supersede-from` + image copy)*
-   - Session D: `editorial/opinions.md` *(2026-05-14 ✓ — published as `authoring-an-opinions-post`; provocation reframed to extreme-same-direction, fast/slow → entry-point spectrum, Tier 1 = suggest-then-decide, mechanical pass implements approved fixes)*
-   - Session E: `editorial/resources.md` *(2026-05-14 ✓ — published as `authoring-a-resources-post`; author contribution **by-act** framing (curation-by-act, not prose-per-bullet), sub-types 3 → 2 (question-driven dropped), Topic 4 fully collapsed as standalone section)*
-4. **Phase 7 Task 13 — `/create-post` skill rewrite.** *Shipped 2026-05-15 ✓.* Skill is now a router: prompts for form first, reads the relevant `editorial/<form>.md` as source of truth, anchors per-form tools/non-negotiables, surfaces tag-drift awareness, verifies via zola check. Old subagent-delegation pattern dropped — most forms run in main conversation. Form list: logbook / concepts / workflows / opinions / resources (cookbook replaced by concepts per the 2026-05-11 redesign).
-5. **Phase 5 Task 10 — real-omni-me logbook entry.** *Deferred 2026-05-15 — user opted for full scaffolding build over real-content validation. `editorial/logbook.md` validates on first organic use.*
-6. **First concepts post — hash demo.** *Deferred 2026-05-15 — user opted for full scaffolding build. Hash curiosity preserved in `mylearnbase/.curiosities/cycle-2.md` and in `editorial/concepts.md` worked sketch for whenever revisited.*
-7. **Curiosity-log mechanism.** *Shipped 2026-05-15 ✓.* Instructions in global `~/.claude/CLAUDE.md` (Curiosity Capture section); `.curiosities/<cycle-id>.md` lives in any project repo, gitignored, parent-synced at session end via Step 2 sync. Mylearnbase seeded with `cycle-2.md` (hash curiosity backfill). The cycle-close review pass that walks the file → concepts candidates is the load-bearing missing half — design + integration into PROJECT_PROCESS.md belongs to Task 15.
-8. **Task 15 — PROJECT_PROCESS + CLAUDE.md sync.** *Shipped 2026-05-16 ✓.* setup_files/PROJECT_PROCESS.md re-established as canonical (329 lines); all four copies synced (mirrors carry banners). Post-system additions landed: Session 4 planning flag, Session 5 capture cadence, Session 6 **Phase D** (cycle-close curiosity review + portfolio-demo identification), End-of-Session step 7 (parent-sync `.curiosities/` alongside `.log/`), new **Post System** section. Per-project CLAUDE.md restructured to point at PROJECT_PROCESS (kills the drift class that left mylearnbase/CLAUDE.md on the old 5-session model). Parent CLAUDE.md "Sessions 1-5" → "Sessions 1-6". Published as `content/posts/workflows/project-development-process.md`.
-9. **Task 14 sub-items.** *Shipped 2026-05-16 ✓.* `editorial/tagging.md` (148 lines) plus `zola.toml` sections expansion for homepage nav. Tagging doc principles-only (no canonical inventory) per user direction — ambiguity resolved at post-creation time, not via catalog. Discovery from `/create-post` Phase 4 + `PROJECT_PROCESS.md` § Post System. Published as `content/posts/workflows/tagging-strategy.md`. Three tag fixes landed: `ui-development` → `ui` (1 post), tags added to 2 tagless workflow posts.
-10. **POST_SYSTEM.md v1 deletion.** *Shipped 2026-05-16 ✓.* Six per-form/cross-form editorials supersede it.
-11. **Phase 8 — cycle close.** *Shipped 2026-05-16 ✓.* zola build/check clean, originally-published posts resolve, `/create-post` prompts for form first, `POST_SYSTEM_PLAN.md` archived to `.archive/post-system-reset/`. **Cycle 2 closed.**
-
-### Cookbook → concepts redesign (2026-05-11)
-
-The "cookbook" form as defined in `POST_SYSTEM.md` v1 (pull out a pattern worth reusing, with code + recognition story as evidence) failed the *satisfying* half of the *useful + satisfying* criterion for this author's workflow. Root cause: heavy LLM reliance for implementation means the pattern itself was rarely the author's intellectual contribution, and the LLM-as-recognizer also dissolves the "I noticed I was doing this twice" trigger. Result: a form that may have fired near-zero times if kept as-is.
-
-**Reframe.** Replace cookbook with **concepts** — interactive demos built to help the author understand something they didn't grasp. The intellectual ownership shifts from "I recognized this pattern" to "I designed this demo to teach me this concept." The latter is LLM-resilient: the LLM can write the code, but choosing what makes the concept teach is the author's work.
-
-**Implications carried forward** (not done in the redesign session):
-
-- `POST_SYSTEM.md`'s cookbook section is stale. The user said "don't care; may delete after all per-form editorials are made." No action this session.
-- The `cookbook init/publish` tools (Phase 6) are left in place but unused for concepts. Repurpose-or-retire is downstream.
-- `editorial/logbook.md` §6 needs a small addition: interactive demos count as a fourth evidence type (alongside cite, showboat exec, showboat image, external observable). Logbook portfolio demos fold into logbook via this addition rather than living as a separate form. Update queued for after workflows/opinions/resources sessions.
-- The provisional sections of `editorial/concepts.md` (5 sections: stake, curiosity moment, demo, what clicked, cross-refs) are starting points; the first real concepts post will reshape them.
-
-The redesign happened entirely in Topic 1 of what was originally planned as a 6-topic walkthrough. Topics 2-6 were skipped because the form was redefined, not documented — prescriptive editorial rules in the abstract would be premature for a form authored zero times.
-
-### Editorial signals collected (running notes for Task 14)
-
-Anything the user comments on about post quality, sample content, or what looks wrong/right during Phase 6 build-and-test. Add inline as bullets with date + context.
-
-- 2026-05-10 (smoke test on Phase-4 work): jargon-heavy prose ("Cycle 2", "Phase 4") meaningless to future-self or external readers. Anchor in dateable concrete events instead.
-- 2026-05-10: section 6 evidence was all `cite` blocks; user noted those are *where to look*, not *whether it works*. Real evidence = runnable exec, screenshot, or observable behavior.
-- 2026-05-10: wall-of-prose formatting was hard to scan; prefer structured/bulleted layouts when content is enumerable.
-- 2026-05-10 (cookbook smoke test): publish doesn't roll back on `zola check` failure — orphan files land in the dest dir even when publish exits non-zero. Same issue exists in logbook publish. Friction signal, not a blocker; could fix via write-temp-then-move, deferred. Editorial implication: include a "if publish fails, also delete `content/posts/<form>/<slug>.md`" step in POST_SYSTEM.md until the tool rolls back automatically.
-- 2026-05-10 (cookbook smoke test): `--from-logbook` placeholder is a **friction-positive** safety net — pre-fills a Zola link target that `zola check` validates at publish time, so a forgotten backlink fails loudly rather than silently. Worth noting in POST_SYSTEM.md as a deliberate authoring discipline pattern, not a bug.
-- 2026-05-10 (architecture): cookbook destinations are flat (`content/posts/cookbook/<slug>.md`), logbook destinations are per-project nested (`content/posts/logbook/<project>/<slug>.md`). Reason: cookbook patterns are cross-project by definition; per-project subdirs would imply the pattern belongs to one project. Worth documenting in POST_SYSTEM.md so the asymmetry is intentional, not accidental.
-- 2026-05-10 (workflows): Category 1 workflows (LLM-referenced docs) have *two* canonical locations now — the source-of-truth in the project repo (read by the LLM at session start) and the rendered post on mylearnbase (read by humans + future-self). The user's prose discipline should treat the project-repo doc as the source — edits flow doc → post, never post → doc. Worth flagging in POST_SYSTEM.md: "edit the doc, then republish; never edit the post directly because the next republish will overwrite."
-- 2026-05-10 (workflows): the dry-run/diff output is genuinely useful for a sync tool — gives the user a "what would change?" preview when an upstream doc is large. Worth surfacing in POST_SYSTEM.md as a recommended habit before each republish. Anti-pattern: blind republish without diff review, which loses sight of which paragraphs are new vs. which were already published.
-- 2026-05-10 (workflows): three forms now use the same shared `_shared.py` substrate. Each form's per-form module is ~150-250 lines (logbook 580 because of capture subcommands, cookbook 270, workflows 200). Per-form modules feel right-sized; further extraction (e.g., a `_publish_base` mixin) would obscure the actual differences. Hold on extraction until a 4th form joins.
+- **Subsumed follow-up:** the Cycle-4 "same-day prev/next tie" (`logbook publish` stamps date-only) is folded into Task 3 — once prev/next is relatedness-based, the date tie only matters in the chronological fallback.
+- **Curiosities captured this cycle** (`.curiosities/cycle-5.md`): (1) lexical (TF-IDF) vs semantic (embeddings) similarity and why the gap shrinks on a single-author corpus; (2) where build-time computation should live (compute-in-CI vs precompute-and-commit) and how that flips when the algorithm changes.
+- **Out of scope:** tagging-strategy rework (flagged volatile but not changing now; Task 3 deliberately avoids depending on tags); cookieless-analytics implementation (only disclosed in Task 4 if/when decided); process docs (`CLAUDE.md`, `PROJECT_PROCESS.md`).

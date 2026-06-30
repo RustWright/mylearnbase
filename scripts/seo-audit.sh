@@ -8,7 +8,7 @@
 #   3. Root resources present + correct: sitemap.xml, robots.txt (custom + prod
 #      Sitemap line), llms.txt
 #   4. JSON-LD on every page: parses as JSON + carries an expected @type
-#      (BlogPosting on leaf posts, WebSite on home/sections)
+#      (BlogPosting + BreadcrumbList on leaf posts, WebSite on home/sections)
 #   5. <head> surface: canonical + OpenGraph + Twitter present on a sample post
 #   6. Lighthouse SEO category score (needs google-chrome + npx; auto-skipped if
 #      either is missing) — run against `zola serve` so canonical matches host
@@ -71,24 +71,25 @@ fi
 section "JSON-LD (parse + @type) — all pages"
 read_json=$(python3 - <<'PY'
 import re, json, glob
-blocks=bad=0; bp=ws=0
+blocks=bad=0; bp=ws=bc=0
+VALID={"BlogPosting","WebSite","BreadcrumbList"}  # BreadcrumbList added Cycle 4
 for path in glob.glob("public/**/index.html", recursive=True):
     html=open(path,encoding='utf-8').read()
     for raw in re.findall(r'<script type=[^>]*ld\+json[^>]*>(.*?)</script>',html,re.DOTALL):
         blocks+=1
         try:
             t=json.loads(raw).get("@type")
-            bp+=t=="BlogPosting"; ws+=t=="WebSite"
-            if t not in ("BlogPosting","WebSite"): bad+=1
+            bp+=t=="BlogPosting"; ws+=t=="WebSite"; bc+=t=="BreadcrumbList"
+            if t not in VALID: bad+=1
         except Exception: bad+=1
-print(blocks,bad,bp,ws)
+print(blocks,bad,bp,ws,bc)
 PY
 )
-set -- $read_json; BLOCKS=$1; LDBAD=$2; BP=$3; WS=$4
+set -- $read_json; BLOCKS=$1; LDBAD=$2; BP=$3; WS=$4; BC=$5
 if [[ "$LDBAD" -eq 0 && "$BLOCKS" -gt 0 && "$BP" -gt 0 && "$WS" -gt 0 ]]; then
-  ok "$BLOCKS JSON-LD blocks valid (BlogPosting=$BP, WebSite=$WS)"
+  ok "$BLOCKS JSON-LD blocks valid (BlogPosting=$BP, WebSite=$WS, BreadcrumbList=$BC)"
 else
-  bad "JSON-LD problem (blocks=$BLOCKS invalid=$LDBAD BlogPosting=$BP WebSite=$WS)"
+  bad "JSON-LD problem (blocks=$BLOCKS invalid=$LDBAD BlogPosting=$BP WebSite=$WS BreadcrumbList=$BC)"
 fi
 
 # ── 5. <head> social surface on a sample post ────────────────────────────────

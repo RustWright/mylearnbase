@@ -166,11 +166,34 @@
       {% endif %}
     </div>
 
-    {# Adjacent posts within this post's own (transparent) section, walked from
-       the parent section's date-sorted pages — page.earlier/.later are not set
-       for transparent-section pages. Pages are newest-first, so the item just
-       before the current one in iteration is newer, the one just after is
-       older. "Previous" = older (read before); "Next" = newer (read next). #}
+    {# Related posts. Primary source: related.json — content-based TF-IDF neighbours
+       produced by scripts/compute-related.py, read here via load_data. It is a build
+       artifact (build.sh regenerates it before every `zola build`), so within a build
+       its keys (page.relative_path) and neighbour paths stay consistent; that is why
+       get_page below is safe. Fallback: when related.json is absent (a plain
+       `zola serve` in dev) or this post has no entry, walk chronological adjacency
+       within the post's own (transparent) section by hand — page.earlier/.later are
+       not set for transparent-section pages. #}
+    {%- set related_map = load_data(path="related.json", required=false) -%}
+    {%- set neighbours = [] -%}
+    {%- if related_map and page.relative_path in related_map -%}
+      {%- set neighbours = related_map[page.relative_path] -%}
+    {%- endif -%}
+
+    {%- if neighbours | length > 0 %}
+    <nav class="post-nav" aria-label="Related posts">
+      {%- for n in neighbours | slice(end=2) -%}
+      {%- set rel_page = get_page(path=n.path) -%}
+      <a class="post-nav__link {% if loop.first %}post-nav__prev{% else %}post-nav__next{% endif %}" href="{{ rel_page.permalink }}">
+        <span class="post-nav__dir">Related</span>
+        <span class="post-nav__title">{{ rel_page.title }}</span>
+      </a>
+      {%- endfor %}
+    </nav>
+    {%- else %}
+    {# Chronological fallback. Pages are newest-first, so the item just before the
+       current one in iteration is newer, the one just after is older.
+       "Previous" = older (read before); "Next" = newer (read next). #}
     {%- set_global po_newer = "" -%}
     {%- set_global po_older = "" -%}
     {%- set_global po_seen = false -%}
@@ -198,6 +221,7 @@
       </a>
       {%- endif %}
     </nav>
+    {%- endif %}
     {%- endif %}
 
     {% include "_footer.html" %}
