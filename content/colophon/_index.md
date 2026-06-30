@@ -26,8 +26,8 @@ There is no application server and no database, and nothing runs per visitor.
 - The project's own documentation is a separate
   **[mdBook](https://rust-lang.github.io/mdBook/)** site.
 
-A fuller, annotated list of the tools and references behind the site is a
-resources post in the works.
+A fuller, annotated list of the tools and references behind the site lives in
+[a dedicated resources post](@/posts/resources/building-mylearnbase.md).
 
 ## Privacy
 
