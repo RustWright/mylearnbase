@@ -1,0 +1,126 @@
+/* ───────────────────────────────────────────────────────────────────────
+   TF-IDF · demo 1 "the ablation" — self-contained styles.
+   Runs in a sandboxed iframe, so it carries its own minimal theme (shared
+   palette with the how-search-works demo) rather than inheriting the site CSS.
+   Layout flows to content height; demo.js sizes the iframe to fit.
+   ─────────────────────────────────────────────────────────────────────── */
+
+:root {
+  --bg: #fbfaf8;
+  --panel: #ffffff;
+  --text: #2c3142;
+  --pale: #8a90a0;
+  --line: #e6e3dd;
+  --accent: #3b5bdb;
+  --radius: 8px;
+  --mono: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+  --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1a1c22; --panel: #23262e; --text: #d7dae2;
+    --pale: #8a90a0; --line: #343844; --accent: #7aa2ff;
+  }
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  font-family: var(--sans);
+  color: var(--text);
+  background: var(--bg);
+  font-size: 15px;
+  line-height: 1.45;
+}
+#demo { padding: 14px; }
+
+/* ── header: objective + mode control + caption + colour legend ───────── */
+#objective { margin: 0 0 12px; max-width: 62ch; }
+#modes { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; overflow: hidden; }
+#modes button {
+  font: 600 0.9rem var(--sans);
+  padding: 8px 16px;
+  border: none;
+  border-right: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--pale);
+  cursor: pointer;
+}
+#modes button:last-child { border-right: none; }
+#modes button small { font-weight: 400; }
+#modes button:hover { color: var(--text); }
+#modes button.on { background: var(--accent); color: #fff; }
+
+#caption {
+  min-height: 2.6em;
+  margin: 12px 0 6px;
+  max-width: 68ch;
+  font-size: 0.95rem;
+}
+#caption b { color: var(--accent); }
+
+#rarity-legend {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  font-size: 0.78rem; color: var(--pale);
+  margin-bottom: 14px;
+}
+#rarity-legend .grad {
+  width: 110px; height: 8px; border-radius: 4px; display: inline-block;
+  background: linear-gradient(90deg, hsl(224,8%,58%), hsl(224,72%,55%));
+}
+#rarity-legend .ends { letter-spacing: .02em; }
+
+/* ── the document grid ────────────────────────────────────────────────── */
+#grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 12px;
+}
+.card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+}
+.card-title { font-weight: 700; font-size: 0.95rem; margin-bottom: 8px; }
+.words { list-style: none; margin: 0; padding: 0; }
+.words li {
+  display: grid;
+  grid-template-columns: 8.5em 1fr;
+  align-items: center;
+  gap: 8px;
+  padding: 2px 4px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.words li:hover { background: rgba(59,91,219,.08); }
+.words li.sel { background: rgba(59,91,219,.14); }
+.words .w {
+  font: 0.86rem var(--mono);
+  color: var(--text);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.words .barwrap { height: 12px; }
+.words .bar { display: block; height: 100%; border-radius: 3px; min-width: 3px; }
+
+/* ── inspector line (click a word) ────────────────────────────────────── */
+#detail {
+  margin: 16px 0 6px;
+  padding: 10px 12px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius);
+  font: 0.86rem var(--mono);
+  line-height: 1.6;
+}
+#detail .k { color: var(--pale); }
+#detail .v { color: var(--text); font-weight: 700; }
+#detail .win { color: var(--accent); }
+
+#credit { margin-top: 16px; font-size: 0.74rem; color: var(--pale); }
+#credit a { color: inherit; }
+
+@media (max-width: 640px) {
+  .words li { grid-template-columns: 7em 1fr; }
+}

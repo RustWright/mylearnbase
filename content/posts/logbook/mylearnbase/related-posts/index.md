@@ -88,7 +88,8 @@ The pieces that make that happen:
   they read fine, so it stays on word overlap. Revisit when the catalogue grows
   more varied in vocabulary.
 - How this actually works, why comparing the words two posts share is enough to
-  call them related, and why that holds up better for a single author than it
-  would across many, is a strong candidate for an interactive concepts demo. The
-  similarity script already records the specific shared words behind each match,
-  which is most of the raw material such a demo would visualize.
+  call them related, and why that holds up better for a single author than across
+  many, is covered in the [concepts post on measuring document
+  similarity](@/posts/concepts/tf-idf.md). The similarity script records the
+  specific shared words behind each match, which is the raw material its demos
+  visualize.

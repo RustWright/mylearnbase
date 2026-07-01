@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TF-IDF: comparing two documents</title>
+  <link rel="stylesheet" href="./demo.css">
+</head>
+<body>
+  <div id="demo">
+    <header id="head">
+      <p id="objective">The last demo turned each document into a list of
+        word&nbsp;weights. To measure how alike two documents are, we line those
+        weights up and multiply them <b>word by word</b>, then add up the
+        products. That single number is the <b>cosine similarity</b>: <b>0</b> if
+        they share nothing, <b>1</b> if they point exactly the same way. Pick two
+        documents and watch the number get built out of their words.</p>
+
+      <div id="controls">
+        <label>Document A <select id="selA"></select></label>
+        <label>Document B <select id="selB"></select></label>
+      </div>
+    </header>
+
+    <div id="stage">
+      <!-- left: the pair, decomposed -->
+      <section id="pair">
+        <p id="pairhead"></p>
+
+        <div id="meter" aria-label="cosine similarity from 0 to 1">
+          <div id="stack"></div>
+          <span id="tick0">0</span>
+          <span id="tick1">1</span>
+        </div>
+        <p id="scorenum"></p>
+
+        <div id="breakdown">
+          <p id="bkhead">Every word both documents use adds
+            <b>weight<sub>A</sub> &times; weight<sub>B</sub></b> to the score.
+            Largest contributions first:</p>
+          <ol id="contribs"></ol>
+        </div>
+
+        <div id="unique">
+          <p id="uqlead">Words only <em>one</em> document uses contribute nothing:
+            they multiply against a <b>zero</b> on the other side and drop out.</p>
+          <p class="uqrow" id="uqA"></p>
+          <p class="uqrow" id="uqB"></p>
+        </div>
+      </section>
+
+      <!-- right: the whole ranking -->
+      <section id="ranks">
+        <p id="rankhead"></p>
+        <ol id="ranklist"></ol>
+        <p id="ranknote"></p>
+      </section>
+    </div>
+
+    <footer id="credit"></footer>
+  </div>
+
+  <script src="./demo.js"></script>
+</body>
+</html>

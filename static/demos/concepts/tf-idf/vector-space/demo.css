@@ -1,0 +1,159 @@
+/* ───────────────────────────────────────────────────────────────────────
+   TF-IDF · demo 2 "comparing two documents" — self-contained styles.
+
+   Sandboxed iframe: carries its own theme (shared palette with demo 1 and the
+   how-search-works demo). Layout flows to content height; demo.js sizes the
+   iframe to fit. The similarity number is decomposed in place: a 0→1 meter
+   whose filled part is split into one segment per shared word, so the reader
+   sees the cosine literally built out of word contributions.
+   ─────────────────────────────────────────────────────────────────────── */
+
+:root {
+  --bg: #fbfaf8;
+  --panel: #ffffff;
+  --text: #2c3142;
+  --pale: #8a90a0;
+  --line: #e6e3dd;
+  --track: #ece9e3;
+  --accent: #3b5bdb;   /* document A */
+  --warm: #e8590c;     /* document B */
+  --same: #ecf1ff;     /* same-cluster row tint */
+  --radius: 8px;
+  --mono: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+  --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1a1c22; --panel: #23262e; --text: #d7dae2;
+    --pale: #8a90a0; --line: #343844; --track: #2b2f38;
+    --accent: #7aa2ff; --warm: #ffa94d; --same: #262c3b;
+  }
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  font-family: var(--sans);
+  color: var(--text);
+  background: var(--bg);
+  font-size: 15px;
+  line-height: 1.45;
+}
+#demo { padding: 14px; }
+b sub { font-weight: 700; }
+
+/* ── header + controls ─────────────────────────────────────────────────────*/
+#objective { margin: 0 0 12px; max-width: 68ch; }
+#controls { display: flex; flex-wrap: wrap; gap: 16px; }
+#controls label {
+  font-size: 0.8rem; color: var(--pale);
+  display: inline-flex; align-items: center; gap: 8px;
+}
+#controls select {
+  font: 600 0.88rem var(--sans);
+  color: var(--text); background: var(--panel);
+  border: 1px solid var(--line); border-radius: 6px; padding: 6px 8px;
+  max-width: 15em;
+}
+
+/* ── stage: pair | ranking ──────────────────────────────────────────────────*/
+#stage {
+  display: grid;
+  grid-template-columns: 1fr 260px;
+  gap: 24px;
+  align-items: start;
+  margin-top: 16px;
+}
+@media (max-width: 640px) { #stage { grid-template-columns: 1fr; } }
+
+#pairhead, #rankhead { margin: 0 0 10px; font-size: 1.02rem; }
+#pairhead .a { color: var(--accent); font-weight: 700; }
+#pairhead .b { color: var(--warm); font-weight: 700; }
+
+/* ── the meter: 0→1 track, filled part segmented by word ────────────────────*/
+#meter {
+  position: relative;
+  height: 26px;
+  background: var(--track);
+  border-radius: 6px;
+  overflow: hidden;
+}
+#stack { display: flex; height: 100%; width: 100%; }
+#stack .seg { height: 100%; transition: width .35s ease; }
+#stack .seg.rest { background: var(--pale); opacity: .5; }
+#tick0, #tick1 {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  font: 600 0.7rem var(--mono); color: var(--pale); pointer-events: none;
+}
+#tick0 { left: 6px; }
+#tick1 { right: 6px; }
+
+#scorenum { margin: 8px 0 4px; font-size: 0.92rem; color: var(--pale); }
+#scorenum b { color: var(--text); font: 700 1.15rem var(--mono); }
+
+/* ── contribution list ──────────────────────────────────────────────────────*/
+#bkhead { margin: 16px 0 8px; font-size: 0.9rem; color: var(--text); max-width: 60ch; }
+#bkhead b, #bkhead sub { font-family: var(--mono); }
+#contribs { list-style: none; margin: 0; padding: 0; }
+#contribs li {
+  display: grid;
+  grid-template-columns: 12ch 1fr 6ch;
+  align-items: center; gap: 10px;
+  padding: 2px 0;
+}
+#contribs .cw { font: 600 0.84rem var(--mono); color: var(--text);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#contribs .cbar { height: 12px; border-radius: 3px; min-width: 2px; }
+#contribs .cv { font: 0.78rem var(--mono); color: var(--pale); text-align: right; }
+#contribs li.rest .cw { color: var(--pale); font-weight: 400; font-style: italic; }
+#contribs li.rest .cbar { background: var(--pale); opacity: .5; }
+
+/* ── unique-words strip ─────────────────────────────────────────────────────*/
+#unique {
+  margin-top: 16px; padding: 10px 12px;
+  background: var(--panel); border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+#uqlead { margin: 0 0 8px; font-size: 0.86rem; color: var(--text); }
+#uqlead b { color: var(--warm); }
+.uqrow { margin: 4px 0; font-size: 0.82rem; color: var(--pale); }
+.uqrow .who { font-weight: 700; }
+.uqrow .who.a { color: var(--accent); }
+.uqrow .who.b { color: var(--warm); }
+.chip {
+  display: inline-block; margin: 2px 4px 2px 0; padding: 1px 6px;
+  font: 0.78rem var(--mono);
+  background: var(--track); border-radius: 4px; color: var(--text);
+}
+.chip .z { color: var(--pale); }
+
+/* ── ranking panel ──────────────────────────────────────────────────────────*/
+#ranks {
+  border-left: 1px solid var(--line); padding-left: 22px;
+}
+@media (max-width: 640px) {
+  #ranks { border-left: none; padding-left: 0; border-top: 1px solid var(--line); padding-top: 16px; }
+}
+#rankhead .a { color: var(--accent); font-weight: 700; }
+#ranklist { list-style: none; margin: 0; padding: 0; }
+#ranklist li {
+  display: grid; grid-template-columns: 1fr 4ch; align-items: center;
+  gap: 8px; padding: 5px 6px; border-radius: 5px; cursor: pointer;
+}
+#ranklist li:hover { background: var(--track); }
+#ranklist li.same { background: var(--same); }
+#ranklist li.cur { outline: 2px solid var(--warm); outline-offset: -2px; }
+#ranklist .rk { font-size: 0.82rem; color: var(--text); }
+#ranklist .rk .rbar {
+  display: block; height: 5px; margin-top: 3px; border-radius: 3px;
+  background: var(--accent); min-width: 1px;
+}
+#ranklist li.cur .rbar { background: var(--warm); }
+#ranklist .rv { font: 0.76rem var(--mono); color: var(--pale); text-align: right; }
+#ranknote {
+  margin: 12px 0 0; font-size: 0.82rem; color: var(--pale);
+  max-width: 30ch; line-height: 1.5;
+}
+
+#credit { margin-top: 18px; font-size: 0.74rem; color: var(--pale); }
+#credit a { color: inherit; }

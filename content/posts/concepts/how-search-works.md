@@ -45,6 +45,6 @@ A couple of threads from here:
 
 - The search box on this very site is the same idea in production. See the
   [build log for adding it](@/posts/logbook/mylearnbase/site-search/index.md).
-- This demo stops at *finding* the matches. The next question, once you have them,
-  is which results come **first**. That's its own kind of beautiful, and its own
-  post.
+- This demo stops at *finding* the matches. Which of them comes **first** is a
+  separate step, covered in the [post on measuring document similarity with
+  TF-IDF](@/posts/concepts/tf-idf.md).

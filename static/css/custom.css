@@ -511,15 +511,18 @@ body.search-open {
   margin-right: auto;
 }
 /* Above 1024px the post page shows a sticky table-of-contents that fills the
-   entire right gutter (theme: body.post aside). A breakout centred on the
-   viewport runs its right edge into that TOC. So when the TOC is present,
-   re-centre the demo on the *non-TOC* region (empty left gutter + content
-   column) and cap its width so the right edge stops short of the TOC.
-   `100%` here is the article's width; `100vw` the viewport. */
+   ENTIRE right gutter (theme: body.post aside, width (100% - main-max)/2), butting
+   right up against the content column. That leaves no free space to the right, so
+   a viewport-centred breakout can only clear the TOC by shifting left, which reads
+   as lopsided. Rather than skew it, drop the breakout while the TOC is present:
+   the demo fills the content column and sits centred under the prose, aligned with
+   it. (The full-width breakout resumes below 1025px, where the theme hides the TOC
+   and both gutters are free.) */
 @media (min-width: 1025px) {
   .demo--wide {
-    width: min(1080px, calc((100% + 100vw) / 2 - 1.5rem));
-    left: calc((300% - 100vw) / 4);
+    left: auto;
+    transform: none;
+    width: 100%;
   }
 }
 /* A comparative demo stacks its two lanes on mobile, so it needs more vertical

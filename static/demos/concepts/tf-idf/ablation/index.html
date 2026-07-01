@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TF-IDF: what is each document about?</title>
+  <link rel="stylesheet" href="./demo.css">
+</head>
+<body>
+  <div id="demo">
+    <header id="head">
+      <p id="objective">Each card is a Wikipedia intro. The bars show the words
+        that score highest as a one-line summary of that document. Flip the
+        scoring method and watch which words rise to the top.</p>
+      <div id="modes" role="tablist" aria-label="scoring method">
+        <button data-mode="tf" class="on">Count &nbsp;<small>(TF)</small></button>
+        <button data-mode="idf">Rarity &nbsp;<small>(IDF)</small></button>
+        <button data-mode="tfidf">TF &times; IDF</button>
+      </div>
+      <p id="caption">…</p>
+      <div id="rarity-legend">
+        <span>bar colour = how rare the word is across the 12 documents:</span>
+        <i class="grad"></i>
+        <span class="ends">common &middot; rare</span>
+      </div>
+    </header>
+
+    <div id="grid" aria-live="polite"></div>
+
+    <p id="detail" hidden></p>
+
+    <footer id="credit"></footer>
+  </div>
+
+  <script src="./demo.js"></script>
+</body>
+</html>
