@@ -9,10 +9,10 @@ understand it; here's what clicked when I did."*
 
 The form is new and still finding its shape. This doc is deliberately
 **rough and lightweight**: enough to author with, not enough to be
-prescriptive. One concepts post now exists, *How indexing can make
-search faster* (`content/posts/concepts/how-search-works.md`). Notes
-below tagged *(first post)* are what building it taught. With n=1,
-treat them as observations, not laws.
+prescriptive. A couple of concepts posts now exist; the worked example
+at the end grounds the guidance in the first one. Notes below tagged
+*(first post)* are what building that first post taught, so treat them
+as early observations, not laws.
 
 ## What concepts is for
 
@@ -162,9 +162,10 @@ Two cross-form notes:
   breaks out wider than the reading column (`demo(wide=true)`) and
   carries its own "works best on a wider screen" note that the demo
   detects and shows itself, rather than baking the caveat into the post
-  prose. One-dimensional demos ship universal. The breakout, the
-  TOC-dodging, and the self-sizing-on-mobile mechanics live in
-  `static/css/custom.css` and the demo's own JS.
+  prose. One-dimensional demos ship universal. The breakout, the way it
+  yields to the sticky table-of-contents on wide screens, and the
+  self-sizing-on-mobile mechanics live in `static/css/custom.css` and
+  the demo's own JS.
 
 ## The curiosity log mechanism
 
@@ -224,22 +225,15 @@ structure that somebody builds and ships.
 > shows up." No stake line and no "what clicked," for the reasons in
 > the section table above.
 
-Two demo ideas sit in the backlog for future cycles: *what hashes
-actually do* (the original v0 sketch for this doc), and a
-**ranking-by-rarity / relevance** demo that this post's closing
-forward-pointer gestures at (once you've found the matches, which
-come first?). The ranking demo depends on this one having landed
-first.
-
 ## What's still rough about this doc
 
 The logbook editorial doc walked six topics in depth: section-by-
 section quality bars, anti-patterns, multiple worked examples,
 practical tests per section. This doc still doesn't, on purpose.
 
-Concepts has now been authored once. That seeds the *(first post)*
-notes above; it doesn't justify writing detailed rules in the
-abstract that may not survive post two. The intent stays the same:
-give an LLM in another session enough context to *start* an authoring
-conversation, not enough to constrain it. Keep iterating as more
-concepts posts ship.
+Concepts has now been authored a couple of times. That seeds the
+*(first post)* notes above; it still doesn't justify writing detailed
+rules in the abstract that may not generalize as more posts ship. The
+intent stays the same: give an LLM in another session enough context
+to *start* an authoring conversation, not enough to constrain it. Keep
+iterating as more concepts posts ship.

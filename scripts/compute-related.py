@@ -69,6 +69,9 @@ STOPWORDS = {
     # contraction fragments left behind after tokenizing (e.g. "I'll" -> "ll")
     "ll", "ve", "re", "im", "isn", "didn", "doesn", "don", "won", "wasn",
     "aren", "wouldn", "couldn", "shouldn", "hasn", "haven", "wont", "cant",
+    # ordinal fragments: the regex can't start on a digit, so "19th"/"21st"
+    # tokenize to just "th"/"st"/"nd"/"rd" — noise, not words.
+    "th", "st", "nd", "rd",
 }
 
 TOKEN_RE = re.compile(r"[a-z][a-z0-9-]*[a-z0-9]|[a-z]")
