@@ -85,11 +85,11 @@
   // ── rendering ─────────────────────────────────────────────────────────
   var CAPTIONS = {
     tf: "<b>Count only.</b> The winners are the same filler on every card &mdash; " +
-        "&ldquo;the&rdquo;, &ldquo;of&rdquo;, &ldquo;and&rdquo;. Raw frequency can&rsquo;t tell the documents apart.",
+      "&ldquo;the&rdquo;, &ldquo;of&rdquo;, &ldquo;and&rdquo;. Raw frequency can&rsquo;t tell the documents apart.",
     idf: "<b>Rarity only.</b> Now the rarest words win. Distinctive &mdash; but is " +
-         "&ldquo;rectangular&rdquo; what Basketball is <i>about</i>? Rarity ignores how central a word is to the document.",
+      "&ldquo;one-thousandth&rdquo; really what Jupiter is <i>about</i>? Rarity ignores how central a word is to the document.",
     tfidf: "<b>TF &times; IDF.</b> Frequent in this document <i>and</i> rare across the others. " +
-           "Each card now reads like a fingerprint of its topic."
+      "Each card now reads like a fingerprint of its topic."
   };
   var mode = "tf";
 

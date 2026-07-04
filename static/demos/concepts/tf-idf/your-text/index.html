@@ -1,29 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>TF-IDF: compare your own text</title>
   <link rel="stylesheet" href="./demo.css">
 </head>
+
 <body>
   <div id="demo">
     <header id="head">
-      <p id="objective">Nothing above was special about Wikipedia articles. Any
-        two chunks of text become vectors the same way, so the same cosine
-        compares them. Paste or type into both boxes and watch the score. (A
+      <p id="objective">Paste or type into both boxes and watch the score. (A
         search query is just an extreme case: a document one line long.)</p>
 
       <div id="panes">
         <div class="pane">
           <label class="a" for="txtA">Text A</label>
-          <textarea id="txtA" spellcheck="false"
-            placeholder="Paste or type some text&hellip;"></textarea>
+          <textarea id="txtA" spellcheck="false" placeholder="Paste or type some text&hellip;"></textarea>
         </div>
         <div class="pane">
           <label class="b" for="txtB">Text B</label>
-          <textarea id="txtB" spellcheck="false"
-            placeholder="&hellip;and something to compare it against."></textarea>
+          <textarea id="txtB" spellcheck="false" placeholder="&hellip;and something to compare it against."></textarea>
         </div>
       </div>
 
@@ -45,7 +43,8 @@
         <p id="scorenum"></p>
 
         <p id="bkhead">Every word both texts use adds
-          <b>weight<sub>A</sub> &times; weight<sub>B</sub></b> to the score:</p>
+          <b>weight<sub>A</sub> &times; weight<sub>B</sub></b> to the score:
+        </p>
         <ol id="contribs"></ol>
         <p id="sharednote"></p>
       </div>
@@ -56,4 +55,5 @@
 
   <script src="./demo.js"></script>
 </body>
+
 </html>
