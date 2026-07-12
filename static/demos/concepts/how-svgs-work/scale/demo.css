@@ -1,0 +1,94 @@
+/* ───────────────────────────────────────────────────────────────────────
+   "How SVGs work" · demo 1 "pixels versus instructions" — self-contained.
+
+   Two copies of the site logo at the same on-screen size. Left is an inline
+   <svg> (re-rendered from its path instructions at the display size — always
+   crisp). Right is a <canvas> whose backing store is deliberately shrunk to
+   DISPLAY / zoom pixels, then stretched back to DISPLAY with image-rendering:
+   pixelated — an honest stand-in for a saved raster (PNG/JPEG) that has a fixed
+   pixel grid and nothing more to give when enlarged. Only variable between the
+   panels is vector-vs-raster, which is the whole lesson.
+   ─────────────────────────────────────────────────────────────────────── */
+
+:root {
+  --bg: #fbfaf8;
+  --panel: #ffffff;
+  --text: #2c3142;
+  --pale: #8a90a0;
+  --line: #e6e3dd;
+  --track: #ece9e3;
+  --accent: #3b5bdb;   /* the SVG / vector side */
+  --warm: #e8590c;     /* the raster / pixel side */
+  --radius: 8px;
+  --mono: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+  --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1a1c22; --panel: #23262e; --text: #d7dae2;
+    --pale: #8a90a0; --line: #343844; --track: #2b2f38;
+    --accent: #7aa2ff; --warm: #ffa94d;
+  }
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  font-family: var(--sans);
+  color: var(--text);
+  background: var(--bg);
+  font-size: 15px;
+  line-height: 1.45;
+}
+#demo { padding: 14px; }
+
+#narrow-note {
+  display: none;
+  margin: 0 0 14px; padding: 9px 12px;
+  font-size: 0.82rem; color: var(--text);
+  background: var(--track); border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+body.is-narrow #narrow-note { display: block; }
+
+#objective { margin: 0 0 20px; max-width: 72ch; }
+
+/* ── the two panels ──────────────────────────────────────────────────────── */
+#stage { display: flex; gap: 24px; flex-wrap: wrap; justify-content: center; }
+.panel { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 9px; }
+.frame {
+  width: 240px; height: 240px;
+  background: var(--panel);
+  border: 1px solid var(--line); border-radius: var(--radius);
+  overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+  /* subtle grid so the pixel blocks read as pixels */
+  background-image:
+    linear-gradient(var(--track) 1px, transparent 1px),
+    linear-gradient(90deg, var(--track) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+.frame svg { display: block; width: 240px; height: 240px; }
+.vector .frame svg { fill: var(--accent); }
+.frame canvas {
+  width: 240px; height: 240px; display: block;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;   /* Firefox fallback */
+}
+figcaption { display: flex; flex-direction: column; align-items: center; gap: 1px; text-align: center; }
+.tag { font-weight: 700; }
+.vector .tag { color: var(--accent); }
+.raster .tag { color: var(--warm); }
+.sub { font-size: 0.78rem; color: var(--pale); font-family: var(--mono); }
+
+/* ── zoom control ────────────────────────────────────────────────────────── */
+#controls { margin: 26px auto 0; max-width: 440px; text-align: center; }
+#controls label { font-size: 0.92rem; }
+#controls label b { font-family: var(--mono); color: var(--warm); }
+#controls input[type="range"] {
+  width: 100%; margin: 12px 0 4px; accent-color: var(--warm);
+}
+#hint { margin: 8px 0 0; font-size: 0.84rem; color: var(--pale); }
+#hint b { color: var(--text); }
+
+#credit { margin-top: 20px; font-size: 0.74rem; color: var(--pale); text-align: center; }

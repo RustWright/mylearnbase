@@ -1,0 +1,110 @@
+/* ───────────────────────────────────────────────────────────────────────
+   "How SVGs work" · demo 2 "read the path" — self-contained styles.
+
+   Left: the logo's <path> on a 0-100 coordinate grid, one command highlighted
+   at a time, with draggable cubic-Bezier control handles. Right: the same path's
+   `d` string, tokenised so the active command lights up and the numbers update
+   as you drag. Colours reuse the site demo palette; strokes are styled via
+   classes (CSS custom properties don't resolve inside SVG presentation
+   attributes, so geometry goes in attributes, paint goes in CSS).
+   ─────────────────────────────────────────────────────────────────────── */
+
+:root {
+  --bg: #fbfaf8;
+  --panel: #ffffff;
+  --text: #2c3142;
+  --pale: #8a90a0;
+  --line: #e6e3dd;
+  --track: #ece9e3;
+  --accent: #3b5bdb;   /* the drawn curve / anchors */
+  --warm: #e8590c;     /* control points + handle lines */
+  --radius: 8px;
+  --mono: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+  --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1a1c22; --panel: #23262e; --text: #d7dae2;
+    --pale: #8a90a0; --line: #343844; --track: #2b2f38;
+    --accent: #7aa2ff; --warm: #ffa94d;
+  }
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  font-family: var(--sans);
+  color: var(--text);
+  background: var(--bg);
+  font-size: 15px;
+  line-height: 1.45;
+}
+#demo { padding: 14px; }
+code { font-family: var(--mono); font-size: 0.9em; }
+
+#narrow-note {
+  display: none;
+  margin: 0 0 14px; padding: 9px 12px;
+  font-size: 0.82rem; color: var(--text);
+  background: var(--track); border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+body.is-narrow #narrow-note { display: block; }
+
+#objective { margin: 0 0 18px; max-width: 74ch; }
+
+/* ── two-column layout ───────────────────────────────────────────────────── */
+#wrap { display: grid; grid-template-columns: minmax(0, 360px) 1fr; gap: 28px; align-items: start; }
+@media (max-width: 680px) { #wrap { grid-template-columns: 1fr; } }
+
+#stagewrap { min-width: 0; }
+#stage {
+  width: 100%; max-width: 360px; aspect-ratio: 1 / 1; display: block;
+  background: var(--panel); border: 1px solid var(--line);
+  border-radius: var(--radius);
+  touch-action: none;   /* let us drag without the page scrolling */
+}
+#axis { margin: 8px 2px 0; font-size: 0.78rem; color: var(--pale); }
+#axis code, #axis b { color: var(--text); }
+
+/* ── SVG element classes (paint only; geometry lives in attributes) ── */
+.grid   { stroke: var(--track); stroke-width: 0.4; }
+.fillprev { fill: var(--accent); opacity: 0.07; stroke: none; }
+.outline { fill: none; stroke: var(--pale); stroke-width: 0.7; stroke-linejoin: round; }
+.seg    { fill: none; stroke: var(--accent); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.hline  { stroke: var(--warm); stroke-width: 0.6; stroke-dasharray: 2 2; }
+.anchor { fill: var(--pale); }
+.anchor.cur { fill: var(--accent); }
+.ctrl   { fill: var(--warm); stroke: var(--panel); stroke-width: 0.7; pointer-events: none; }
+.grab   { fill: transparent; cursor: grab; }
+#stage.dragging .grab { cursor: grabbing; }
+
+/* ── the d string + explanation ──────────────────────────────────────────── */
+.lbl { margin: 0 0 8px; font-size: 0.86rem; color: var(--pale); }
+.lbl b { color: var(--text); font-family: var(--mono); }
+#dstr {
+  font: 0.9rem/1.7 var(--mono);
+  background: var(--panel); border: 1px solid var(--line);
+  border-radius: var(--radius); padding: 12px 13px;
+  word-break: break-word;
+}
+.tok { padding: 1px 4px; border-radius: 4px; cursor: pointer; color: var(--pale); white-space: nowrap; }
+.tok:hover { color: var(--text); }
+.tok.on { color: var(--panel); background: var(--accent); font-weight: 700; }
+
+#expl { margin: 16px 0; font-size: 0.92rem; min-height: 3.4em; max-width: 60ch; }
+#expl b { color: var(--text); }
+#expl .cmd { font-family: var(--mono); color: var(--accent); font-weight: 700; }
+
+#stepper { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+#stepper button {
+  font: 600 0.84rem var(--sans); color: var(--text);
+  background: var(--track); border: 1px solid var(--line);
+  border-radius: 999px; padding: 5px 13px; cursor: pointer;
+}
+#stepper button:hover:not(:disabled) { border-color: var(--accent); }
+#stepper button:disabled { opacity: 0.4; cursor: default; }
+#reset { margin-left: auto; color: var(--pale); }
+#stepcount { font: 0.8rem var(--mono); color: var(--pale); }
+
+#credit { margin-top: 20px; font-size: 0.74rem; color: var(--pale); }

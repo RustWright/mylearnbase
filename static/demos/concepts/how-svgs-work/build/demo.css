@@ -1,0 +1,129 @@
+/* ───────────────────────────────────────────────────────────────────────
+   "How SVGs work" · demo 3 "build your own" — self-contained styles.
+
+   A live SVG editor (textarea) beside a preview that re-renders as you type,
+   with a challenge picker, a collapsible cheat-sheet, and a reveal-an-example
+   panel. The preview canvas is a fixed 0-100 square (matching demo 2's grid) on
+   a checkerboard so white shapes stay visible.
+   ─────────────────────────────────────────────────────────────────────── */
+
+:root {
+  --bg: #fbfaf8;
+  --panel: #ffffff;
+  --text: #2c3142;
+  --pale: #8a90a0;
+  --line: #e6e3dd;
+  --track: #ece9e3;
+  --accent: #3b5bdb;
+  --warm: #e8590c;
+  --ok: #2f9e44;
+  --radius: 8px;
+  --mono: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+  --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1a1c22; --panel: #23262e; --text: #d7dae2;
+    --pale: #8a90a0; --line: #343844; --track: #2b2f38;
+    --accent: #7aa2ff; --warm: #ffa94d; --ok: #69db7c;
+  }
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  font-family: var(--sans);
+  color: var(--text);
+  background: var(--bg);
+  font-size: 15px;
+  line-height: 1.45;
+}
+#demo { padding: 14px; }
+code { font-family: var(--mono); font-size: 0.88em; }
+
+#narrow-note {
+  display: none;
+  margin: 0 0 14px; padding: 9px 12px;
+  font-size: 0.82rem; color: var(--text);
+  background: var(--track); border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+body.is-narrow #narrow-note { display: block; }
+
+#objective { margin: 0 0 16px; max-width: 74ch; }
+
+/* ── challenge chips + prompt ─────────────────────────────────────────────── */
+#chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip {
+  font: 600 0.82rem var(--sans); color: var(--text);
+  background: var(--track); border: 1px solid var(--line);
+  border-radius: 999px; padding: 5px 14px; cursor: pointer;
+}
+.chip:hover { border-color: var(--accent); }
+.chip.on { background: var(--accent); color: var(--panel); border-color: var(--accent); }
+#prompt { margin: 12px 0 16px; font-size: 0.94rem; max-width: 70ch; min-height: 1.4em; }
+#prompt b { color: var(--text); }
+
+/* ── editor / preview ─────────────────────────────────────────────────────── */
+#pane { display: grid; grid-template-columns: 1fr 300px; gap: 20px; align-items: start; }
+@media (max-width: 680px) { #pane { grid-template-columns: 1fr; } }
+.col { min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.collabel { font-size: 0.78rem; font-weight: 700; color: var(--pale); }
+
+#src {
+  width: 100%; min-height: 300px; resize: vertical;
+  font: 0.84rem/1.55 var(--mono); color: var(--text);
+  background: var(--panel); border: 1px solid var(--line);
+  border-radius: var(--radius); padding: 11px 12px; tab-size: 2;
+}
+#src:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+#status { margin: 0; font: 0.8rem var(--mono); min-height: 1.3em; }
+#status.ok { color: var(--ok); }
+#status.bad { color: var(--warm); }
+
+#preview {
+  width: 100%; display: flex; align-items: center; justify-content: center;
+  padding: 16px; border: 1px solid var(--line); border-radius: var(--radius);
+  background-color: var(--panel);
+  background-image:
+    linear-gradient(45deg, var(--track) 25%, transparent 25%),
+    linear-gradient(-45deg, var(--track) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, var(--track) 75%),
+    linear-gradient(-45deg, transparent 75%, var(--track) 75%);
+  background-size: 16px 16px;
+  background-position: 0 0, 0 8px, 8px -8px, -8px 0;
+}
+#preview svg { width: 260px; height: 260px; display: block; }
+@media (max-width: 340px) { #preview svg { width: 200px; height: 200px; } }
+
+/* ── tools: cheat-sheet + reveal ──────────────────────────────────────────── */
+#tools { margin-top: 20px; display: flex; flex-direction: column; gap: 10px; }
+details {
+  background: var(--panel); border: 1px solid var(--line);
+  border-radius: var(--radius); padding: 10px 14px;
+}
+summary { cursor: pointer; font-weight: 600; font-size: 0.9rem; }
+summary:hover { color: var(--accent); }
+.cheatgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 12px; }
+@media (max-width: 560px) { .cheatgrid { grid-template-columns: 1fr; } }
+.cheatgrid h4 { margin: 0 0 6px; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--pale); }
+.cheatgrid ul { margin: 0 0 12px; padding-left: 18px; }
+.cheatgrid li { margin: 2px 0; font-size: 0.86rem; }
+.cheatnote { margin: 6px 0; font-size: 0.82rem; color: var(--pale); }
+.cheatnote b { color: var(--text); }
+.cheatnote a, .onenote a { color: var(--accent); }
+
+.onenote { margin: 10px 0; font-size: 0.86rem; color: var(--pale); font-style: italic; }
+#excode {
+  margin: 0 0 12px; padding: 12px 13px; overflow-x: auto;
+  font: 0.82rem/1.5 var(--mono); color: var(--text);
+  background: var(--bg); border: 1px solid var(--line); border-radius: 6px;
+}
+#loadex {
+  font: 600 0.82rem var(--sans); color: var(--panel);
+  background: var(--accent); border: none;
+  border-radius: 999px; padding: 6px 15px; cursor: pointer;
+}
+#loadex:hover { opacity: 0.9; }
+
+#credit { margin-top: 18px; font-size: 0.74rem; color: var(--pale); }

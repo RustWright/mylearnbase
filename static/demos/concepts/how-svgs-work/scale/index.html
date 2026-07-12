@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SVG: pixels versus instructions</title>
+  <link rel="stylesheet" href="./demo.css">
+</head>
+<body>
+  <div id="demo">
+    <div id="narrow-note">This demo puts two copies of the logo side by side. It works best on a wider screen (tablet, laptop, or desktop).</div>
+
+    <header id="head">
+      <p id="objective">Both squares hold the <b>same logo at the same size</b>.
+        The left one is stored as <b>SVG</b> &mdash; a short list of drawing
+        instructions. The right one is stored the way a photo, PNG, or JPEG is:
+        a fixed grid of coloured <b>pixels</b>. They start out identical. Now drag
+        the zoom and watch them part ways.</p>
+    </header>
+
+    <div id="stage">
+      <figure class="panel vector">
+        <div class="frame" id="vecframe"></div>
+        <figcaption>
+          <span class="tag">Instructions (SVG)</span>
+          <span class="sub">redrawn at 240px &mdash; always sharp</span>
+        </figcaption>
+      </figure>
+
+      <figure class="panel raster">
+        <div class="frame"><canvas id="ras" width="240" height="240"></canvas></div>
+        <figcaption>
+          <span class="tag">Pixels (like a PNG)</span>
+          <span class="sub" id="rres">saved as 240&times;240 px</span>
+        </figcaption>
+      </figure>
+    </div>
+
+    <div id="controls">
+      <label for="zoom">Zoom in <b id="zval">1&times;</b></label>
+      <input id="zoom" type="range" min="1" max="30" value="1" step="1">
+      <p id="hint">At <b>1&times;</b> they match. Push the zoom and the pixels break
+        into blocks, while the instructions just get redrawn bigger.</p>
+    </div>
+
+    <footer id="credit">The specimen is this site&rsquo;s own logo.</footer>
+  </div>
+
+  <script src="./demo.js"></script>
+</body>
+</html>

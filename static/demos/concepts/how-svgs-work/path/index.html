@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SVG: read the path</title>
+  <link rel="stylesheet" href="./demo.css">
+</head>
+<body>
+  <div id="demo">
+    <div id="narrow-note">This demo has a drawing on one side and its code on the other. It works best on a wider screen (tablet, laptop, or desktop).</div>
+
+    <header id="head">
+      <p id="objective">That crisp logo is one <code>&lt;path&gt;</code> whose whole
+        shape lives in a single string of letters and numbers, the <b>d</b>
+        attribute. Here it is, taken apart. <b>Step through it</b> one command at a
+        time; on the curves, <b>drag the hollow control points</b> and watch both
+        the picture and the numbers change.</p>
+    </header>
+
+    <div id="wrap">
+      <div id="stagewrap">
+        <svg id="stage" viewBox="0 0 100 100" role="img" aria-label="the logo path, editable"></svg>
+        <p id="axis">The box is a <b>0&ndash;100</b> grid. <b>y increases downward</b>,
+          so <code>50 6</code> sits near the top.</p>
+      </div>
+
+      <div id="side">
+        <p class="lbl">The <b>d</b> attribute (the pen&rsquo;s path). Tap a command to jump to it:</p>
+        <div id="dstr"></div>
+        <p id="expl"></p>
+        <nav id="stepper">
+          <button id="prev">&larr; Back</button>
+          <span id="stepcount"></span>
+          <button id="next">Next &rarr;</button>
+          <button id="reset" title="restore the original numbers">Reset curve</button>
+        </nav>
+      </div>
+    </div>
+
+    <footer id="credit">The specimen is this site&rsquo;s own logo.</footer>
+  </div>
+
+  <script src="./demo.js"></script>
+</body>
+</html>

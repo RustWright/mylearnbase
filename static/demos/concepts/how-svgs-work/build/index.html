@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SVG: build your own</title>
+  <link rel="stylesheet" href="./demo.css">
+</head>
+<body>
+  <div id="demo">
+    <div id="narrow-note">This demo puts an editor next to a live preview. It works best on a wider screen (tablet, laptop, or desktop).</div>
+
+    <header id="head">
+      <p id="objective">Your turn. This is a live SVG editor: type shapes on the
+        left, the picture appears on the right. Pick a challenge, open the
+        reference if you need the vocabulary, and when you&rsquo;re done (or stuck)
+        reveal an example &mdash; there&rsquo;s never just one right answer.</p>
+    </header>
+
+    <div id="chips" role="tablist"></div>
+    <p id="prompt"></p>
+
+    <div id="pane">
+      <div class="col">
+        <label class="collabel" for="src">SVG source &mdash; edit me</label>
+        <textarea id="src" spellcheck="false" autocomplete="off" autocapitalize="off"></textarea>
+        <p id="status" aria-live="polite"></p>
+      </div>
+      <div class="col">
+        <span class="collabel">Live preview</span>
+        <div id="preview"></div>
+      </div>
+    </div>
+
+    <div id="tools">
+      <details id="cheat">
+        <summary>Quick reference &mdash; elements &amp; path commands</summary>
+        <div class="cheatgrid">
+          <div>
+            <h4>Shapes</h4>
+            <ul>
+              <li><code>&lt;rect x y width height rx&gt;</code></li>
+              <li><code>&lt;circle cx cy r&gt;</code></li>
+              <li><code>&lt;ellipse cx cy rx ry&gt;</code></li>
+              <li><code>&lt;line x1 y1 x2 y2&gt;</code></li>
+              <li><code>&lt;polygon points="x,y x,y &hellip;"&gt;</code></li>
+              <li><code>&lt;polyline&gt;</code>, <code>&lt;path&gt;</code>, <code>&lt;text&gt;</code>, <code>&lt;g&gt;</code></li>
+            </ul>
+            <h4>Paint</h4>
+            <ul>
+              <li><code>fill</code>, <code>stroke</code>, <code>stroke-width</code>, <code>opacity</code></li>
+            </ul>
+          </div>
+          <div>
+            <h4>Path <code>d</code> commands</h4>
+            <ul>
+              <li><code>M</code> move (pen up) &nbsp; <code>L</code> line</li>
+              <li><code>H</code> / <code>V</code> horizontal / vertical line</li>
+              <li><code>C</code> cubic curve &nbsp; <code>S</code> smooth cubic</li>
+              <li><code>Q</code> quadratic &nbsp; <code>T</code> smooth quadratic</li>
+              <li><code>A</code> arc &nbsp; <code>Z</code> close the path</li>
+            </ul>
+            <p class="cheatnote"><b>Uppercase</b> = absolute coordinates.
+              <b>lowercase</b> = relative to where the pen is.</p>
+            <p class="cheatnote"><a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Element" target="_blank" rel="noopener">Full element reference on MDN &rarr;</a></p>
+          </div>
+        </div>
+      </details>
+
+      <details id="reveal">
+        <summary>Reveal an example solution</summary>
+        <p class="onenote">One way to do it &mdash; there are many. Read it, then load it if you like.</p>
+        <pre id="excode"></pre>
+        <button id="loadex">Load this example into the editor</button>
+      </details>
+    </div>
+
+    <footer id="credit">Everything you type stays in your browser.</footer>
+  </div>
+
+  <script src="./demo.js"></script>
+</body>
+</html>
