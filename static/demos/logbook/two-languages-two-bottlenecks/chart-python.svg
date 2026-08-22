@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 460" role="img" aria-label="Log-log chart of milliseconds per step versus number of boids, Python only. The pure-Python scalar loop is highest, NumPy all-pairs runs about three times below it, and the NumPy grid crosses all-pairs near five hundred boids." style="max-width:100%;height:auto">
+<style>
+.bg{fill:#ffffff}
+.grid{stroke:#eeeae2;stroke-width:1}.axtx{fill:#7d776c;font:12px ui-monospace,Menlo,monospace}
+.axlab{fill:#4a463f;font:600 12.5px ui-sans-serif,system-ui,sans-serif}
+.note{fill:#7d776c;font:11px ui-sans-serif,system-ui,sans-serif}
+.pyd{stroke:#8a2e08}.py{stroke:#c1440e}.pyl{stroke:#e27b3a}
+.rsd{stroke:#004e7a}.rs{stroke:#0072b2}.rsl{stroke:#3da0da}
+.lbl-pyd{fill:#8a2e08}.lbl-py{fill:#c1440e}.lbl-pyl{fill:#e27b3a}
+.lbl-rsd{fill:#004e7a}.lbl-rs{fill:#0072b2}.lbl-rsl{fill:#3da0da}
+.endlab{font:600 12px ui-sans-serif,system-ui,sans-serif}
+@media (prefers-color-scheme:dark){
+ .bg{fill:#1b1f26}
+ .grid{stroke:#262b33}.axtx{fill:#8d8880}.axlab{fill:#c3bfb6}.note{fill:#8d8880}
+ .pyd{stroke:#d95a2e}.py{stroke:#f0764a}.pyl{stroke:#f8a278}
+ .rsd{stroke:#2e86c4}.rs{stroke:#4aa5dc}.rsl{stroke:#86c8f0}
+ .lbl-pyd{fill:#d95a2e}.lbl-py{fill:#f0764a}.lbl-pyl{fill:#f8a278}
+ .lbl-rsd{fill:#2e86c4}.lbl-rs{fill:#4aa5dc}.lbl-rsl{fill:#86c8f0}
+}
+</style>
+<rect class="bg" x="0" y="0" width="720" height="460" rx="10"/>
+<line class="grid" x1="56" y1="371.5" x2="570" y2="371.5"/>
+<text class="axtx" x="47" y="375.5" text-anchor="end">0.1</text>
+<line class="grid" x1="56" y1="290.2" x2="570" y2="290.2"/>
+<text class="axtx" x="47" y="294.2" text-anchor="end">1</text>
+<line class="grid" x1="56" y1="209.0" x2="570" y2="209.0"/>
+<text class="axtx" x="47" y="213.0" text-anchor="end">10</text>
+<line class="grid" x1="56" y1="127.7" x2="570" y2="127.7"/>
+<text class="axtx" x="47" y="131.7" text-anchor="end">100</text>
+<line class="grid" x1="56" y1="46.5" x2="570" y2="46.5"/>
+<text class="axtx" x="47" y="50.5" text-anchor="end">1k</text>
+<line class="grid" x1="56.0" y1="22" x2="56.0" y2="414"/>
+<text class="axtx" x="56.0" y="434" text-anchor="middle">100</text>
+<line class="grid" x1="292.2" y1="22" x2="292.2" y2="414"/>
+<text class="axtx" x="292.2" y="434" text-anchor="middle">1k</text>
+<line class="grid" x1="528.4" y1="22" x2="528.4" y2="414"/>
+<text class="axtx" x="528.4" y="434" text-anchor="middle">10k</text>
+<text class="axlab" x="313" y="452" text-anchor="middle">number of boids (N)</text>
+<text class="axlab" transform="translate(15,218) rotate(-90)" text-anchor="middle">ms / step</text>
+<path d="M56.0 229.2 L150.0 171.4 L221.1 126.4 L292.2 78.9" class="pyd" fill="none" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="3 5"/>
+<circle cx="56.0" cy="229.2" r="3" class="pyd" fill="none" stroke-width="1.6"/>
+<circle cx="150.0" cy="171.4" r="3" class="pyd" fill="none" stroke-width="1.6"/>
+<circle cx="221.1" cy="126.4" r="3" class="pyd" fill="none" stroke-width="1.6"/>
+<circle cx="292.2" cy="78.9" r="3" class="pyd" fill="none" stroke-width="1.6"/>
+<text class="endlab lbl-pyd" x="300.2" y="82.9">scalar</text>
+<path d="M56.0 274.4 L150.0 208.2 L221.1 162.2 L292.2 113.8 L363.3 56.3 L404.9 28.1" class="py" fill="none" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="9 5"/>
+<rect x="53.2" y="271.6" width="5.6" height="5.6" class="py" fill="none" stroke-width="1.6"/>
+<rect x="147.2" y="205.4" width="5.6" height="5.6" class="py" fill="none" stroke-width="1.6"/>
+<rect x="218.3" y="159.4" width="5.6" height="5.6" class="py" fill="none" stroke-width="1.6"/>
+<rect x="289.4" y="111.0" width="5.6" height="5.6" class="py" fill="none" stroke-width="1.6"/>
+<rect x="360.5" y="53.5" width="5.6" height="5.6" class="py" fill="none" stroke-width="1.6"/>
+<rect x="402.1" y="25.3" width="5.6" height="5.6" class="py" fill="none" stroke-width="1.6"/>
+<text class="endlab lbl-py" x="412.9" y="32.1">NumPy all-pairs</text>
+<path d="M56.0 221.4 L150.0 187.6 L221.1 161.4 L292.2 135.5 L363.3 106.8 L404.9 88.8 L434.4 75.5 L476.0 55.3" class="pyl" fill="none" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M56.0 217.8L59.6 221.4L56.0 225.0L52.4 221.4Z" class="pyl" fill="none" stroke-width="1.6"/>
+<path d="M150.0 184.0L153.6 187.6L150.0 191.2L146.4 187.6Z" class="pyl" fill="none" stroke-width="1.6"/>
+<path d="M221.1 157.8L224.7 161.4L221.1 165.0L217.5 161.4Z" class="pyl" fill="none" stroke-width="1.6"/>
+<path d="M292.2 131.9L295.8 135.5L292.2 139.1L288.6 135.5Z" class="pyl" fill="none" stroke-width="1.6"/>
+<path d="M363.3 103.2L366.9 106.8L363.3 110.4L359.7 106.8Z" class="pyl" fill="none" stroke-width="1.6"/>
+<path d="M404.9 85.2L408.5 88.8L404.9 92.4L401.3 88.8Z" class="pyl" fill="none" stroke-width="1.6"/>
+<path d="M434.4 71.9L438.0 75.5L434.4 79.1L430.8 75.5Z" class="pyl" fill="none" stroke-width="1.6"/>
+<path d="M476.0 51.7L479.6 55.3L476.0 58.9L472.4 55.3Z" class="pyl" fill="none" stroke-width="1.6"/>
+<text class="endlab lbl-pyl" x="484.0" y="59.3">NumPy grid</text>
+<text class="note" x="56" y="452">dashed = O(n²)   solid = O(n)   log-log</text>
+</svg>

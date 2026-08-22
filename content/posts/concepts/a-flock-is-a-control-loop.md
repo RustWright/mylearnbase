@@ -143,4 +143,6 @@ The system might still be able to find a stable equilibrium state with the cohes
 
 Understanding how to analyse and tune the boid simulation as a control system is useful because the same systems thinking approach and tools can be applied to a physical controller or to an ML algorithm. Each application is just a different approach to minimizing system error to reach a desired state/equilibrium.
 
+The same flock, scaled up to thousands of boids, is where the performance questions get interesting. In [Two Languages, Two Bottlenecks](/posts/logbook/two-languages-two-bottlenecks/) I dig into why the right optimization is completely different in Python and in Rust.
+
 [^build]: I wanted the demo to be something you could actually tune, which means running the simulation live in the page as WebAssembly. I'd built and tuned the logic in Python, but Python isn't suited to compiling to WASM, so I rewrote it in Rust to get the embeddable version. A write-up on that port is coming.
