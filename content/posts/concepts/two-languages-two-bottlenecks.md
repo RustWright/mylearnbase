@@ -3,6 +3,7 @@ title = "Two Languages, Two Bottlenecks"
 slug = "two-languages-two-bottlenecks"
 date = 2026-08-22
 draft = false
+aliases = ["/posts/logbook/two-languages-two-bottlenecks/"]
 
 [taxonomies]
 tags = ["performance", "algorithms", "rust", "simulation"]
@@ -23,7 +24,7 @@ That interpreter cost is the first bottleneck to overcome. The baseline for ever
 
 The common fix is to get out of the interpreter's way, handing the expensive work to a library written in a faster language. Here that library is NumPy, which moves the heavy parts of the loop out of Python and into compiled C. The payoff is immediate. On the same machine, the NumPy version runs the same math about 3× faster than the baseline. This is the first drop you can see in the chart, with the pure-Python loop highest and NumPy's all-pairs line about 3× below it.
 
-![The benchmark so far, Python only. The pure-Python loop is highest, NumPy all-pairs about 3× below it, and the NumPy grid crossing all-pairs near N=500.](/demos/logbook/two-languages-two-bottlenecks/chart-python.svg)
+![The benchmark so far, Python only. The pure-Python loop is highest, NumPy all-pairs about 3× below it, and the NumPy grid crossing all-pairs near N=500.](/demos/concepts/two-languages-two-bottlenecks/chart-python.svg)
 
 ## Why reach for a spatial grid
 
@@ -33,7 +34,7 @@ When the population is small, like the N=100 flock from the tuning post, this ba
 
 The accepted solution for this issue is breaking up the entire canvas into a spatial grid. Now, instead of scanning the whole population, each boid only searches the cells that could actually hold a neighbour, the cell it's in and the 8 around it, a 3×3 block shown in the figure below. So as N grows the cost rises only linearly, O(n), instead of quadratically, which means a much faster loop at large N.
 
-![A canvas split into grid cells. One boid searches only its own cell and the 8 around it, a 3×3 block; boids outside the block are never checked.](/demos/logbook/two-languages-two-bottlenecks/grid-search.svg)
+![A canvas split into grid cells. One boid searches only its own cell and the 8 around it, a 3×3 block; boids outside the block are never checked.](/demos/concepts/two-languages-two-bottlenecks/grid-search.svg)
 
 ## When the faster algorithm loses
 
@@ -57,7 +58,7 @@ I will point out, though, that just like in Python, how the algorithm is impleme
 
 After some refactoring, the grid allocated a single structure once at the start of the loop and filled it as it went, adding neighbours while it searched the relevant non-empty cells. That version pulled ahead almost immediately, outperforming all-pairs below 100 boids, and in the chart it runs below the naive line from the very first point.
 
-{{ demo(name="logbook/two-languages-two-bottlenecks/naive-vs-grid", wide=true, height=760, caption="Naive O(n²) against the spatial grid, live in Rust and WebAssembly. Toggle the mode and drag N upward.") }}
+{{ demo(name="concepts/two-languages-two-bottlenecks/naive-vs-grid", wide=true, height=760, caption="Naive O(n²) against the spatial grid, live in Rust and WebAssembly. Toggle the mode and drag N upward.") }}
 
 ## Memory layout, the last lever
 
@@ -71,13 +72,13 @@ Cache locality helps because the CPU pulls data from memory in chunks and keeps 
 
 SIMD helps for a related reason. A single CPU instruction can run the same operation on a whole batch of values at once, so work that would take N steps one value at a time finishes in a fraction of that, depending on how many values fit in a batch. The figure below shows why the layout matters. One memory load grabs a single boid's four fields when a boid's data is stored together, but four boids' worth of one field when it's stored field-by-field, so one instruction can update four boids at once.
 
-![AoS versus SoA memory layout. The same 4-wide load reads one boid's four fields in AoS, but four boids' worth of a single field in SoA.](/demos/logbook/two-languages-two-bottlenecks/aos-soa.svg)
+![AoS versus SoA memory layout. The same 4-wide load reads one boid's four fields in AoS, but four boids' worth of a single field in SoA.](/demos/concepts/two-languages-two-bottlenecks/aos-soa.svg)
 
 In Python you never had a choice about this layout, it comes baked into NumPy, and its speedup is folded inseparably into that same 3× from earlier. However, Rust is already compiled, so the layout becomes a deliberate choice, and something you can measure on its own by holding the algorithm fixed and changing nothing else. I adopted it anyway, without any ergonomics crates, just for the learning experience.
 
 For me it was a lot more intuitive to think through the boid algorithms when treating each boid as a separate independent structure within an array, so an Array of Structures (AoS). The Structure of Arrays (SoA) version took some getting used to, since you reason about whole operations across all the boids at once and track each one by its index instead. You pay that intuition price to get the performance, but once the SoA way of thinking clicks, the payoff is clear. In the chart the two lowest lines are both this same Rust grid, and the only thing separating them is AoS versus SoA. There's a reason a lot of python libraries like Numpy, Pytorch and Tensorflow are built on this kind of array-based computation.
 
-![The full benchmark matrix, all six implementations on one log-log chart. The four Rust lines sit an order of magnitude or more below the two Python lines.](/demos/logbook/two-languages-two-bottlenecks/chart-full.svg)
+![The full benchmark matrix, all six implementations on one log-log chart. The four Rust lines sit an order of magnitude or more below the two Python lines.](/demos/concepts/two-languages-two-bottlenecks/chart-full.svg)
 
 So what's the point of the whole exercise? Taken together, the chart tells the whole story in one view. At N=1000 the fastest implementation runs nearly 500× faster than where we started. On any real project at scale, you have to understand the actual bottlenecks before you can pick the lever that buys the biggest improvement. And just as importantly, as every example here has shown, how you implement that lever decides how much it actually buys you. A wasteful implementation adds constant factors that quietly cap your performance ceiling.
 
