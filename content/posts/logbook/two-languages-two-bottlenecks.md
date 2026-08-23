@@ -80,3 +80,5 @@ For me it was a lot more intuitive to think through the boid algorithms when tre
 ![The full benchmark matrix, all six implementations on one log-log chart. The four Rust lines sit an order of magnitude or more below the two Python lines.](/demos/logbook/two-languages-two-bottlenecks/chart-full.svg)
 
 So what's the point of the whole exercise? Taken together, the chart tells the whole story in one view. At N=1000 the fastest implementation runs nearly 500× faster than where we started. On any real project at scale, you have to understand the actual bottlenecks before you can pick the lever that buys the biggest improvement. And just as importantly, as every example here has shown, how you implement that lever decides how much it actually buys you. A wasteful implementation adds constant factors that quietly cap your performance ceiling.
+
+All of the code behind this post, the Python reference and the Rust port with both memory layouts, is on [GitHub](https://github.com/RustWright/boids-flocking-sim).
