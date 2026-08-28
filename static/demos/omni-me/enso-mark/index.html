@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The enso mark under pressure</title>
+<style>
+/* ───────────────────────────────────────────────────────────────────────
+   omni-me — "the enso mark at the sizes it actually appears"
+   Self-contained (the demo runs in a sandboxed iframe, so it carries its
+   own minimal theme rather than inheriting the site's CSS).
+   The tiles are always charcoal: #1e1e1e is part of the mark, not the page.
+   ─────────────────────────────────────────────────────────────────────── */
+:root {
+  --bg: #fbfaf8; --panel: #ffffff; --text: #2c3142; --pale: #8a90a0;
+  --line: #e6e3dd; --accent: #3b5bdb; --radius: 8px;
+  --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --bg:#1a1c22; --panel:#23262e; --text:#d7dae2; --pale:#8a90a0;
+          --line:#343844; --accent:#7aa2ff; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  font-family: var(--sans); color: var(--text); background: var(--bg);
+  font-size: 15px; line-height: 1.45; padding: 18px 20px 24px;
+}
+h1 { font-size: 16px; margin: 0 0 4px; }
+.sub { color: var(--pale); font-size: 12.5px; margin: 0 0 14px; max-width: 62ch; }
+
+.controls { display: flex; flex-wrap: wrap; gap: 18px; margin-bottom: 16px; }
+.group { display: flex; flex-direction: column; gap: 5px; }
+.group > .label {
+  font-size: 10px; text-transform: uppercase; letter-spacing: .07em;
+  color: var(--pale);
+}
+.seg { display: flex; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+.seg button {
+  font: inherit; font-size: 13px; padding: 5px 11px; border: 0; cursor: pointer;
+  background: var(--panel); color: var(--text); border-right: 1px solid var(--line);
+}
+.seg button:last-child { border-right: 0; }
+.seg button[aria-pressed="true"] { background: var(--accent); color: #fff; }
+.seg button:disabled { opacity: .38; cursor: not-allowed; }
+
+.ladder {
+  display: flex; align-items: flex-end; flex-wrap: wrap; gap: 20px;
+  padding: 18px 16px; background: var(--panel);
+  border: 1px solid var(--line); border-radius: var(--radius);
+}
+.cell { display: flex; flex-direction: column; align-items: center; gap: 7px; }
+.tile { background: #1e1e1e; line-height: 0; overflow: hidden; display: inline-block; }
+.cap { font-family: var(--mono); font-size: 10.5px; color: var(--pale); }
+
+.verdict {
+  margin-top: 14px; font-size: 13px; line-height: 1.5;
+  border-left: 3px solid var(--accent); padding: 2px 0 2px 12px;
+  color: var(--text); max-width: 66ch; min-height: 2.9em;
+}
+.verdict b { font-weight: 600; }
+</style>
+</head>
+<body>
+
+<h1>The enso mark under pressure</h1>
+<p class="sub">
+  A launcher icon is judged at 32 pixels through a mask you don't control. Switch between
+  the round-2 concept and the round-3 refinement, and watch what happens at the small end
+  of the ladder.
+</p>
+
+<div class="controls">
+  <div class="group">
+    <span class="label" id="lbl-round">Round</span>
+    <div class="seg" role="group" aria-labelledby="lbl-round">
+      <button data-round="r2" aria-pressed="false">2 — concept</button>
+      <button data-round="r3" aria-pressed="true">3 — refined</button>
+    </div>
+  </div>
+  <div class="group">
+    <span class="label" id="lbl-weight">Weight</span>
+    <div class="seg" role="group" aria-labelledby="lbl-weight">
+      <button data-weight="light" aria-pressed="true">Light</button>
+      <button data-weight="medium" aria-pressed="false">Medium</button>
+      <button data-weight="bold" aria-pressed="false">Bold</button>
+    </div>
+  </div>
+  <div class="group">
+    <span class="label" id="lbl-mask">Mask</span>
+    <div class="seg" role="group" aria-labelledby="lbl-mask">
+      <button data-mask="square" aria-pressed="true">Square</button>
+      <button data-mask="rounded" aria-pressed="false">Rounded</button>
+      <button data-mask="circle" aria-pressed="false">Circle</button>
+    </div>
+  </div>
+</div>
+
+<div class="ladder" id="ladder"></div>
+<p class="verdict" id="verdict"></p>
+
+<script>
+// Mark geometry, copied verbatim from the SVGs in the repository. Round 2 is
+// the concept as it was chosen; round 3 is the same idea after the thin end was
+// fattened and the two brush terminals were given round caps.
+const MARKS = {
+  r2: `<path d="M 59.23 75.37 A 27 27 0 1 1 73.38 63.5 L 70.05 63.0 A 22 22 0 1 0 58.52 72.67 Z" fill="#448aff"/>
+       <circle cx="50" cy="50" r="3.5" fill="#dcddde"/>`,
+  light: `<path d="M75.21,40.32 A27 27 0 1 1 59.68,24.79 L57.69,32.53 A17 17 0 1 0 67.47,42.31 Z" fill="#448aff"/>
+          <circle cx="71.34" cy="41.32" r="3.99" fill="#448aff"/>
+          <circle cx="58.68" cy="28.66" r="3.99" fill="#448aff"/>
+          <circle cx="50" cy="50" r="5.0" fill="#dcddde"/>`,
+  medium: `<path d="M74.85,39.45 A27 27 0 1 1 60.55,25.15 L57.55,33.97 A16 16 0 1 0 66.03,42.45 Z" fill="#448aff"/>
+           <circle cx="70.44" cy="40.95" r="4.66" fill="#448aff"/>
+           <circle cx="59.05" cy="29.56" r="4.66" fill="#448aff"/>
+           <circle cx="50" cy="50" r="5.0" fill="#dcddde"/>`,
+  bold: `<path d="M74.47,38.59 A27 27 0 1 1 61.41,25.53 L57.34,35.41 A15 15 0 1 0 64.59,42.66 Z" fill="#448aff"/>
+         <circle cx="69.53" cy="40.63" r="5.34" fill="#448aff"/>
+         <circle cx="59.37" cy="30.47" r="5.34" fill="#448aff"/>
+         <circle cx="50" cy="50" r="5.0" fill="#dcddde"/>`,
+};
+
+// 24 and 32 are the sizes the round-2 mark was failing at; 48 is a phone
+// launcher grid; 160 is there so the small end has something to be judged against.
+const SIZES = [16, 24, 32, 48, 64, 96, 160];
+
+const VERDICTS = {
+  r2: `<b>Round 2.</b> The stroke tapers to almost nothing where the ring opens, and the
+       terminals are cut square. At 160 that reads as a brush lifting off the paper; by 32
+       the thin end has dropped under a pixel and what is left reads as a broken arc rather
+       than a ring. The opening also sat at the bottom here, before it was moved.`,
+  light: `<b>Round 3, light.</b> The thin end is fattened to a floor and both brush terminals
+          are capped with a circle, so the stroke has mass everywhere. The most taper of the
+          three — and the one that shipped.`,
+  medium: `<b>Round 3, medium.</b> Less taper, so it holds a little harder at 16 — at the cost
+           of some of the brushstroke's character at large sizes.`,
+  bold: `<b>Round 3, bold.</b> Nearly a uniform ring. Maximum small-size legibility, minimum
+         calligraphy; at 160 it stops reading as a brushstroke and starts reading as a shape.`,
+};
+
+const state = { round: "r3", weight: "light", mask: "square" };
+
+function radiusFor(px) {
+  if (state.mask === "circle")  return "50%";
+  if (state.mask === "rounded") return Math.round(px * 0.22) + "px";
+  return "0";
+}
+
+function render() {
+  const key  = state.round === "r2" ? "r2" : state.weight;
+  const body = MARKS[key];
+
+  document.getElementById("ladder").innerHTML = SIZES.map(px => `
+    <div class="cell">
+      <span class="tile" style="border-radius:${radiusFor(px)}">
+        <svg width="${px}" height="${px}" viewBox="0 0 100 100"
+             role="img" aria-label="The enso mark at ${px} pixels">${body}</svg>
+      </span>
+      <span class="cap">${px}px</span>
+    </div>`).join("");
+
+  document.getElementById("verdict").innerHTML = VERDICTS[key];
+
+  document.querySelectorAll("[data-weight]").forEach(b => {
+    b.disabled = state.round === "r2";
+  });
+  document.querySelectorAll("[data-round],[data-weight],[data-mask]").forEach(b => {
+    const [k, v] = b.dataset.round  ? ["round",  b.dataset.round]
+                 : b.dataset.weight ? ["weight", b.dataset.weight]
+                 :                    ["mask",   b.dataset.mask];
+    b.setAttribute("aria-pressed", String(state[k] === v));
+  });
+}
+
+document.querySelector(".controls").addEventListener("click", e => {
+  const b = e.target.closest("button");
+  if (!b || b.disabled) return;
+  if (b.dataset.round)  state.round  = b.dataset.round;
+  if (b.dataset.weight) state.weight = b.dataset.weight;
+  if (b.dataset.mask)   state.mask   = b.dataset.mask;
+  render();
+});
+
+render();
+</script>
+</body>
+</html>

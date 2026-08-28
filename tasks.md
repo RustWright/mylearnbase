@@ -1,5 +1,5 @@
 # Tasks — Cycle 5 (Incremental Polish)
-
+See bottom for new notes!
 **Created:** 2026-06-30 (Cycle 5 Planning)
 **Objective:** A batch of "little things" that make the site better, no sweeping changes — refresh drifted project docs, give prev/next a content-based basis, ship the parked privacy page, and publish a content batch about the site itself.
 **Source of truth:** the approved plan-mode plan (archived) holds the full rationale; this file is the working tracker. Open knobs get settled at task-execution time, not before.
@@ -66,3 +66,8 @@ The posts flagged during planning. Route authoring via `/create-post`.
 - **Subsumed follow-up:** the Cycle-4 "same-day prev/next tie" (`logbook publish` stamps date-only) is folded into Task 3 — once prev/next is relatedness-based, the date tie only matters in the chronological fallback.
 - **Curiosities captured this cycle** (`.curiosities/cycle-5.md`): (1) lexical (TF-IDF) vs semantic (embeddings) similarity and why the gap shrinks on a single-author corpus; (2) where build-time computation should live (compute-in-CI vs precompute-and-commit) and how that flips when the algorithm changes.
 - **Out of scope:** tagging-strategy rework (flagged volatile but not changing now; Task 3 deliberately avoids depending on tags); cookieless-analytics implementation (only disclosed in Task 4 if/when decided); process docs (`CLAUDE.md`, `PROJECT_PROCESS.md`).
+
+
+- We need to make our own version of https://www.asd-ste100.org/about.html
+- I'm still very frustrated with the basic writing quality of the log books and I want to try something new, 
+- We don't need to adopt the entire manual but we should understand how and why it can improve AI writing quality, then adapt it to our needs
