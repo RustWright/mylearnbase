@@ -71,3 +71,4 @@ The posts flagged during planning. Route authoring via `/create-post`.
 - We need to make our own version of https://www.asd-ste100.org/about.html
 - I'm still very frustrated with the basic writing quality of the log books and I want to try something new, 
 - We don't need to adopt the entire manual but we should understand how and why it can improve AI writing quality, then adapt it to our needs
+- Sometimes asking for an unreasonablu tight word, character or line count can also force the model to select words use better
