@@ -1,0 +1,88 @@
+schema  = 1
+project = "mylearnbase"
+cycle   = 5
+updated = 2026-08-30
+
+# All five Cycle-5 tasks in tasks.md are closed. The live queue below comes from
+# three places tasks.md does not index: the un-checkboxed user notes at its foot,
+# ui-checklist.md, and the parent-synced curiosity log.
+# Contract: ../../setup_files/TASK_HUB_CONTRACT.md
+
+[[task]]
+id     = "mylearnbase-0001"
+title  = "Close Cycle 5 — run the Session 6 review and the cycle-close pass"
+status = "todo"
+size   = "M"
+ref    = "tasks.md § Tasks 1-5; project.md status line"
+note   = "All five tasks are DONE but project.md still reads 'Cycle 5 in progress'."
+
+[[task]]
+id     = "mylearnbase-0002"
+title  = "Plan Cycle 6"
+status = "blocked"
+size   = "M"
+ref    = "project.md"
+blocked_by = ["mylearnbase-0001"]
+
+[[task]]
+id     = "mylearnbase-0003"
+title  = "Adapt ASD-STE100 into a house writing standard for logbook posts"
+status = "todo"
+size   = "L"
+ref    = "tasks.md § Notes — the trailing user notes"
+note   = "Standing complaint about logbook writing quality. Understand why controlled English improves model output, then adapt rather than adopt the whole manual."
+
+[[task]]
+id     = "mylearnbase-0004"
+title  = "Publish our own version of the ASD-STE100 about page"
+status = "blocked"
+size   = "M"
+ref    = "tasks.md § Notes; https://www.asd-ste100.org/about.html"
+blocked_by = ["mylearnbase-0003"]
+
+[[task]]
+id     = "mylearnbase-0005"
+title  = "Test tight word, character and line budgets as a lever on model word choice"
+status = "todo"
+size   = "S"
+ref    = "tasks.md § Notes"
+note   = "User's hypothesis: an unreasonably tight budget forces better word selection. Cheap to test, feeds 0003."
+
+[[task]]
+id     = "mylearnbase-0006"
+title  = "Turn the two surviving Cycle-5 curiosities into concept posts"
+status = "todo"
+size   = "M"
+tags   = ["post-system"]
+ref    = "curiosities/mylearnbase/cycle-5.md (parent repo); editorial/concepts.md"
+note   = "Lexical vs semantic similarity on a single-author corpus; and where build-time computation should live."
+
+[[task]]
+id     = "mylearnbase-0007"
+title  = "Sweep the nine ui-checklist items never tested in Sweep 7"
+status = "todo"
+size   = "S"
+ref    = "ui-checklist.md"
+note   = "Focus states, keyboard nav, active-section, instant-nav, code-block scroll, image sizing, CLS, footer on inner pages, light-mode fresh measure."
+
+[[task]]
+id     = "mylearnbase-0008"
+title  = "Exercise KaTeX, Mermaid and superseded_by with real content"
+status = "todo"
+size   = "S"
+ref    = "ui-checklist.md — the three 'unexercised' rows"
+note   = "All three are wired in post.html and verified by reading, but no live post sets extra.math, extra.mermaid or superseded_by."
+
+[[task]]
+id     = "mylearnbase-0009"
+title  = "Implement privacy-preserving analytics"
+status = "shelved"
+ref    = "ui-checklist.md Tier 2; tasks.md § Notes — Out of scope"
+note   = "The privacy/colophon page shipped in Cycle-5 Task 4; the analytics implementation itself was deliberately left out."
+
+[[task]]
+id     = "mylearnbase-0010"
+title  = "Rework the tagging strategy"
+status = "shelved"
+ref    = "tasks.md § Notes — Out of scope"
+note   = "Flagged volatile but deliberately not changed in Cycle 5; Task 3 was designed to avoid depending on tags."
