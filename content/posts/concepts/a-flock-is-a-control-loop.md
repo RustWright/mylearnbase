@@ -19,7 +19,7 @@ Watching emergent group behaviour after defining simple rules on the individual 
 
 Without understanding the control loop dynamics it feels like magic that defining rules for each boid creates group behaviour that is stable and organized.
 
-We'll break down how to describe and analyse the group's emergent behaviour from the lens of a controls engineer. We'll also review how the behaviour can be tuned to create different system effects by adjusting the three rules affecting the emergent behaviour.
+I'll break down how to describe and analyse the group's emergent behaviour from the lens of a controls engineer. I'll also review how the behaviour can be tuned to create different system effects by adjusting the three rules affecting the emergent behaviour.
 
 ## The three rules, one at a time
 
@@ -53,9 +53,9 @@ Now that we've discussed each of the rules and how they contribute to the emerge
 
 I'll be using the *alignment rule* as an example since it's the switch that takes the boids from looking chaotic to looking like a single unit.
 
-The alignment rule measures an error which is the difference in the *direction* between any specific boid and that of the group. If the boid is pointing perfectly in line with the average velocity of the group, there is no error to correct. Conversely, if the boid is pointing in the exact opposite direction of the group this is the maximum error scenario with the strongest corrective effect.
+The alignment rule measures an error which is the difference in the *direction* between any specific boid and that of the group. If the boid is pointing perfectly in line with the average velocity (direction only) of the group, there is no error to correct. Conversely, if the boid is pointing in the exact opposite direction of the group this is the maximum error scenario with the strongest corrective effect.
 
-The error is then multiplied by an *alignment gain* which amplifies the effect it has on the velocity. The higher the gain, the more aggressively the boid tries to correct its velocity to get back in line with the rest of the group.
+The error is then multiplied by an *alignment gain* which amplifies the effect it has on the velocity. The higher the gain, the more aggressively the boid tries to correct its heading to get back in line with the rest of the group.
 
 Viewing each rule as a proportional controller allows us to analyse the entire system as a control loop.
 
@@ -73,7 +73,7 @@ Before reading the explanations below, I recommend you try two different experim
 
 Experiments:
 
-1. Starting with the provided pre-set stable flocking state, try to make the flock *more aligned* by increasing the alignment gain. What do you observe when the gain is increased too far?
+1. Starting with the provided pre-set stable flocking state, try to make the flock *more aligned* by increasing the alignment gain. What do you observe when the gain is pushed to the limit that the sliders allow?
 2. Starting with the stable state, play around with the ratio between the cohesion gain and the separation gain. Does the system remain stable? Without setting **Separation to 0**, can you get all the boids in a flock to perfectly overlap with each other so it looks like a single boid?
 
 ### Over-aligned
