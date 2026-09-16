@@ -70,6 +70,17 @@ resume_links = [
   { name = "GitHub", url = "https://github.com/RustWright", external = true },
 ]
 
+# The site's REAL address, deliberately a copy of base_url above.
+#
+# scripts/build-resume-pdf.sh must override base_url with a localhost address,
+# or the printed page pulls its CSS from production instead of from disk. But
+# that same override leaks into anything that reads base_url, and the first
+# structured résumé shipped "127.0.0.1:1187" as the printed site address with
+# six clickable links in the PDF pointing at localhost. Anything that must name
+# the real site on paper reads this key instead, which no build flag touches.
+# templates/resume.html fails the build if the two ever disagree.
+canonical_url = "https://mylearnbase.com"
+
 back_link_text = "Back"
 force_theme = false
 

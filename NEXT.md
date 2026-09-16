@@ -1,40 +1,40 @@
 # NEXT — mylearnbase
 
-**Updated:** 2026-09-16 · Cycle 6 (audience routing) opened. KaTeX fix + résumé shipped; hero flock approved.
+**Updated:** 2026-09-16 · Cycle 6. KaTeX, résumé (restructured), demo back-links, Playground, Projects shipped.
 
 ## Next action
-**Build the destination surfaces in order: `1d` demo back-links → `1c` Playground → `1b` Projects hub.**
-Then `Part 2` (homepage router + header nav) — **last, necessarily**: Zola validates internal links at
-build and the router points at all three. Plan: `~/.claude/plans/could-you-look-into-abstract-kahn.md`.
+**`Part 2`: homepage router + header nav + "Now" line.** Every destination it links to now exists
+(`/projects/`, `/playground/`, `/resume/`), which is why it had to come last: Zola validates internal
+links at build. Then `3b`/`3c` motion. Plan: `~/.claude/plans/could-you-look-into-abstract-kahn.md`.
+**Discuss with the user first, in Part 2:** the em dashes in `content/_index.md` — the tagline
+(`bio`, line 10: "I build things to learn — and write down how.") and the intro at line 29. It bugs them.
 
 ## Decisions in force
-- **Hero flock approved.** Treatment **top band**; opacity **0.2**; hero **hugs its content** (no
-  min-height). Gutters was rejected: its percentage mask *relocates* onto the text edges below ~760px.
-  Prototype at `/demos/mylearnbase/hero-flock/`.
-- **Header nav.** Desktop `Projects · Playground · Posts · Résumé`; **phones drop Posts** + use the
-  logo mark (41px slack at 375px vs 77px overflow with four). Reason is redundancy, not importance:
-  Posts has three other routes. **Tags leaves at every width.** Logo hover = task `3b`.
-- **Résumé: HTML is canonical.** PDF generated from it by `scripts/build-resume-pdf.sh`, run **locally
-  and committed**; `build.sh` warns on drift via `static/resume/.source-hash`.
-- **No email on the résumé** until a forwarding alias exists on **efeerhie.com** (parked; Cloudflare
-  Email Routing); LinkedIn carries contact. **No phone, no address, ever. No Memberships section** —
-  the EGM membership lapses end of 2026 and a "present" claim on a static document rots.
-- **Playground lives at `/playground/`**; demo *files* stay at `/demos/…`.
-- **`themes/serene` is pinned** (`update = none`). SessionStart no longer fast-forwards it and warns on
-  drift; restore with `git submodule update --init --checkout themes/serene` (**`--checkout` required**).
+- **Résumé is structured data** (records in `content/resume/_index.md` front matter), rendered by one
+  template as both the page and the PDF. Chosen over a print-only stylesheet because markdown cannot put
+  dates on the role's line. User: "good enough for now" (2026-09-16); further polish is deliberately deferred.
+- **Anything naming the site on paper reads `extra.canonical_url`, never `base_url`** — the PDF build
+  overrides `base_url` with localhost. The build fails if the two disagree; the PDF script fails on any
+  localhost address in the PDF's text *or* its link annotations (each check is blind to the other).
+- **Résumé copy must work on paper**: no "this site", no "here". PDF typeface is bundled Source Sans 3.
+- **Projects: authored facts, derived evidence.** `status` is `active`|`complete` or the build fails.
+  One lead demo per write-up. **Project copy read and approved by the user** (2026-09-16). Link a repo
+  only if public: boids links `boids-flocking-sim`, never `boids-private`.
+- **Playground:** light demos preview live, heavy (>150KB, measured) show a content-addressed poster with
+  the play button over it; rerun `capture-demo-posters.py` after changing a heavy demo. A tile opens the
+  standalone demo. `noindex` keeps a demo out of search *and* the gallery (only `hero-flock`).
+- **File sizes on downloads only.** **Site search stays posts-only.** **`demos.json` is derived.** **Header nav.** Desktop `Projects · Playground · Posts · Résumé`; **phones drop Posts**, use the logo
+  mark. **Tags leaves at every width.** Logo hover is `3b`. Hero flock: top band, opacity 0.2.
+- **No email on the résumé** until a forwarding alias exists on **efeerhie.com**; **no phone/address ever.**
+- **`themes/serene` is pinned** (`update = none`); restore with `git submodule update --init --checkout themes/serene`.
 
 ## Do NOT re-survey
-- **KaTeX overflow: fixed and verified** (162px lateral scroll → none, 3 equations, scroll-shadow
-  added). Numbers in `ui-checklist.md` Sweep 8. Don't re-measure.
-- **Flock calibration is settled:** count derives from world area, and **units-per-pixel (`K=1.25`) is
-  the fixed quantity**, not world width — 81 boids/megapixel at 1280px, 80 at 375px. Rationale inline in
-  `static/js/hero-flock.js` + `architecture.md § Interactive Demos`.
-- **PDF generation is solved.** Chrome headless prints against *screen* media, so print rules sit
-  unconditionally in `static/css/resume-print.css` with the `media` attribute as the switch; the build
-  must pass `--base-url` or it pulls CSS from production.
+- **KaTeX, flocks, PDF pipeline, demo chrome, Playground, Projects: verified** at 1280/375, both schemes.
+  Résumé PDF 2 pages, leak guards proven to fire. SEO audit passes (148 JSON-LD valid, Lighthouse 100).
+- ⚠️ Local testing: `python -m http.server` sends no `Cache-Control`; clear the browser cache after CSS edits.
 
 ## Open threads
-- 🔴 **`content/posts/opinions/skip-the-boilerplate.md` untracked in a PUBLIC repo.** `draft = true`, so
-  unpublished — but SessionEnd will commit and push the raw markdown to GitHub. **Unresolved.**
-- **Cycle 5 never formally closed** though every `tasks.md` task is done. Close it; write Cycle 6 tasks.
-- **Homepage "Now" line — approved, not built**; lands with Part 2. Deferred: ASD-STE100 + voice work.
+- **Résumé polish, deferred by the user** so as not to get bogged down: page 2 is ~40% full (one page
+  means cutting ~a third); "Best Graduating Student" is listed twice; accent colour (site blue vs old red).
+- **Demo/site theme mismatch, pre-existing:** demos follow `prefers-color-scheme`, the site has its own toggle.
+- **Cycle 5 never formally closed** though every `tasks.md` task is done. Close it, write Cycle 6.

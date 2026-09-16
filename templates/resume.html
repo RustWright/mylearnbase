@@ -1,21 +1,20 @@
-{#- Résumé page. A one-off prose section, following the colophon precedent
-    (content/colophon/_index.md): Serene's page machinery keys on `section.*`,
-    so a loose page would not render. Needs [extra] title + subtitle in the
-    front matter or the masthead comes out headless.
+{#- Résumé page. A one-off section, following the colophon precedent
+    (content/colophon/_index.md): Serene's page machinery keys on `section.*`.
 
-    Differs from prose.html in three ways, each load-bearing:
-      1. `{% block page %}resume{% endblock %}` puts a `resume` class on <body>,
-         which is what the @media print rules in custom.css key off.
-      2. A contact row and a PDF download button above the content.
-      3. Person JSON-LD. The page also emits the WebSite block from
-         _head_extend.html; multiple JSON-LD blocks on one page are valid, and
-         post pages already ship two. -#}
+    The résumé is structured data in the section's front matter, not markdown:
+    each role, degree, skill group and award is a record. That is what lets the
+    layout put the organisation over the role and the dates right-aligned on the
+    role's line, which markdown (a heading plus a separate date paragraph)
+    cannot express. See the note at the top of content/resume/_index.md.
+
+    ONE document for two media. The same markup is the web page and, through
+    static/css/resume-print.css, the downloadable PDF. So the two can never state
+    different facts; they differ only in presentation. -#}
 {% extends "_base.html" %}
 
 {#- TWO classes, both load-bearing. `prose-page` is what the theme keys its
-    content width off (`body.prose-page main { max-width: … }` in main.scss);
-    without it the résumé runs edge-to-edge on a wide screen. `resume` is what
-    the @media print block in custom.css targets. -#}
+    content width off; without it the résumé runs edge-to-edge. `resume` is what
+    resume-print.css targets. -#}
 {% block page %}prose-page resume{% endblock page %}
 {% block lang -%}
 {%- if section.extra.lang %}{{ section.extra.lang }}{% else %}{{ section.lang }}{% endif -%}
@@ -63,25 +62,133 @@
 {% endblock head %}
 
 {% block content %}
+{%- set r = section.extra -%}
+{#- The site's REAL address. Never config.base_url here: build-resume-pdf.sh
+    overrides base_url with localhost so the printed page loads local CSS, and
+    reading it put "127.0.0.1:1187" on the PDF with six clickable localhost links.
+    Internal links still go through get_url (so a renamed page fails the build)
+    and only have their prefix swapped. On the live site the swap is a no-op; in
+    local dev those links point at production, which is the accepted cost. -#}
+{%- set canon = config.extra.canonical_url | trim_end_matches(pat="/") -%}
+{%- set base = config.base_url | trim_end_matches(pat="/") -%}
+{%- if base != canon and not base is containing("127.0.0.1") and not base is containing("localhost") -%}
+  {{ throw(message="zola.toml: base_url (" ~ base ~ ") and extra.canonical_url (" ~ canon ~ ") disagree. They must name the same site.") }}
+{%- endif -%}
+{%- set site_host = canon | trim_start_matches(pat="https://") | trim_start_matches(pat="http://") -%}
 <div id="wrapper">
   <main>
     {% include "_section_title.html" %}
 
     <div class="resume-meta">
+      {#- Each link carries two renderings. On screen the name is enough, since
+          it is clickable. On paper a link cannot be clicked, so the print sheet
+          swaps in the URL itself. -#}
       <ul class="resume-contact">
         {%- for link in config.extra.resume_links %}
-        <li><a href="{{ link.url }}"{% if link.external %} target="_blank" rel="noreferrer noopener"{% endif %}>{{ link.name }}</a></li>
+        <li><a href="{{ link.url }}"{% if link.external %} target="_blank" rel="noreferrer noopener"{% endif %}>
+          <span class="rs-screen">{{ link.name }}</span>
+          <span class="rs-print">{{ link.url | trim_start_matches(pat="https://") | trim_start_matches(pat="www.") | trim_end_matches(pat="/") }}</span>
+        </a></li>
         {%- endfor %}
+        <li class="rs-print"><a href="{{ canon }}/">{{ site_host }}</a></li>
       </ul>
-      {%- if section.extra.pdf %}
-      {#- A plain link, not a JS-driven save: the file is a static asset, so the
-          browser's own download handling is all this needs. -#}
-      <a class="resume-download" href="{{ get_url(path=section.extra.pdf) }}" download>Download PDF</a>
+      {%- if r.pdf %}
+      {#- A plain link: the file is a static asset, so the browser's own download
+          handling is all this needs. The size is stated because this is a
+          DOWNLOAD; page links never state one. Measured by build.sh into
+          download-sizes.json; absent under a bare `zola serve`. -#}
+      {%- set sizes = load_data(path="download-sizes.json", required=false) -%}
+      {%- set pdf_size = "" -%}
+      {%- if sizes and r.pdf in sizes -%}{%- set pdf_size = sizes | get(key=r.pdf) -%}{%- endif %}
+      <a class="resume-download" href="{{ get_url(path=r.pdf) }}" download>Download PDF
+        {%- if pdf_size %} <span class="resume-download-size">({{ pdf_size.label }})</span>{% endif -%}
+      </a>
       {%- endif %}
     </div>
 
     <article class="prose resume-body">
-      {{ section.content | safe }}
+
+      {%- if r.education %}
+      <section class="rs-section">
+        <h2>Education</h2>
+        {%- for e in r.education %}
+        <div class="rs-entry">
+          <h3 class="rs-primary">{{ e.degree }}</h3>
+          <div class="rs-line">
+            <span class="rs-secondary">{{ e.school }}</span>
+            <span class="rs-dates">{{ e.dates }}</span>
+          </div>
+          {%- if e.details %}<p class="rs-details">{{ e.details | join(sep=" · ") }}</p>{% endif %}
+        </div>
+        {%- endfor %}
+      </section>
+      {%- endif %}
+
+      {%- if r.experience %}
+      {#- rs-section--long: the one section too tall to keep on a single page,
+          so it may break between roles (each role still stays whole). -#}
+      <section class="rs-section rs-section--long">
+        <h2>Experience</h2>
+        {%- for e in r.experience %}
+        <div class="rs-entry">
+          <h3 class="rs-primary">{{ e.org }}</h3>
+          <div class="rs-line">
+            <span class="rs-secondary">{{ e.role }}</span>
+            <span class="rs-dates">{{ e.dates }}</span>
+          </div>
+          {%- if e.bullets %}
+          <ul class="rs-bullets">
+            {%- for b in e.bullets %}
+            <li>{{ b }}</li>
+            {%- endfor %}
+          </ul>
+          {%- endif %}
+        </div>
+        {%- endfor %}
+      </section>
+      {%- endif %}
+
+      {%- if r.skills %}
+      <section class="rs-section">
+        <h2>Technical Skills</h2>
+        <dl class="rs-skills">
+          {%- for s in r.skills %}
+          <div><dt>{{ s.label }}</dt><dd>{{ s.items }}</dd></div>
+          {%- endfor %}
+        </dl>
+      </section>
+      {%- endif %}
+
+      {%- if r.projects %}
+      <section class="rs-section">
+        <h2>Selected Projects</h2>
+        <p class="rs-note">Full write-ups and runnable demos at
+          <a href="{{ get_url(path='@/projects/_index.md') | replace(from=base, to=canon) }}">{{ site_host }}/projects</a>.</p>
+        {%- for p in r.projects %}
+        {#- get_url on the project page fails the build if it is renamed, so a
+            résumé link can never quietly point at a missing page. -#}
+        <div class="rs-entry">
+          <div class="rs-line">
+            <h3 class="rs-primary"><a href="{{ get_url(path='@/' ~ p.page) | replace(from=base, to=canon) }}">{{ p.name }}</a></h3>
+            <span class="rs-dates rs-stack">{{ p.stack }}</span>
+          </div>
+          <p class="rs-summary">{{ p.summary }}</p>
+        </div>
+        {%- endfor %}
+      </section>
+      {%- endif %}
+
+      {%- if r.awards %}
+      <section class="rs-section">
+        <h2>Awards</h2>
+        <ul class="rs-awards">
+          {%- for a in r.awards %}
+          <li class="rs-line"><span>{{ a.name }}</span><span class="rs-dates">{{ a.dates }}</span></li>
+          {%- endfor %}
+        </ul>
+      </section>
+      {%- endif %}
+
     </article>
 
     {% include "_footer.html" %}
@@ -91,8 +198,7 @@
 
 {#- Required, not optional: main.js calls Lightense() unconditionally on every
     page (enableImgLightense, main.js:187), so a template that omits this throws
-    a ReferenceError on load even with no images to zoom. Every other content
-    template ships the same line. -#}
+    a ReferenceError on load even with no images to zoom. -#}
 {% block script %}
 <script src="{{ get_url(path='js/lightense.min.js') }}"></script>
 {% endblock script %}

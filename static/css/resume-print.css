@@ -7,57 +7,216 @@
  * govern the generated PDF.
  *
  * WHY THE ATTRIBUTE AND NOT A MEDIA QUERY: Chrome's headless --print-to-pdf
- * renders against SCREEN media, so `@media print` blocks are ignored entirely
- * and the PDF comes out with the site nav, the theme toggle, and a "Download
- * PDF" button inside the download. Verified on Chrome 151 by forcing a red
- * background under @media print — the PDF stayed white — and --headless=old
- * behaves the same way. Keeping the rules unconditional in their own file means
- * one copy serves both paths instead of a media query and a duplicate class.
+ * renders against SCREEN media, so `@media print` blocks are ignored entirely.
+ * Verified on Chrome 151 by forcing a red background under @media print — the
+ * PDF stayed white — and --headless=old behaves the same way.
  *
- * Everything interactive goes: a sticky header would repeat on every printed
- * page. Colours are forced light because the generator inherits whatever theme
- * the machine reports, and a dark-mode laptop would otherwise emit a
- * black-background PDF that burns a recruiter's toner.
+ * This sheet DESIGNS a document; it does not merely strip the web page. An
+ * earlier version only hid the site chrome and forced black text, and the
+ * result was a web page on paper: web line spacing, three pages for less than
+ * the old two-page LaTeX résumé held, and a name the size of a section heading.
  */
 
+/* ── Typeface ────────────────────────────────────────────────────────────────
+   Self-hosted, because the site's own font is a SYSTEM stack (ui-sans-serif,
+   system-ui). Headless Chrome resolves that to whatever the generating machine
+   has installed — DejaVu Sans here — so the PDF's typeface silently depended on
+   which computer ran the script. Source Sans 3 (SIL OFL 1.1, via Fontsource):
+   readable at 10pt and narrow enough to keep the document to two pages. These
+   files load only when this sheet applies, so web visitors never fetch them. */
+@font-face {
+  font-family: "Resume Sans";
+  font-weight: 400; font-style: normal; font-display: block;
+  src: url("/fonts/source-sans-3-latin-400-normal.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Resume Sans";
+  font-weight: 400; font-style: italic; font-display: block;
+  src: url("/fonts/source-sans-3-latin-400-italic.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Resume Sans";
+  font-weight: 600; font-style: normal; font-display: block;
+  src: url("/fonts/source-sans-3-latin-600-normal.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Resume Sans";
+  font-weight: 700; font-style: normal; font-display: block;
+  src: url("/fonts/source-sans-3-latin-700-normal.woff2") format("woff2");
+}
+
+/* ── Tokens ─────────────────────────────────────────────────────────────────
+   Fixed values, not the theme's variables: the generator inherits whatever
+   colour scheme the machine reports, and a résumé must not change with it.
+   The accent is the site's light-theme primary (#5871a2). */
+body.resume {
+  --rs-ink: #1b1d22;
+  --rs-muted: #555b66;
+  --rs-accent: #5871a2;
+  --rs-rule: #c9d1e0;
+}
+
+/* ── Remove everything that is not the document ──────────────────────────── */
 body.resume .site-header,
 body.resume .search-overlay,
 body.resume #reader-controls,
 body.resume #back-to-top,
 body.resume footer,
-body.resume .resume-download { display: none !important; }
+body.resume .resume-download,
+body.resume .rs-screen { display: none !important; }
+
+body.resume .rs-print { display: inline !important; }
+
+/* ── Page ────────────────────────────────────────────────────────────────── */
+@page { size: letter; margin: 13mm 15mm 12mm; }
 
 body.resume {
   background: #fff !important;
-  color: #000 !important;
-  font-size: 10.5pt;
+  color: var(--rs-ink) !important;
+  font-family: "Resume Sans", ui-sans-serif, sans-serif !important;
+  font-size: 10pt;
+  line-height: 1.32;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
 }
-
 body.resume #wrapper,
 body.resume main {
   max-width: none;
   margin: 0;
   padding: 0;
 }
+/* The reader-controls font-size variable must not reach paper. */
+body.resume article.prose { font-size: 10pt !important; font-family: inherit !important; }
+body.resume a { color: inherit !important; text-decoration: none !important; border: 0 !important; }
 
-body.resume .resume-meta { margin: 0 0 1.2em; }
-body.resume .resume-contact a { color: #000 !important; border-bottom: none; }
-
-/* Never split a role or a section away from its own heading. */
-body.resume .resume-body h2,
-body.resume .resume-body h3 { break-after: avoid; page-break-after: avoid; }
-body.resume .resume-body h2 { margin: 1.1em 0 0.5em; }
-body.resume .resume-body h3 { margin: 0.9em 0 0.15em; }
-body.resume .resume-body li { break-inside: avoid; page-break-inside: avoid; }
-
-/* A printed URL cannot be clicked, so bare links would lose their target — but
-   only expand EXTERNAL ones. Expanding in-page anchors would print
-   "(#education)" after every internal reference, which helps nobody. */
-body.resume .resume-body a[href^="http"]::after {
-  content: " (" attr(href) ")";
-  font-size: 0.85em;
-  color: #444;
+/* ── Masthead ────────────────────────────────────────────────────────────── */
+body.resume .section-title {
+  margin: 0;
+  padding: 0;
+  text-align: left;
+}
+body.resume .section-title h1 {
+  font-size: 22pt;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  color: var(--rs-accent) !important;
+  margin: 0 0 1.5pt;
+}
+body.resume .section-title p {
+  font-size: 10.5pt;
+  color: var(--rs-muted) !important;
+  margin: 0;
 }
 
-/* Ignored on screen, honoured whenever the page is actually paginated. */
-@page { margin: 14mm 14mm 12mm; }
+/* The gap below the masthead lives HERE, not on the first section: the screen
+   sheet zeroes .rs-section:first-child's top margin with a more specific
+   selector, which silently won and pressed EDUCATION against the contact line. */
+body.resume .resume-meta { margin: 4pt 0 12pt; padding: 0; display: block; }
+body.resume .resume-contact {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+  font-size: 9.5pt;
+  color: var(--rs-muted);
+}
+body.resume .resume-contact li + li::before {
+  content: "·";
+  margin: 0 0.55em;
+  color: var(--rs-rule);
+}
+
+/* ── Sections ────────────────────────────────────────────────────────────── */
+body.resume .resume-body { margin: 0; padding: 0; }
+body.resume .resume-body .rs-section { margin: 11pt 0 0; }
+body.resume .resume-body .rs-section:first-child { margin-top: 0; }
+
+/* Keep every short section whole on one page. Without this the first test
+   ended page 1 on a lone "SELECTED PROJECTS" heading, its entries overleaf:
+   `break-after: avoid` on the heading is not enough, because a note paragraph
+   sits between the heading and the first entry. Experience is the one section
+   too tall to hold together, so it may break, but only between roles. */
+body.resume .rs-section { break-inside: avoid; page-break-inside: avoid; }
+body.resume .rs-section--long { break-inside: auto; page-break-inside: auto; }
+
+body.resume .rs-section > h2 {
+  display: block;             /* full-width rule; the theme sizes h2 to its text */
+  width: auto;
+  font-size: 9.5pt;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--rs-accent) !important;
+  margin: 0 0 5pt;
+  padding: 0 0 2pt;
+  border-bottom: 0.75pt solid var(--rs-accent);
+  break-after: avoid;
+  page-break-after: avoid;
+}
+/* The theme puts anchor glyphs and decoration on prose headings. */
+body.resume .rs-section h2::before,
+body.resume .rs-section h2::after,
+body.resume .rs-section h3::before,
+body.resume .rs-section h3::after { content: none !important; }
+
+/* A role never splits across a page break: organisation, role, dates and its
+   bullets stay together. Every entry here is short enough for that. */
+body.resume .rs-entry {
+  margin: 0 0 6.5pt;
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+body.resume .rs-primary {
+  font-size: 10.5pt;
+  font-weight: 600;
+  line-height: 1.25;
+  margin: 0;
+  color: var(--rs-ink) !important;
+}
+body.resume .rs-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  column-gap: 12pt;
+}
+body.resume .rs-secondary { font-style: italic; color: var(--rs-ink); }
+body.resume .rs-dates {
+  white-space: nowrap;
+  font-size: 9.5pt;
+  color: var(--rs-muted) !important;
+  font-variant-numeric: tabular-nums;
+}
+body.resume .rs-stack { font-style: normal; }
+
+body.resume .rs-details,
+body.resume .rs-summary,
+body.resume .rs-note {
+  margin: 1.5pt 0 0;
+  font-size: 9.75pt;
+}
+body.resume .rs-details,
+body.resume .rs-note { color: var(--rs-muted) !important; }
+body.resume .rs-note { margin: 0 0 5pt; }
+
+body.resume .rs-bullets {
+  margin: 2.5pt 0 0;
+  padding-left: 12pt;
+}
+body.resume .rs-bullets li {
+  margin: 0 0 1.5pt;
+  padding-left: 1pt;
+}
+body.resume .rs-bullets li::marker { color: var(--rs-accent); }
+
+body.resume .rs-skills { margin: 0; }
+body.resume .rs-skills > div {
+  display: grid;
+  grid-template-columns: 1.6in 1fr;    /* wide enough that no label wraps */
+  gap: 8pt;
+  margin: 0 0 2.5pt;
+}
+body.resume .rs-skills dt { font-weight: 600; }
+body.resume .rs-skills dd { margin: 0; }
+
+body.resume .rs-awards li { margin: 0 0 2pt; }

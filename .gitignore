@@ -14,6 +14,15 @@ static/giallo-*.css
 # in build.sh before each `zola build` (same lifecycle as the Pagefind index).
 related.json
 
+# Download file sizes — same lifecycle, measured by build.sh from the files being
+# deployed. Kept out of static/ because only templates read it; nothing fetches it.
+download-sizes.json
+
+# Demo → parent-post index — same lifecycle, derived by scripts/build-demo-index.py
+# from the demo() shortcode calls in content/posts/. Committing it would let it
+# disagree with the posts, which is the whole failure the derivation avoids.
+static/demos/_shared/demos.json
+
 # mdBook build output
 docs/book/
 

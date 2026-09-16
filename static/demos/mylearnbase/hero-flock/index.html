@@ -3,6 +3,13 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Keep this page out of search results. It is a design-review artifact, not
+       a reader-facing demo: it carries the treatment switcher and the notes that
+       chose the top-band mask. Nothing here is secret — the flock it previews is
+       the homepage background — it just should not be an entry point to the site.
+       This is the ONLY demo marked noindex; the rest are legitimate standalone
+       landing pages, which is what the back-link bar exists to support. -->
+  <meta name="robots" content="noindex, follow">
   <title>Homepage hero flock — prototype</title>
   <style>
     /* The site's theme variables, restated locally: a standalone demo page does
@@ -251,5 +258,6 @@
       flock.setDensity(document.getElementById('density').value / 100);
     });
   </script>
+  <script src="/demos/_shared/demo-chrome.js" defer></script>
 </body>
 </html>

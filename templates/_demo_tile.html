@@ -1,0 +1,50 @@
+{#- One demo tile, shared by the Playground and the project pages.
+
+    Expects `d` in context: one entry from static/demos/_shared/demos.json
+    (url, title, caption, heavy, poster). Styles are the unscoped .pg-tile*
+    rules in custom.css; the pg- prefix is the namespace.
+
+    One partial rather than two copies because the tile carries several
+    non-obvious decisions (live preview vs. poster, the stretched link, the
+    missing size label), and a second copy would be where one of them quietly
+    got undone. -#}
+<div class="pg-tile{% if d.heavy %} pg-tile--heavy{% endif %}">
+  <div class="pg-stage">
+    {%- if d.heavy %}
+    {#- Nothing of the demo itself is fetched until the visitor opens it.
+        The poster is a captured still (scripts/capture-demo-posters.py),
+        content-addressed so it cannot be stale — when it is absent the
+        tile falls back to the drawn card, which is why there is no
+        staleness check here. The play button stays ON TOP of the still
+        either way, so a frozen frame still reads as "this moves". -#}
+    {%- if d.poster %}
+    <img class="pg-poster" src="{{ get_url(path=d.poster) }}" alt="" aria-hidden="true"
+         loading="lazy" decoding="async" width="900">
+    {%- endif %}
+    {#- The glyph carries its own solid fill, so it stays legible over any
+        still without a heavy scrim hiding the poster. -#}
+    <span class="pg-glyph" aria-hidden="true">&#9654;</span>
+    {%- else %}
+    {#- Rendered at roughly 2.4x the tile's width and scaled down, so the
+        thumbnail shows the demo's DESKTOP layout rather than its narrow
+        fallback. The scale factor lives in custom.css next to the width
+        that depends on it. aria-hidden + tabindex=-1 keep a decorative
+        preview out of the reading order; the tile's own link is the
+        accessible route in. -#}
+    <iframe src="{{ d.url }}" loading="lazy" scrolling="no" tabindex="-1"
+            aria-hidden="true" title="" class="pg-preview"></iframe>
+    {%- endif %}
+  </div>
+
+  <div class="pg-body">
+    {#- The link sits on the title and stretches over the whole tile via
+        ::after in custom.css. It cannot wrap the tile directly: an
+        <iframe> is interactive content and an <a> may not contain it. -#}
+    <h3 class="pg-tile-title"><a class="pg-link" href="{{ d.url }}">{{ d.title }}</a></h3>
+    {%- if d.caption %}<p class="pg-caption">{{ d.caption }}</p>{% endif %}
+    {#- No size label, deliberately. "Heavy" protects the GALLERY's weight
+        (no 600KB demo loads on scroll); once a visitor clicks, it is an
+        ordinary page load, and visitors do not think of pages in bytes.
+        Sizes are for downloads — see the résumé's PDF button. -#}
+  </div>
+</div>

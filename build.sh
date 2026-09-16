@@ -4,9 +4,11 @@
 # Cloudflare doesn't pre-install Zola and runs no post-build step, so this script
 # owns the whole pipeline: fetch Zola if it isn't already on PATH, compute the
 # related-posts index (scripts/compute-related.py → related.json, read by
-# templates/post.html via load_data), build the site, then index the rendered HTML
-# in public/ with Pagefind (which writes public/pagefind/). related.json, like the
-# Pagefind index, is a regenerated build artifact (gitignored) — never committed.
+# templates/post.html via load_data), derive the demo index
+# (scripts/build-demo-index.py → static/demos/_shared/demos.json), build the site,
+# then index the rendered HTML in public/ with Pagefind (which writes
+# public/pagefind/). Both indexes, like the Pagefind index, are regenerated build
+# artifacts (gitignored) — never committed.
 #
 # Cloudflare Pages → Settings → Builds & deployments → Build command:  bash build.sh
 #
@@ -47,11 +49,48 @@ if [ -f "$RESUME_SRC" ]; then
   fi
 fi
 
+# Download sizes. A download link states its file size, the way a page link does
+# not: someone saving a file thinks about what they are getting, and Zola has no
+# template function that can read a file's size (its file helpers are get_hash,
+# get_image_metadata and load_data). So measure here, into download-sizes.json.
+#
+# Measured at build time from the file actually being deployed, rather than
+# recorded when build-resume-pdf.sh generates the PDF: a size written at
+# generation goes stale if the file ever arrives another way, while one measured
+# here cannot disagree with what ships. Keyed by site URL, so a template looks it
+# up with the same path its front matter already carries (extra.pdf).
+echo "Measuring downloads (static/**/*.pdf → download-sizes.json)…"
+python3 - <<'PY'
+import json
+from pathlib import Path
+
+sizes = {}
+for pdf in sorted(Path("static").rglob("*.pdf")):
+    n = pdf.stat().st_size
+    label = f"{n / 1048576:.1f} MB" if n >= 1048576 else f"{round(n / 1024)} KB"
+    sizes["/" + pdf.relative_to("static").as_posix()] = {"bytes": n, "label": label}
+Path("download-sizes.json").write_text(json.dumps(sizes, indent=2) + "\n", encoding="utf-8")
+print(f"  {len(sizes)} download(s) measured")
+PY
+
 echo "Computing related posts (TF-IDF → related.json)…"
 python3 scripts/compute-related.py
 
+echo "Deriving the demo index (demo() calls → static/demos/_shared/demos.json)…"
+python3 scripts/build-demo-index.py
+
 echo "Building site with ${ZOLA}…"
 "$ZOLA" build
+
+# Assert the derived back-links actually resolve in what was just built.
+#
+# This is the one link class Zola cannot check: the demo bar is injected by
+# JavaScript at runtime, so a wrong URL is invisible to `zola check` and to the
+# build, and surfaces only as a reader hitting a 404 from inside a demo.
+# build-demo-index.py reconstructs Zola's routing in Python to produce those
+# URLs, and this is what keeps that reconstruction honest.
+echo "Verifying demo back-links resolve…"
+python3 scripts/build-demo-index.py --verify public
 
 echo "Indexing with Pagefind v${PAGEFIND_VERSION}…"
 npx -y "pagefind@${PAGEFIND_VERSION}" --site public

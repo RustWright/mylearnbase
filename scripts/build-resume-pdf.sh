@@ -114,6 +114,28 @@ else
   echo "warning: pdftotext not found — could not verify the print stylesheet applied." >&2
 fi
 
+# The --base-url override above is necessary, and it is also a leak waiting to
+# happen: anything that renders base_url prints this script's localhost address.
+# The first structured résumé did exactly that — "127.0.0.1:1187" as the site
+# address, and six clickable links in the PDF pointing at localhost. BOTH places
+# need checking, because each is invisible to the other method: link targets
+# live in uncompressed /URI annotations that pdftotext never shows, while the
+# printed text sits in compressed content streams that a raw byte search cannot
+# read. Verified: a raw grep of that PDF found the five link targets and missed
+# the printed "127.0.0.1:1187" entirely.
+LOCALHOST_RE="127\.0\.0\.1|localhost"
+if { pdftotext "$OUT" - 2>/dev/null; cat "$OUT"; } | LC_ALL=C grep -a -q -E "$LOCALHOST_RE"; then
+  echo "error: the PDF names a localhost address — base_url leaked into the printed page:" >&2
+  { pdftotext "$OUT" - 2>/dev/null; cat "$OUT"; } \
+    | LC_ALL=C grep -a -o -E "/URI \([^)]*($LOCALHOST_RE)[^)]*\)|[^ ]*($LOCALHOST_RE)[^ ]*" \
+    | sort -u | head -8 | sed 's/^/  - /' >&2
+  echo "       Anything that names the real site must read config.extra.canonical_url," >&2
+  echo "       which this script does not override. See templates/resume.html." >&2
+  rm -f "$OUT"
+  exit 1
+fi
+echo "Verified: no localhost address in the PDF text or its links."
+
 # Record what the PDF was built FROM, so build.sh can tell when the page has moved
 # on without it. Hashing the source (not the PDF) is the point: the PDF's bytes
 # change on every run from timestamps, so it cannot be its own witness.

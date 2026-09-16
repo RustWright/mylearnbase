@@ -1,0 +1,89 @@
+{#- Playground — the gallery of every reader-facing demo on the site.
+
+    Path is /playground/, not /demos/. Zola copies static/demos/ verbatim into
+    public/demos/, so a section at /demos/ would emit an index.html into a
+    directory the static copier owns, and the precedence there is unverified.
+    The demo FILES stay at /demos/…, so no published post link changes.
+
+    Data comes from static/demos/_shared/demos.json, derived from the posts'
+    demo() shortcode calls by scripts/build-demo-index.py. required=false is the
+    hinge that keeps `zola serve` working without running build.sh first — the
+    same arrangement post.html uses for related.json.
+
+    Tiles are grouped by parent post because the collection is lopsided: two
+    posts own three demos each, so one flat grid opens with three near-identical
+    SVG tiles followed by three near-identical TF-IDF tiles. Grouped, each post
+    reads as one idea approached from several angles.
+
+    Previews are LIVE IFRAMES, not screenshots. The original plan called for
+    captured posters; measurement killed it. The one set of ready-made posters
+    (the four boids_*.gif files) are 393-695KB each — heavier than the 533KB
+    WASM bundle they would have stood in for. Screenshots also drift from the
+    demo silently, and several demos start deliberately blank, so a capture
+    would need per-demo scripting to reach a state worth showing. A live
+    preview cannot go stale, costs 9-26KB for the nine light demos, and needs
+    no capture tooling at all.
+
+    The three heavy demos (588-610KB: two WASM bundles and a search corpus) get
+    a card instead and load nothing until the visitor opens them. Which demos
+    are heavy is derived from measured byte weight, not a hand-kept list. -#}
+{% extends "_base.html" %}
+
+{#- prose-page is what the theme keys content width off (body.prose-page main
+    in main.scss). playground is this page's own hook in custom.css. -#}
+{% block page %}prose-page playground{% endblock page %}
+{% block lang -%}
+{%- if section.extra.lang %}{{ section.extra.lang }}{% else %}{{ section.lang }}{% endif -%}
+{%- endblock lang %}
+{% block title %}{{ section.title }}{% endblock title %}
+{% block desc %}
+  {% if section.description %}{% set desc = section.description %}{% else %}{% set desc = config.description %}{% endif %}
+  <meta name="description" content="{{ desc }}">
+{% endblock desc %}
+
+{% block content %}
+{%- set data = load_data(path="static/demos/_shared/demos.json", required=false) -%}
+<div id="wrapper">
+  <main>
+    {% include "_section_title.html" %}
+
+    {%- if section.content %}
+    <article class="prose">{{ section.content | safe }}</article>
+    {%- endif %}
+
+    {%- if data and data.groups %}
+    {%- for group in data.groups %}
+    {#- Five of the seven groups own a single demo, which in a 3-up grid would
+        leave two empty cells under each heading. A lone demo gets a horizontal
+        tile instead, filling its row and reading as deliberate. -#}
+    <section class="pg-group{% if group.demos | length == 1 %} pg-group--single{% endif %}">
+      <h2 class="pg-group-title">
+        {%- if group.url %}<a href="{{ group.url }}">{{ group.title }}</a>
+        {%- else %}{{ group.title }}{% endif -%}
+      </h2>
+
+      <div class="pg-tiles">
+        {%- for d in group.demos %}
+        {% include "_demo_tile.html" %}
+        {%- endfor %}
+      </div>
+    </section>
+    {%- endfor %}
+    {%- else %}
+    {#- Only reachable when the index has not been generated — a bare
+        `zola serve` in development. Production always runs build.sh. -#}
+    <p class="pg-empty">The demo gallery is being rebuilt. In the meantime, every
+      demo is embedded in <a href="{{ get_url(path='@/posts/_index.md') }}">the posts</a>.</p>
+    {%- endif %}
+
+    {% include "_footer.html" %}
+  </main>
+</div>
+{% endblock content %}
+
+{#- Required: main.js calls Lightense() unconditionally on every page
+    (enableImgLightense, main.js:187), so omitting this throws a ReferenceError
+    on load even with no images to zoom. -#}
+{% block script %}
+<script src="{{ get_url(path='js/lightense.min.js') }}"></script>
+{% endblock script %}

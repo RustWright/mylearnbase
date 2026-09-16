@@ -1,0 +1,144 @@
+{#- One project page (content/projects/<slug>.md).
+
+    Everything below the prose is DERIVED from what is already published, so a
+    project page cannot drift from the posts it points at:
+
+      write-ups  = the pages of extra.logbook (a logbook section) plus each path
+                   in extra.posts. get_page / get_section fail the build on a
+                   bad path, so a renamed post is a loud error, not a dead link.
+                   Drafts are excluded by Zola itself.
+      demos      = every listed demo in demos.json whose parent post is one of
+                   those write-ups. No per-project demo list exists to go stale.
+
+    Only the LEAD demo of each write-up gets a tile — the first one in that post,
+    in the author's own order (build-demo-index.py records it). A project page is
+    an overview, and the Playground already shows every demo; the rest are one
+    link away. mylearnbase alone owns eight demos, which as eight tiles would bury
+    the page's actual subject.
+
+    Pages rather than one data file, because each project gets a URL a recruiter
+    can link directly, and room for a real description. (The plan also cited
+    search indexing; that no longer applies — site search is deliberately
+    posts-only.) The same write-up/demo association is computed in projects.html
+    for the hub's counts; change the rule in both. -#}
+{% extends "_base.html" %}
+
+{% block page %}prose-page project{% endblock page %}
+{% block lang -%}
+{%- if page.extra.lang %}{{ page.extra.lang }}{% else %}{{ page.lang }}{% endif -%}
+{%- endblock lang %}
+{% block title %}{{ page.title }}{% endblock title %}
+{% block desc %}
+  <meta name="description" content="{% if page.description %}{{ page.description }}{% else %}{{ config.description }}{% endif %}">
+{% endblock desc %}
+
+{% block content %}
+{#- A page template has no `section`, but _footer.html reads section.path to
+    decide whether to offer RSS. Hand it the parent section, as post.html does.
+    /projects/ is not under the blog path, so no RSS link — which is correct. -#}
+{%- set section = get_section(path="projects/_index.md", metadata_only=true) -%}
+
+{#- A status outside the vocabulary fails the build rather than rendering an
+    unlabelled badge. -#}
+{%- if page.extra.status == "active" -%}{%- set status_label = "Active" -%}
+{%- elif page.extra.status == "complete" -%}{%- set status_label = "Complete" -%}
+{%- else -%}{{ throw(message="project " ~ page.relative_path ~ ": extra.status must be 'active' or 'complete', got '" ~ page.extra.status ~ "'") }}
+{%- endif -%}
+
+{%- set posts_section = get_section(path="posts/_index.md", metadata_only=true) -%}
+{%- set date_format = posts_section.extra.date_format -%}
+
+{#- Write-ups: logbook section pages + explicitly named posts. -#}
+{%- set_global writeups = [] -%}
+{%- if page.extra.logbook is defined -%}
+  {%- set logbook = get_section(path=page.extra.logbook) -%}
+  {%- for q in logbook.pages -%}{%- set_global writeups = writeups | concat(with=q) -%}{%- endfor -%}
+{%- endif -%}
+{%- if page.extra.posts is defined -%}
+  {%- for path in page.extra.posts -%}
+    {%- set q = get_page(path=path) -%}
+    {%- set_global writeups = writeups | concat(with=q) -%}
+  {%- endfor -%}
+{%- endif -%}
+{%- set writeups = writeups | sort(attribute="date") | reverse -%}
+
+{#- Demos: lead demo per write-up, plus a total for the Playground link. -#}
+{%- set demo_index = load_data(path="static/demos/_shared/demos.json", required=false) -%}
+{%- set_global leads = [] -%}
+{%- set_global n_demos = 0 -%}
+{%- if demo_index -%}
+  {%- for w in writeups -%}
+    {%- set_global found = false -%}
+    {%- for d in demo_index.demos -%}
+      {%- if d.listed and d.post and d.post.url == w.path -%}
+        {%- set_global n_demos = n_demos + 1 -%}
+        {%- if not found -%}
+          {%- set_global leads = leads | concat(with=d) -%}
+          {%- set_global found = true -%}
+        {%- endif -%}
+      {%- endif -%}
+    {%- endfor -%}
+  {%- endfor -%}
+{%- endif -%}
+
+<div id="wrapper">
+  <main>
+    <div class="section-title">
+      <h1>{{ page.title }}</h1>
+      {%- if page.description %}<p>{{ page.description }}</p>{% endif %}
+    </div>
+
+    <dl class="proj-facts">
+      <div><dt>Status</dt><dd><span class="proj-status proj-status--{{ page.extra.status }}">{{ status_label }}</span></dd></div>
+      {%- if page.extra.period %}<div><dt>When</dt><dd>{{ page.extra.period }}</dd></div>{% endif %}
+      {%- if page.extra.stack %}<div><dt>Built with</dt><dd>{{ page.extra.stack | join(sep=", ") }}</dd></div>{% endif %}
+      {%- if page.extra.repo %}
+      <div><dt>Source</dt><dd><a href="{{ page.extra.repo }}" target="_blank" rel="noreferrer noopener">{{ page.extra.repo | trim_start_matches(pat="https://") }}</a></dd></div>
+      {%- endif %}
+    </dl>
+
+    <article class="prose">
+      {{ page.content | safe }}
+    </article>
+
+    {%- if leads | length > 0 %}
+    <section class="proj-section">
+      <h2>Try it</h2>
+      <div class="pg-tiles">
+        {%- for d in leads %}
+        {% include "_demo_tile.html" %}
+        {%- endfor %}
+      </div>
+      {%- if n_demos > leads | length %}
+      <p class="proj-more"><a href="{{ get_url(path='@/playground/_index.md') }}">All {{ n_demos }} demos from this project are in the Playground &rarr;</a></p>
+      {%- endif %}
+    </section>
+    {%- endif %}
+
+    {%- if writeups | length > 0 %}
+    <section class="proj-section">
+      <h2>Write-ups</h2>
+      {#- .layout-list is the theme's scope for post-list styling, so the
+          rows here match every other list of posts on the site. -#}
+      <div class="layout-list">
+        <div class="post-list">
+          {%- for w in writeups %}
+          <a class="post instant" href="{{ w.permalink }}">
+            <span>{{ w.title }}</span>
+            <span class="date">{{ w.components.1 | capitalize }} &middot; {{ w.date | date(format=date_format) }}</span>
+          </a>
+          {%- endfor %}
+        </div>
+      </div>
+    </section>
+    {%- endif %}
+
+    {% include "_footer.html" %}
+  </main>
+</div>
+{% endblock content %}
+
+{#- Required: main.js calls Lightense() unconditionally on every page. -#}
+{% block script %}
+<script src="{{ get_url(path='js/lightense.min.js') }}"></script>
+{% endblock script %}
