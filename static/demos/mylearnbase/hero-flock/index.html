@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Homepage hero flock — prototype</title>
+  <style>
+    /* The site's theme variables, restated locally: a standalone demo page does
+       not load the site stylesheet. Values taken from the live Serene build, so
+       the flock renders in exactly the colour it will on the homepage. */
+    body {
+      --bg-color: #fff;
+      --text-color: #2f3030;
+      --text-pale-color: #767676;
+      --text-decoration-color: #a9a9a9;
+      --primary-color: #5871a2;
+      margin: 0;
+      background: var(--bg-color);
+      color: var(--text-color);
+      font: 16px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    }
+    body.dark {
+      --bg-color: #1c1c1c;
+      --text-color: #c1c1c1;
+      --text-pale-color: #848484;
+      --text-decoration-color: #5f5f5f;
+      --primary-color: #6f8fd1;
+    }
+
+    .wrap { max-width: 720px; margin: 0 auto; padding: 0 15px; }
+
+    /* The hero: canvas behind, content above. The canvas is taken OUT OF FLOW on
+       purpose. Left in flow it feeds a sizing loop — a canvas's intrinsic size is
+       its width/height attributes, which the resize handler sets from the measured
+       box, so the box it is measured against grows on every pass. Absolute
+       positioning makes the height flow one way only: content (plus min-height)
+       sizes the hero, and the canvas fills whatever that turns out to be. */
+    .hero { position: relative; margin: 0 0 1.5em; }
+    #flock { position: absolute; inset: 0; width: 100%; height: 100%; display: block; cursor: crosshair; }
+
+    /* Treatments. A mask decides WHERE the flock is allowed to show, without
+       touching the simulation — so every option below is the same flock at the
+       same density, differing only in what reaches the eye. "Distracting" is
+       nearly always motion underneath text rather than motion as such, which is
+       what `gutters` and `band` each remove in a different way. */
+    #flock.t-gutters {
+      -webkit-mask-image: linear-gradient(to right, #000 0%, #000 14%, transparent 31%, transparent 69%, #000 86%, #000 100%);
+              mask-image: linear-gradient(to right, #000 0%, #000 14%, transparent 31%, transparent 69%, #000 86%, #000 100%);
+    }
+    #flock.t-band {
+      -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 22%, transparent 62%);
+              mask-image: linear-gradient(to bottom, #000 0%, #000 22%, transparent 62%);
+    }
+
+    /* The gutters mask is percentage-based, so it does not disappear on a phone —
+       it relocates. Measured at 375px: the canvas is 360 wide, the visible bands
+       are 0-50px and 310-360px, and the text spans 15-345px. The flock therefore
+       lands exactly under the left and right edges of the text, which is the one
+       place it must not be. Below the width where real gutters exist, fall back
+       to the band treatment. */
+    @media (max-width: 760px) {
+      #flock.t-gutters {
+        -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 22%, transparent 62%);
+                mask-image: linear-gradient(to bottom, #000 0%, #000 22%, transparent 62%);
+      }
+    }
+    #flock.t-off { display: none; }
+
+    .treatments { display: flex; gap: .4em; flex-wrap: wrap; }
+    .treatments button[aria-pressed="true"] { border-color: var(--primary-color); color: var(--primary-color); }
+    .hero-content {
+      position: relative;
+      padding: 3.5em 15px 2.25em;
+      max-width: 720px;
+      margin: 0 auto;
+      pointer-events: none;   /* let the pointer reach the canvas: it is the predator */
+    }
+    .hero-content a { pointer-events: auto; }
+    #name { font-size: 1.55em; font-weight: 600; letter-spacing: -0.01em; }
+    #bio { color: var(--text-pale-color); margin-top: 0.2em; }
+
+    .doors { display: flex; flex-wrap: wrap; gap: 0.75em; margin-top: 1.6em; }
+    .door {
+      flex: 1 1 10em; text-decoration: none; color: var(--text-color);
+      border: 1.5px solid var(--text-decoration-color); border-radius: 6px;
+      padding: 0.7em 0.9em; background: color-mix(in srgb, var(--bg-color) 82%, transparent);
+      transition: border-color .18s ease, transform .18s ease;
+    }
+    .door:hover { border-color: var(--primary-color); transform: translateY(-2px); }
+    .door b { display: block; color: var(--primary-color); font-weight: 600; }
+    .door span { font-size: .85em; color: var(--text-pale-color); }
+
+    .panel {
+      border-top: 1px solid var(--text-decoration-color);
+      margin-top: 2em; padding: 1em 0 3em;
+      font-size: .9em; color: var(--text-pale-color);
+    }
+    .row { display: flex; align-items: center; gap: .8em; margin: .55em 0; flex-wrap: wrap; }
+    .row label { min-width: 7em; }
+    input[type=range] { flex: 1 1 12em; }
+    button {
+      border: 1.5px solid var(--text-decoration-color); background: var(--bg-color);
+      color: var(--text-color); border-radius: 4px; padding: .35em .8em; cursor: pointer;
+    }
+    button:hover { border-color: var(--primary-color); color: var(--primary-color); }
+    code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .92em; }
+  </style>
+</head>
+<body>
+  <div class="hero">
+    <canvas id="flock" aria-hidden="true"></canvas>
+    <div class="hero-content">
+      <div id="name">Efe-Oghene Erhie</div>
+      <div id="bio">I build things to learn — and write down how.</div>
+      <div class="doors">
+        <a class="door" href="#"><b>Projects</b><span>What I've built, and how each one works.</span></a>
+        <a class="door" href="#"><b>Playground</b><span>Interactive demos. No reading required.</span></a>
+        <a class="door" href="#"><b>Résumé</b><span>Background, skills, and a PDF.</span></a>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap panel">
+    <p><strong>Move your pointer across the flock.</strong> It is the predator — the
+      same <code>flee()</code> rule the shipped demo uses, at the same tuned
+      <code>predator_fear_factor</code> of 0.2.</p>
+
+    <div class="row">
+      <label>Treatment</label>
+      <div class="treatments">
+        <button data-t="full" aria-pressed="false">Full bleed</button>
+        <button data-t="gutters" aria-pressed="false">Gutters only</button>
+        <button data-t="band" aria-pressed="true">Top band</button>
+        <button data-t="off" aria-pressed="false">Off</button>
+      </div>
+    </div>
+    <p style="margin:.2em 0 .9em">Same flock, same density in all four — only what
+      reaches the eye changes. <strong>Gutters only</strong> keeps motion out of the
+      text column on a wide screen, but the mask is percentage-based, so on a phone
+      it does not vanish, it <em>relocates</em> to sit under the text's own left and
+      right edges (measured at 375px: bands at 0–50px and 310–360px, text at
+      15–345px). It therefore falls back to the band below 760px, which means
+      shipping it costs a breakpoint. <strong>Top band</strong> fades the flock out
+      before the text begins and needs no such special case at any width.
+      <strong>Off</strong> is the honest control — check whether you miss it.</p>
+
+    <div class="row">
+      <label for="density">Density</label>
+      <input type="range" id="density" min="50" max="300" step="10" value="100">
+      <output id="density-val">measuring…</output>
+    </div>
+    <p style="margin:.2em 0 .9em">1.00× is the shipped density: <code>POPULATION = 100</code>
+      over the reference 1600×1200 world, re-derived for this hero. Push past ~2×
+      and the flock collapses into a static separation lattice — which is what
+      happens if you carry the raw count across instead of the density.
+      <strong>Narrow your browser window</strong> and watch <em>boids/megapixel</em>:
+      it should hold steady (81 at 1280px, 80 at 375px) while the raw count and the
+      world size both shrink with the viewport. That number staying put — together
+      with boids rendering the same pixel size at every width — is the fix for the
+      desktop-vs-mobile mismatch.</p>
+    <div class="row">
+      <label for="opacity">Opacity</label>
+      <input type="range" id="opacity" min="10" max="100" step="5" value="20">
+      <output id="opacity-val">0.20</output>
+    </div>
+    <div class="row">
+      <label for="height">Extra height</label>
+      <input type="range" id="height" min="0" max="240" step="10" value="0">
+      <output id="height-val">0px (hugs content)</output>
+    </div>
+    <div class="row">
+      <button id="theme">Toggle dark</button>
+      <button id="respawn">Respawn flock</button>
+    </div>
+
+    <p>The controls exist only for judging the prototype; the homepage ships fixed
+      values. Everything else is production behaviour: parameters are the shipped
+      <code>Params::default()</code>, colour is read from the live theme variable,
+      and <code>prefers-reduced-motion</code> paints one settled frame instead of
+      animating.</p>
+  </div>
+
+  <script src="/js/hero-flock.js"></script>
+  <script>
+    var canvas = document.getElementById('flock');
+    var hero = document.querySelector('.hero');
+
+    // 0 = no min-height at all, so the hero is exactly as tall as its content
+    // and there is no band below the cards for the flock to fail to fill.
+    function setHeight(extra) {
+      var natural = Math.round(document.querySelector('.hero-content').getBoundingClientRect().height);
+      hero.style.minHeight = extra ? (natural + extra) + 'px' : '';
+      document.getElementById('height-val').textContent =
+        extra ? '+' + extra + 'px (' + (natural + extra) + 'px total)' : '0px (hugs content, ' + natural + 'px)';
+      window.dispatchEvent(new Event('resize'));
+    }
+    setHeight(0);
+
+    // Top band is the chosen treatment (2026-09-16): it keeps motion off the
+    // text at every width, where gutters needs a 760px breakpoint to avoid
+    // landing the flock on the text's own edges.
+    canvas.className = 't-band';
+    var flock = window.HeroFlock.mount(canvas, { opacity: 0.2 });
+
+    function showDensity(mult) {
+      var s = flock.stats();
+      // perMegapixel is the number that has to hold steady across viewport
+      // widths; the raw count legitimately shrinks with the world.
+      document.getElementById('density-val').textContent =
+        mult.toFixed(2) + '× — ' + s.boids + ' boids, world ' +
+        s.world[0] + '×' + s.world[1] + ', ' + s.perMegapixel + ' boids/megapixel';
+    }
+    showDensity(1);
+
+    // Refresh on resize too — narrowing the window is the whole point of the
+    // boids/megapixel readout, and a figure frozen at load would show the old
+    // world size exactly when you are looking for the new one.
+    window.addEventListener('resize', function () {
+      showDensity(document.getElementById('density').value / 100);
+    });
+
+    document.getElementById('density').addEventListener('input', function (e) {
+      var m = e.target.value / 100;
+      flock.setDensity(m);
+      showDensity(m);
+    });
+    document.getElementById('opacity').addEventListener('input', function (e) {
+      var v = e.target.value / 100;
+      document.getElementById('opacity-val').textContent = v.toFixed(2);
+      flock.setOpacity(v);
+    });
+    document.getElementById('height').addEventListener('input', function (e) {
+      setHeight(+e.target.value);
+      showDensity(document.getElementById('density').value / 100);
+    });
+    document.querySelectorAll('.treatments button').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        document.querySelectorAll('.treatments button')
+          .forEach(function (b) { b.setAttribute('aria-pressed', String(b === btn)); });
+        canvas.className = btn.dataset.t === 'full' ? '' : 't-' + btn.dataset.t;
+        // Keep the loop off entirely while hidden rather than animating a
+        // display:none canvas — otherwise "Off" still costs a frame budget.
+        btn.dataset.t === 'off' ? flock.stop() : flock.start();
+      });
+    });
+
+    document.getElementById('theme').addEventListener('click', function () {
+      document.body.classList.toggle('dark');
+    });
+    document.getElementById('respawn').addEventListener('click', function () {
+      flock.setDensity(document.getElementById('density').value / 100);
+    });
+  </script>
+</body>
+</html>

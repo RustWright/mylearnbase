@@ -1,0 +1,63 @@
+/* Résumé print styles — THIS FILE IS THE PDF.
+ *
+ * Deliberately NOT wrapped in `@media print`. It is attached in
+ * templates/resume.html as `<link media="print">`, so the media ATTRIBUTE is the
+ * switch: a browser applies it on Ctrl+P, and scripts/build-resume-pdf.sh flips
+ * that attribute to "all" (via the ?print URL parameter) so the same rules also
+ * govern the generated PDF.
+ *
+ * WHY THE ATTRIBUTE AND NOT A MEDIA QUERY: Chrome's headless --print-to-pdf
+ * renders against SCREEN media, so `@media print` blocks are ignored entirely
+ * and the PDF comes out with the site nav, the theme toggle, and a "Download
+ * PDF" button inside the download. Verified on Chrome 151 by forcing a red
+ * background under @media print — the PDF stayed white — and --headless=old
+ * behaves the same way. Keeping the rules unconditional in their own file means
+ * one copy serves both paths instead of a media query and a duplicate class.
+ *
+ * Everything interactive goes: a sticky header would repeat on every printed
+ * page. Colours are forced light because the generator inherits whatever theme
+ * the machine reports, and a dark-mode laptop would otherwise emit a
+ * black-background PDF that burns a recruiter's toner.
+ */
+
+body.resume .site-header,
+body.resume .search-overlay,
+body.resume #reader-controls,
+body.resume #back-to-top,
+body.resume footer,
+body.resume .resume-download { display: none !important; }
+
+body.resume {
+  background: #fff !important;
+  color: #000 !important;
+  font-size: 10.5pt;
+}
+
+body.resume #wrapper,
+body.resume main {
+  max-width: none;
+  margin: 0;
+  padding: 0;
+}
+
+body.resume .resume-meta { margin: 0 0 1.2em; }
+body.resume .resume-contact a { color: #000 !important; border-bottom: none; }
+
+/* Never split a role or a section away from its own heading. */
+body.resume .resume-body h2,
+body.resume .resume-body h3 { break-after: avoid; page-break-after: avoid; }
+body.resume .resume-body h2 { margin: 1.1em 0 0.5em; }
+body.resume .resume-body h3 { margin: 0.9em 0 0.15em; }
+body.resume .resume-body li { break-inside: avoid; page-break-inside: avoid; }
+
+/* A printed URL cannot be clicked, so bare links would lose their target — but
+   only expand EXTERNAL ones. Expanding in-page anchors would print
+   "(#education)" after every internal reference, which helps nobody. */
+body.resume .resume-body a[href^="http"]::after {
+  content: " (" attr(href) ")";
+  font-size: 0.85em;
+  color: #444;
+}
+
+/* Ignored on screen, honoured whenever the page is actually paginated. */
+@page { margin: 14mm 14mm 12mm; }

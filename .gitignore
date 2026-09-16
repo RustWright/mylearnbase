@@ -45,6 +45,15 @@ editorial/_feedback/
 # Curiosity captures (concepts-post trigger pipeline) — gitignored, parent-synced
 .curiosities/
 
+# In-progress post drafts held back from a PUBLIC repo.
+#
+# `draft = true` keeps a post off the built site, but it does NOT keep the
+# markdown out of git — the source stays readable on GitHub. public-gate.sh will
+# not catch this either: its patterns deliberately exclude markdown posts to keep
+# false positives near zero. So holding a draft back is a manual act, and this is
+# where it goes. Delete the line when the post is ready to be public.
+content/posts/opinions/skip-the-boilerplate.md
+
 # OS files
 .DS_Store
 Thumbs.db

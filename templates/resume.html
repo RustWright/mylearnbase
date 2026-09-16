@@ -1,0 +1,98 @@
+{#- Résumé page. A one-off prose section, following the colophon precedent
+    (content/colophon/_index.md): Serene's page machinery keys on `section.*`,
+    so a loose page would not render. Needs [extra] title + subtitle in the
+    front matter or the masthead comes out headless.
+
+    Differs from prose.html in three ways, each load-bearing:
+      1. `{% block page %}resume{% endblock %}` puts a `resume` class on <body>,
+         which is what the @media print rules in custom.css key off.
+      2. A contact row and a PDF download button above the content.
+      3. Person JSON-LD. The page also emits the WebSite block from
+         _head_extend.html; multiple JSON-LD blocks on one page are valid, and
+         post pages already ship two. -#}
+{% extends "_base.html" %}
+
+{#- TWO classes, both load-bearing. `prose-page` is what the theme keys its
+    content width off (`body.prose-page main { max-width: … }` in main.scss);
+    without it the résumé runs edge-to-edge on a wide screen. `resume` is what
+    the @media print block in custom.css targets. -#}
+{% block page %}prose-page resume{% endblock page %}
+{% block lang -%}
+{%- if section.extra.lang %}{{ section.extra.lang }}{% else %}{{ section.lang }}{% endif -%}
+{%- endblock lang %}
+{% block title %}{{ section.title }}{% endblock title %}
+{% block desc %}
+  {% if section.description %}{% set desc = section.description %}{% else %}{% set desc = config.description %}{% endif %}
+  <meta name="description" content="{{ desc }}">
+{% endblock desc %}
+
+{% block head %}
+{#- Print styles as a media-gated stylesheet rather than an @media print block.
+    A browser applies it on Ctrl+P; the PDF generator visits /resume/?print and
+    the script below flips media to "all", because Chrome's headless
+    --print-to-pdf renders against SCREEN media and would otherwise ignore print
+    rules completely. One copy of the rules serves both paths. -#}
+<link rel="stylesheet" href="{{ get_url(path='css/resume-print.css') }}" media="print" data-print-css>
+<script>
+  // Runs before paint so the generator never captures an unstyled first frame.
+  if (location.search.indexOf('print') !== -1) {
+    document.currentScript.previousElementSibling.media = 'all';
+  }
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": {{ config.extra.author | json_encode | safe }},
+  "url": {{ get_url(path="/resume/") | json_encode | safe }},
+  "jobTitle": "Mechanical Engineer",
+  "description": {{ section.extra.subtitle | json_encode | safe }},
+  "alumniOf": [
+    { "@type": "CollegeOrUniversity", "name": "University of Waterloo" },
+    { "@type": "CollegeOrUniversity", "name": "University of Manitoba" }
+  ],
+  "knowsAbout": ["Robotics", "Simulation", "Control Systems", "Python", "C++", "Rust", "Mechanical Engineering"],
+  "sameAs": [
+    {%- for link in config.extra.resume_links -%}
+    {{ link.url | json_encode | safe }}{% if not loop.last %},{% endif %}
+    {%- endfor -%}
+  ]
+}
+</script>
+{% endblock head %}
+
+{% block content %}
+<div id="wrapper">
+  <main>
+    {% include "_section_title.html" %}
+
+    <div class="resume-meta">
+      <ul class="resume-contact">
+        {%- for link in config.extra.resume_links %}
+        <li><a href="{{ link.url }}"{% if link.external %} target="_blank" rel="noreferrer noopener"{% endif %}>{{ link.name }}</a></li>
+        {%- endfor %}
+      </ul>
+      {%- if section.extra.pdf %}
+      {#- A plain link, not a JS-driven save: the file is a static asset, so the
+          browser's own download handling is all this needs. -#}
+      <a class="resume-download" href="{{ get_url(path=section.extra.pdf) }}" download>Download PDF</a>
+      {%- endif %}
+    </div>
+
+    <article class="prose resume-body">
+      {{ section.content | safe }}
+    </article>
+
+    {% include "_footer.html" %}
+  </main>
+</div>
+{% endblock content %}
+
+{#- Required, not optional: main.js calls Lightense() unconditionally on every
+    page (enableImgLightense, main.js:187), so a template that omits this throws
+    a ReferenceError on load even with no images to zoom. Every other content
+    template ships the same line. -#}
+{% block script %}
+<script src="{{ get_url(path='js/lightense.min.js') }}"></script>
+{% endblock script %}

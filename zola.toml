@@ -54,6 +54,22 @@ nav = [
 ]
 blog_section_path = "/posts"
 
+# Résumé contact row + Person JSON-LD `sameAs` (templates/resume.html).
+#
+# Deliberately NO phone number and NO postal address: the source CV carries both,
+# and neither belongs on a page that is public and search-indexed.
+#
+# NO personal email either, for now. A mailto: on an indexed page is harvested,
+# and a personal address once scraped cannot be withdrawn. LinkedIn carries the
+# contact path in the meantime. The intended fix is a forwarding alias on the
+# efeerhie.com domain (Cloudflare Email Routing, free) — an address that can be
+# rotated or switched off without touching the personal inbox. Add it here once
+# it exists.
+resume_links = [
+  { name = "LinkedIn", url = "https://www.linkedin.com/in/efe-erhie", external = true },
+  { name = "GitHub", url = "https://github.com/RustWright", external = true },
+]
+
 back_link_text = "Back"
 force_theme = false
 

@@ -531,3 +531,102 @@ body.search-open {
 @media (max-width: 640px) {
   .demo--wide iframe { height: 1040px; }
 }
+
+/* ── Résumé page ─────────────────────────────────────────────────────
+   Screen styling for /resume/ (templates/resume.html). The print rules below
+   are what `scripts/build-resume-pdf.sh` renders, so the downloadable PDF and
+   this page can never describe different facts — they are the same document. */
+.resume-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1em;
+  margin: 0 15px 2em;
+}
+.resume-contact {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1em;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.9em;
+}
+.resume-contact a {
+  color: var(--text-pale-color);
+  text-decoration: none;
+  border-bottom: 1.5px solid var(--primary-pale-color);
+}
+.resume-contact a:hover {
+  color: var(--primary-color);
+  border-bottom-color: var(--primary-color);
+}
+.resume-download {
+  margin-left: auto;
+  padding: 0.4em 0.9em;
+  border: 1.5px solid var(--primary-color);
+  border-radius: 4px;
+  color: var(--primary-color);
+  text-decoration: none;
+  font-size: 0.85em;
+  white-space: nowrap;
+}
+.resume-download:hover { background: var(--primary-pale-color); }
+
+/* Employer/date lines sit directly under each role heading, so the theme's
+   generous h3 spacing would orphan them from their own heading. */
+.resume-body h3 { margin-bottom: 0.2em; }
+.resume-body h3 + p { margin-top: 0; color: var(--text-pale-color); font-size: 0.92em; }
+
+@media (max-width: 500px) {
+  .resume-download { margin-left: 0; }
+}
+
+/* ── Résumé: print / PDF ─────────────────────────────────────────────
+   Moved out to static/css/resume-print.css. It is NOT a media query there:
+   Chrome's headless --print-to-pdf renders against screen media and ignores
+   `@media print` entirely, so the rules are unconditional in their own file
+   and templates/resume.html attaches them with media="print" — the attribute
+   is the switch, and the PDF generator flips it. */
+
+/* ── Display math: scroll the equation, not the page ─────────────────
+   KaTeX's own stylesheet (katex@0.16.11) ships:
+
+     .katex-display > .katex { display: block; text-align: center; white-space: nowrap }
+
+   `nowrap` forbids the equation from breaking, and `.katex-display` itself
+   declares NO overflow — so an equation wider than the reading column escapes
+   its box and widens the whole document, which reads as lateral scroll on a
+   phone. Confining the overflow here turns that into a scrollbar on the
+   equation alone.
+
+   overflow-y stays `hidden` rather than `auto` so tall constructs (fractions,
+   large operators, \overbrace) don't also gain a vertical scrollbar; the block
+   padding is the headroom that keeps them from clipping against the edges.
+
+   Loaded from the CDN in post.html / prose.html / home.html under
+   `extra.math = true`, so this rule is the site's only guard — the Serene theme
+   has no .katex-* rules at all. */
+.katex-display {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-block: 0.5em;
+
+  /* Scroll-shadow: a soft edge appears only on the side that has more equation
+     off-screen. Containing the overflow above solved the page width but left a
+     silent failure — iOS hides scrollbars until you touch, so a phone reader
+     sees a truncated formula with no cue that it continues, and reads the
+     fragment as the whole equation.
+
+     Pure CSS, no JS, and it detects scrollability on its own via background-
+     attachment. The two `local` layers scroll WITH the equation, so each sits
+     over its own edge only while that edge is at the end of its travel; the two
+     `scroll` shadows stay pinned to the box. At rest the cover hides the shadow;
+     scroll away from an edge and the cover slides off, revealing it. Cover
+     layers must be the theme's opaque background or the shadow shows through. */
+  background:
+    linear-gradient(to right, var(--bg-color) 40%, transparent) 0 0 / 3em 100% no-repeat local,
+    linear-gradient(to left,  var(--bg-color) 40%, transparent) 100% 0 / 3em 100% no-repeat local,
+    radial-gradient(farthest-side at 0 50%, var(--text-decoration-color), transparent) 0 0 / 1em 100% no-repeat scroll,
+    radial-gradient(farthest-side at 100% 50%, var(--text-decoration-color), transparent) 100% 0 / 1em 100% no-repeat scroll;
+}

@@ -47,7 +47,7 @@ Last swept: 2026-06-30 (Sweep 7 — Cycle 5: post-Cycle-4 feature catch-up + con
 - [x] Code blocks render with syntax highlighting + copy button — Sweep 7 (highlight `class` spans + `#copy-cfg` data present; section default `copy = true`)
 - [x] Callouts (`> [!NOTE]` etc.) render correctly — Sweep 7 (`github_alerts`; callout markup on the MVP archive post)
 - [x] `{{ demo() }}` shortcode iframes render — Sweep 7 (same-origin iframe on the concepts + reader-controls posts; loads in browser with 0 console errors)
-- [ ] KaTeX math renders (when `extra.math`) — wiring verified in `post.html`; **unexercised**: no current post sets `extra.math`
+- [x] KaTeX math renders (when `extra.math`) — Sweep 8 (2026-09-16). Now exercised: *A Flock Is a Control Loop* sets `extra.math`. Three display equations render; **all three overflowed the reading column and widened the page** (doc `scrollWidth` 537 vs 375 viewport = 162px of lateral scroll) because KaTeX ships `.katex-display > .katex { white-space: nowrap }` while declaring no `overflow` on `.katex-display`. Fixed in `static/css/custom.css` (`overflow-x: auto` + scroll-shadow affordance); re-measured 367 ≤ 375, 0 vertical clipping, equation tails reachable, no shadows at 1280px where the equations fit.
 - [ ] Mermaid diagrams render (when `extra.mermaid`) — wiring verified in `post.html`; **unexercised**: no current post sets `extra.mermaid`
 - [x] Series links + tags links resolve — Sweep 7 (49 per-tag pages + 3 series pages + both landings build; `zola check` clean)
 - [ ] `superseded_by` banner renders when set — banner wiring verified in `post.html`; **unexercised**: only documented in workflow prose, no live post sets it
@@ -79,7 +79,7 @@ Last swept: 2026-06-30 (Sweep 7 — Cycle 5: post-Cycle-4 feature catch-up + con
 
 ## Responsive (folds in mobile-responsivity item)
 
-- [x] **Mobile (~375px):** no horizontal scroll — Sweep 7 (home `scrollWidth` 367 ≤ 375; post 1272 ≤ 1280); nav reflows (Sweep 1)
+- [x] **Mobile (~375px):** no horizontal scroll — Sweep 8 (2026-09-16): home 367 ≤ 375 **and a post re-measured at a true 375px viewport** (367 ≤ 375). ⚠️ **Methodology fix:** Sweep 7 recorded "post 1272 ≤ 1280" under this mobile item — a *desktop* measurement filed under the 375px check, so no post was ever measured narrow. That is precisely how the KaTeX overflow above survived a green sweep. When checking this item, confirm the viewport width in the evidence matches the heading. Nav reflows (Sweep 1).
 - [x] **Tablet (~768px):** layout adapts at `--homepage-max-width` boundary — Sweep 1 (not re-tested Sweep 7; between the two measured widths)
 - [x] **Desktop (~1280px):** content max-width sensible, not stretched — Sweep 7 (no overflow at 1280)
 - [x] Homepage `#info` / `#links` / recent-list reflow cleanly — Sweep 1/2 (mobile home no overflow Sweep 7)

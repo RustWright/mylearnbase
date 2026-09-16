@@ -71,25 +71,25 @@ fi
 section "JSON-LD (parse + @type) — all pages"
 read_json=$(python3 - <<'PY'
 import re, json, glob
-blocks=bad=0; bp=ws=bc=0
-VALID={"BlogPosting","WebSite","BreadcrumbList"}  # BreadcrumbList added Cycle 4
+blocks=bad=0; bp=ws=bc=pe=0
+VALID={"BlogPosting","WebSite","BreadcrumbList","Person"}  # BreadcrumbList Cycle 4; Person Cycle 6 (/resume/)
 for path in glob.glob("public/**/index.html", recursive=True):
     html=open(path,encoding='utf-8').read()
     for raw in re.findall(r'<script type=[^>]*ld\+json[^>]*>(.*?)</script>',html,re.DOTALL):
         blocks+=1
         try:
             t=json.loads(raw).get("@type")
-            bp+=t=="BlogPosting"; ws+=t=="WebSite"; bc+=t=="BreadcrumbList"
+            bp+=t=="BlogPosting"; ws+=t=="WebSite"; bc+=t=="BreadcrumbList"; pe+=t=="Person"
             if t not in VALID: bad+=1
         except Exception: bad+=1
-print(blocks,bad,bp,ws,bc)
+print(blocks,bad,bp,ws,bc,pe)
 PY
 )
-set -- $read_json; BLOCKS=$1; LDBAD=$2; BP=$3; WS=$4; BC=$5
+set -- $read_json; BLOCKS=$1; LDBAD=$2; BP=$3; WS=$4; BC=$5; PE=$6
 if [[ "$LDBAD" -eq 0 && "$BLOCKS" -gt 0 && "$BP" -gt 0 && "$WS" -gt 0 ]]; then
-  ok "$BLOCKS JSON-LD blocks valid (BlogPosting=$BP, WebSite=$WS, BreadcrumbList=$BC)"
+  ok "$BLOCKS JSON-LD blocks valid (BlogPosting=$BP, WebSite=$WS, BreadcrumbList=$BC, Person=$PE)"
 else
-  bad "JSON-LD problem (blocks=$BLOCKS invalid=$LDBAD BlogPosting=$BP WebSite=$WS BreadcrumbList=$BC)"
+  bad "JSON-LD problem (blocks=$BLOCKS invalid=$LDBAD BlogPosting=$BP WebSite=$WS BreadcrumbList=$BC Person=$PE)"
 fi
 
 # ── 5. <head> social surface on a sample post ────────────────────────────────

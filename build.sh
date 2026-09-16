@@ -26,6 +26,27 @@ else
   ZOLA="./zola"
 fi
 
+# Résumé drift check. The HTML page is the source of truth and the PDF is
+# generated from it (scripts/build-resume-pdf.sh), but that generation happens
+# LOCALLY — Cloudflare's build image is not guaranteed to carry a browser. So the
+# one thing CI can do is notice when the two have parted company.
+#
+# Warn, never fail: a stale download is worth shipping; a blocked deploy over a
+# résumé bullet is not. The point is that the drift is LOUD rather than silent.
+RESUME_SRC="content/resume/_index.md"
+RESUME_HASH="static/resume/.source-hash"
+if [ -f "$RESUME_SRC" ]; then
+  if [ -f "$RESUME_HASH" ]; then
+    if [ "$(shasum -a 256 "$RESUME_SRC" | awk '{print $1}')" != "$(cat "$RESUME_HASH")" ]; then
+      echo "WARNING: $RESUME_SRC changed since the PDF was generated."
+      echo "         The page and its download now disagree."
+      echo "         Fix with: bash scripts/build-resume-pdf.sh && git add static/resume/"
+    fi
+  else
+    echo "WARNING: no $RESUME_HASH — the résumé PDF has never been generated."
+  fi
+fi
+
 echo "Computing related posts (TF-IDF → related.json)…"
 python3 scripts/compute-related.py
 

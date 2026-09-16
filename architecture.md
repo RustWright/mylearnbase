@@ -166,6 +166,23 @@ Demos are **reactive reader experiences** embedded in otherwise-static pages. Ea
 
 **Why iframes, not WASM islands (the original plan):** an iframe isolates each demo's JS/CSS from the page and from sibling demos, needs no compile step or extra toolchain, and serves as a plain static file. The central design tension is that the demos are genuinely reactive content living inside a static-site build; the iframe boundary is what reconciles the two.
 
+### The homepage hero flock
+
+`static/js/hero-flock.js` is the one interactive that is **not** an iframe demo: it renders directly onto a canvas behind the homepage hero, with the pointer acting as the predator.
+
+It is a hand port of the flocking rules from the boids project's Rust core (`demo/boids-core/src/lib.rs`) — cohesion, separation, velocity-matching alignment, wall repulsion, and `flee` — running the tuned parameters from that project's `config.py`. It is the same simulation the *A Flock Is a Control Loop* post is about, not a lookalike.
+
+**Why a re-implementation rather than embedding the real demo.** The shipped flock is a 533KB WASM bundle. That is a reasonable cost for a page a reader chose to open and an unreasonable one for a front door. The rules themselves are about forty lines, so re-implementing is cheaper and more honest than either embedding the bundle or faking the motion. The port is ~4.7KB gzipped, roughly 112× smaller.
+
+**The parameters are a cross-repo dependency with no automated guard.** They originate in `~/life/masters_planning/projects/01_boids`, which is a separate repository and not a submodule here. It does not exist on the Cloudflare build machine, so there is no point in the build where both copies are in scope and no check can compare them. Retuning a rule there leaves this file silently stale. A comment in `hero-flock.js` is the only control, which is why that one is written to be hard to delete casually.
+
+**Two calibration decisions worth not undoing**, both recorded inline:
+
+- **Density, not count.** `POPULATION = 100` is tuned for a 1600×1200 world. A wide hero has roughly a third of that area, so carrying the number across triples the density and the flock collapses into a static separation lattice. The count is derived from world area instead.
+- **Units-per-pixel is the fixed quantity** (`K = 1.25`), not the world width. Fixing the world width instead makes zoom a function of viewport width — 3px boids on a phone against 12px on a laptop. Holding `K` fixed keeps boid size, rule radii, and boids-per-pixel identical at every width; the world dimensions follow from the canvas. Measured: 81 boids/megapixel at 1280px, 80 at 375px.
+
+Accessibility and cost: `prefers-reduced-motion: reduce` paints one settled frame and never starts the animation loop; the loop also stops on `visibilitychange` and when an `IntersectionObserver` reports the canvas off-screen.
+
 ---
 
 ## Risk Register
