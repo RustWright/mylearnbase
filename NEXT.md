@@ -1,15 +1,16 @@
 # NEXT — mylearnbase
 
-**Updated:** 2026-09-16 · Cycle 6. Parts 0–4 of the plan shipped: KaTeX fix, résumé, Projects, Playground, demo
-back-links, homepage router + header, hero flock, logo hover + door stagger, post descriptions + preview card.
+**Updated:** 2026-09-16 · Cycle 6 (Audience Routing) implementation complete and deployed (`099d03d`); Sweep 8
+recorded; Cycle 5 closed. Tracker `tasks.md`, queue `.omni/tasks.toml`, history `project.md`.
 
 ## Next action
-**Sweep 8 in `ui-checklist.md`**, recording the Cycle 6 verification already done (see "Do NOT re-survey"; no
-re-run needed). **Then cycle bookkeeping:** close Cycle 5 per `PROJECT_PROCESS.md` § Cycle Closure (every Cycle 5
-task is done), write the Cycle 6 `tasks.md` from the plan, update `project.md`'s session log, and delete the
-`mylearnbase-site-backlog.md` memory note plus its `MEMORY.md` line. Plan: `~/.claude/plans/could-you-look-into-abstract-kahn.md`.
+**Not chosen yet: ask the user.** Derived from state, not priority: Cycle 6 is still open (hub `0016`, XS: Phase D
+only; no curiosities were logged, so just the logbook-demo question), then Cycle 7 planning (`0017`). The biggest
+standing item is the user's ASD-STE100 writing standard (`0003`, notes at the foot of `tasks.md`).
 
 ## Decisions in force
+- **Cycle 5 closed with no code review, and none is scheduled** (user, 2026-09-16). That choice was made for
+  Cycle 5; ask before assuming it for Cycle 6. Cycle 5 curiosities: no survivors (`0006` cut).
 - **Copy approved by the user (2026-09-16):** tagline, `/posts/` subtitle, Now line, form copy, all 32 descriptions.
 - **Descriptions:** chosen once in `_head_extend.html`. A published page without one fails the build (drafts fall
   back). Publish tools take `--description`, keep it, and refuse before writing. `zola check` does NOT catch it.
@@ -26,13 +27,13 @@ task is done), write the Cycle 6 `tasks.md` from the plan, update `project.md`'s
   hook fast-forwarding it. **Never `update = none`:** clones obey it, so Cloudflare built without the theme.
 
 ## Do NOT re-survey
-- **Verified:** KaTeX, flocks, PDF, demo chrome, Playground, Projects, homepage, `/posts/`, header, motion
-  (1280/375, both schemes, reduced motion, Lighthouse 99/CLS 0). 35 post/project pages: unique descriptions,
-  search/og/twitter/JSON-LD agree. Gate proven (fails build, drafts exempt). Tools tested in a scratch site.
-  SEO audit passes (Lighthouse SEO 100). Editorial guides republished and in sync with their posts.
-- ⚠️ Minified HTML omits `</head>`. `http.server` sends no `Cache-Control`. Extra Playwright contexts need `bringToFront()`.
+- **Sweep 8 is the verification record** (`ui-checklist.md`): KaTeX, résumé/PDF, Projects, Playground, demo chrome,
+  homepage, header, motion, descriptions, SEO audit (148 JSON-LD, Lighthouse SEO 100), homepage perf 99 / CLS 0.
+- **Live site checked after the fix deploy:** home, `/resume/`, `/projects/`, `/playground/`, a post, the card.
+- ⚠️ Minified HTML omits `</head>` and puts `content` before `name`. Extra Playwright contexts need `bringToFront()`.
+- ⚠️ `PROJECT_PROCESS.md` has no "§ Cycle Closure"; closing a cycle is Session 6 (Phases A–D).
 
 ## Open threads
-- **Unscheduled:** 12 standalone demo pages lack a meta description; front-matter template body is the old format.
-- **Résumé polish, deferred:** page 2 ~40% full; "Best Graduating Student" listed twice; accent colour.
-- **Demo/site theme mismatch, pre-existing:** demos follow `prefers-color-scheme`, the site has a toggle.
+- All queued in `.omni/tasks.toml`: demo-page meta descriptions (`0011`), stale front-matter template body (`0012`),
+  résumé polish (`0013`, deferred by the user), demo theme toggle (`0014`), untested checklist rows (`0007`, `0008`).
+- **Untested:** whether the door stagger shows after a speculation-rules prerender of `/`.

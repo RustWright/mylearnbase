@@ -202,11 +202,15 @@ The Cycle 1 launch target. Recorded here for trajectory; most "deferred" items h
 
 Cloudflare does **not** pre-install Zola or run a post-build step, so `build.sh` owns the whole pipeline:
 
-1. Fetch Zola v0.22.1 if it isn't already on `PATH` (reused locally, downloaded in CI).
-2. `zola build` → `public/`.
-3. `npx pagefind --site public` → search index in `public/pagefind/`.
+1. Fetch Zola v0.22.1 if it isn't already on `PATH`.
+2. Drift checks that warn and never fail: the résumé PDF, the link-preview card, the age of the Now line.
+3. Generate the gitignored artifacts: `download-sizes.json`, `related.json`, `static/demos/_shared/demos.json`.
+4. `zola build` → `public/`, then `build-demo-index.py --verify public` (every demo back-link must exist).
+5. `npx pagefind --site public` → search index in `public/pagefind/`.
 
 Running `bash build.sh` locally reproduces production output exactly, including the Pagefind index that a plain `zola serve` cannot generate (so search is a prod-only feature in dev). mdBook docs deploy independently via GitHub Actions to GitHub Pages.
+
+**The theme is pinned by its recorded commit, and nothing else.** `themes/serene` is a submodule, so the repo records one exact commit (v5.6.1) and every clone checks that out. `.gitmodules` also carries `pinned = true`, a key git ignores: only the session hook (`~/.dotfiles/scripts/session-start.sh`) reads it, to stop fast-forwarding the theme the way it does the project submodules. **Never mark it `update = none` instead.** Git honours that in every clone, Cloudflare's included, which then skips the theme and fails the build on a missing `theme.toml`; four deploys failed that way on 2026-09-16. A clone that ran `git submodule init` while that key was set keeps a copy in its local config, so use `git submodule update --init --checkout themes/serene` to restore it.
 
 ---
 
@@ -309,6 +313,21 @@ The design-review prototype stays at `/demos/mylearnbase/hero-flock/`, marked `n
 ---
 
 ## Architecture Revision History
+
+### Cycle 6 (2026-09-15 → 2026-09-16)
+
+**Trigger:** The front door was organised by post form, an author's taxonomy, and gave a first-time visitor no route. Recruiters, project browsers and explorers had no surface to arrive at.
+
+**Changes:**
+| Aspect | Before | After |
+|--------|--------|-------|
+| Homepage | Hero + five-form guide + Latest | Hero flock + three intent doors + Now line + Latest; form guide on `/posts/` |
+| Header nav | Posts · Logbook · Tags | Projects · Playground · Posts · Résumé, logo mark inlined |
+| Destinations | None | `/resume/` (page + generated PDF), `/projects/`, `/playground/` |
+| Demos | Dead ends when opened standalone | Derived `demos.json`, back-link chrome, poster tiles |
+| Descriptions | None authored; two disagreeing fallbacks | One chain in `_head_extend.html`; published posts must set one |
+| Preview card | One-off PNG | Rendered from source, drift-checked |
+| Motion | None | Hero flock, logo hover, door stagger; all behind reduced-motion |
 
 ### Cycle 5 (2026-06-30)
 

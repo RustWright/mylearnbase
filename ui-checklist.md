@@ -5,7 +5,7 @@ Modeled on `omni-me/ui-checklist.md`, content-shifted for a **static content sit
 
 Legend: `[ ]` not yet verified • `[x]` verified pass • `[!]` known issue/gap to fix
 
-Last swept: 2026-06-30 (Sweep 7 — Cycle 5: post-Cycle-4 feature catch-up + content-based prev/next verification)
+Last swept: 2026-09-16 (Sweep 8, Cycle 6: audience routing, destination surfaces, motion, post descriptions)
 
 ---
 
@@ -27,14 +27,14 @@ Last swept: 2026-06-30 (Sweep 7 — Cycle 5: post-Cycle-4 feature catch-up + con
 
 ## Homepage (`/`)
 
-- [x] Above-the-fold communicates what the site IS (tagline "I build things to learn — and write down how." + value-prop naming logbooks / workflows / interactive demos) — Sweep 2
+- [x] Above-the-fold communicates what the site IS — Sweep 8: tagline "I build things to learn, then write down how." over the hero flock, then three intent doors (Projects / Playground / Résumé), all visible without scrolling at 375px. The old value-prop paragraph is now the `/posts/` subtitle.
 - [x] Clear value proposition / hero — bold `#name`, tagline, value-prop paragraph — Sweep 2
 - [x] Recent posts surface is scannable (title, form badge, date legible)
 - [x] Social links present — GitHub + LinkedIn (`linkedin.com/in/efe-erhie`) both render in `#right` — Sweep 2
 - [x] Avatar / logo slot renders — Sweep 5 (logo mark via `favicon.svg`; theme circle-crop overridden so the full mark shows)
 - [x] Theme toggle present and works
-- [x] Visual hierarchy: eye lands on the most important thing first — Sweep 2 (hero → value-prop → guide → latest)
-- [x] No awkward empty space / orphaned sections — "What you'll find here" guide fills the page; was sparse — Sweep 2
+- [x] Visual hierarchy: eye lands on the most important thing first — Sweep 8 (hero → doors → "browse every post" → Now line → Latest 5). The five-form guide moved to `/posts/`.
+- [x] No awkward empty space / orphaned sections — Sweep 8 (removed the gap between doors and Now; doors, Now and Latest share one 15px inset)
 - [ ] Footer / copyright correct (homepage runs `footer = false`; verify on inner pages)
 
 ## Post page (`/posts/<form>/<slug>/`)
@@ -55,15 +55,23 @@ Last swept: 2026-06-30 (Sweep 7 — Cycle 5: post-Cycle-4 feature catch-up + con
 
 ## List / aggregator pages
 
-- [x] `/posts/` split-by-form aggregator groups correctly (logbook / concepts / workflows / opinions / resources / archive) — Sweep 1, re-confirmed Sweep 7 (builds clean)
+- [x] `/posts/` split-by-form aggregator groups correctly (logbook / concepts / workflows / opinions / resources / archive) — Sweep 1, re-confirmed Sweep 7 (builds clean). Sweep 8: each form heading carries its one-line guide description; headings were unstyled (browser-default blue, 15px out of line) and are now styled.
 - [x] Each form section heading links to its section page — Sweep 1/7
-- [x] Empty-form sections note "no content yet" gracefully — Sweep 1/7 (opinions + resources still empty; concepts now has 1)
+- [x] Empty-form sections note "no content yet" gracefully — Sweep 1/7 (as of Sweep 8 only opinions is empty; 32 published: logbook 11, concepts 5, workflows 6, resources 1, archive 9)
 - [x] Section pages (`/posts/logbook/` etc.) list their posts — Sweep 7 (9 sections build, 0 orphan)
 - [x] Tag landing + per-tag pages work — Sweep 7 (`/tags/` + 49 per-tag pages; `/series/` + 3)
 
+## Destination surfaces (Cycle 6)
+
+- [x] **Résumé** `/resume/` (alias `/cv/`) — Sweep 8: one template renders page and PDF; PDF is 2 pages with the font embedded; print shows no screen chrome; `Person` JSON-LD parses; no email, phone or address, and both leak guards were proven to fire on a leaky build.
+- [x] **Projects** `/projects/` + omni-me / mylearnbase / boids pages — Sweep 8: 1280/375, both schemes; every card link resolves.
+- [x] **Playground** `/playground/` — Sweep 8: 11 tiles (`hero-flock` is `noindex`), 3 heavy tiles show content-addressed posters and open on click, 3→1 columns, 0 console errors, no sideways scroll, 11/11 links resolve.
+- [x] **Demo back-links** — Sweep 8: standalone, 12/12 demos mount the bar with 0 errors and nothing covered; embedded, 10/10 iframes carry the script and render **no** bar. `build-demo-index.py` reports 12 on disk, 10 linked, 0 broken embeds.
+- [x] **Motion** (front door and header chrome only) — Sweep 8, Chromium only: hero flock flees the pointer (density near it fell 64%) and pauses off-screen; logo spark turns on hover and `:focus-visible` with no clipping; doors stagger in, and hover lift still works after. Reduced motion: one static flock frame, no animations, no hover transforms. Untested: whether the door stagger shows after a speculation-rules prerender of `/`.
+
 ## Navigation & Search
 
-- [x] Header/nav links resolve (no 404s) — Sweep 7 (3 nav entries: Posts / Logbook / Tags; `zola check` clean). Slim nav is intentional (empty forms stay off the header, linked on the homepage guide).
+- [x] Header/nav links resolve (no 404s) — Sweep 8 (`extra.nav` = Projects · Playground · Posts · Résumé, logo mark before the wordmark; all 12 homepage + header links 200). Below 575px the wordmark and Posts hide: the full row measured 505px, so 575px leaves slack, and the header fits at 320px.
 - [ ] Active section visually distinguished — not tested this sweep
 - [ ] Instant-nav (`class="instant"`) works without full reload — not tested this sweep
 - [x] 404 page renders with recovery link — Sweep 7 (`404.html` builds with "back to home")
@@ -100,16 +108,16 @@ Last swept: 2026-06-30 (Sweep 7 — Cycle 5: post-Cycle-4 feature catch-up + con
 ## Performance
 
 - [ ] Images sized appropriately (no oversized assets) — not measured this sweep
-- [ ] No layout shift on load (CLS) — not measured this sweep (Lighthouse perf category not run)
+- [x] No layout shift on load (CLS) — Sweep 8, homepage only: Lighthouse perf 99, CLS 0, TBT 0, LCP 1.8s (the Now paragraph). A 0.0009 shift on `#text` was fixed with `flex-shrink: 0` on the avatar (CLS 0 in 5/5 runs). Motion changed nothing (3 runs each, identical). Post pages not measured.
 - [x] Fonts load without blocking / FOUT jank — Sweep 4 (OpenDyslexic `font-display: swap`, loaded on demand)
 - [x] `minify_html` output is clean — Sweep 7 (build clean with `minify_html = true`)
-- [x] No console errors or warnings — Sweep 7 (concepts post in browser: **0 errors / 0 warnings** with header.js + reader-controls.js + search.js + demo iframe all live)
+- [x] No console errors or warnings — Sweep 7 (concepts post in browser: **0 errors / 0 warnings** with header.js + reader-controls.js + search.js + demo iframe all live). Sweep 8: 0 errors on the homepage, `/playground/` and all 12 standalone demos.
 
 ## SEO / Social surface (cross-checks Phase 2/3)
 
-- [x] `<title>` + `<meta name="description">` present and per-page correct — Sweep 3 (Lighthouse SEO `document-title` + `meta-description` pass)
-- [x] **OpenGraph + Twitter cards** render — Sweep 3 (og:site_name/title/description/type/url/locale + twitter:card/title/description); **og:image + twitter:image wired Sweep 5** (1200×630 card, `summary_large_image`)
-- [x] **JSON-LD** structured data present + parses — Sweep 3 (`BlogPosting` on leaf posts, `WebSite` on home/sections; all valid JSON). Schema-field validity confirmed Sweep 6 — `validator.schema.org` returns **0 errors / 0 warnings** against the live site.
+- [x] `<title>` + `<meta name="description">` present and per-page correct — Sweep 3 (Lighthouse SEO `document-title` + `meta-description` pass). **Sweep 8:** "present" had hidden a real gap. No post set `description`, so every post fell back to the `/posts/` section's text. All 32 published posts now carry an authored one, chosen in one place (`_head_extend.html`), and `zola build` fails on a published post without one (`zola check` does not render templates, so it can't catch this). 35 post/project pages: unique descriptions, and search/og/twitter/JSON-LD agree.
+- [x] **OpenGraph + Twitter cards** render — Sweep 3 (og:site_name/title/description/type/url/locale + twitter:card/title/description); **og:image + twitter:image wired Sweep 5** (1200×630 card, `summary_large_image`). Sweep 8: the card is rendered from source (`scripts/build-og-card.py`; `build.sh` warns when stale) and carries the new tagline.
+- [x] **JSON-LD** structured data present + parses — Sweep 3 (`BlogPosting` on leaf posts, `WebSite` on home/sections; all valid JSON). Schema-field validity confirmed Sweep 6 — `validator.schema.org` returns **0 errors / 0 warnings** against the live site. Sweep 8: 148 blocks valid (BlogPosting 35 / WebSite 77 / BreadcrumbList 35 / Person 1); the audit allowlist learned `Person`.
 - [x] `<link rel="canonical">` present — Sweep 3 (per-page `page.permalink` / `section.permalink`)
 - [x] Favicon resolves (no 404) — Sweep 5 (SVG favicon + 16/32/180 PNGs + apple-touch; all 200)
 - [x] `sitemap.xml`, `robots.txt`, `llms.txt` reachable at root — Sweep 3 (`robots.txt` now custom AI-welcoming + production `Sitemap:`; `llms.txt` served)
@@ -384,3 +392,42 @@ dark); CLS / image-sizing (Lighthouse performance category not run).
 **Verdict:** site is healthy. All Cycle-4 features confirmed live, the Cycle-5 content-based
 prev/next verified in-browser, the SEO audit is green again (harness drift fixed), and no
 regressions. `ui-checklist.md` is current as of Cycle 5.
+
+### Sweep 8 — 2026-09-16 (Cycle 6: audience routing, destination surfaces, motion, post descriptions)
+
+**Why:** Cycle 6 rebuilt the front door around visitor intent (recruiter, project browser,
+explorer), added three destination surfaces, fixed KaTeX overflow, added motion, and made post
+descriptions mandatory. Each part was verified as it shipped; this entry records those results
+rather than re-running them.
+
+**Method:** `bash build.sh` (compute-related, demo index, résumé and preview-card drift checks,
+Zola, Pagefind) + `zola check --skip-external-links` + `scripts/seo-audit.sh` + Playwright on
+`zola serve` at 1280px and a true 375px viewport, light and dark, with console capture +
+Lighthouse performance on `/` (3 to 5 runs per variant).
+
+**Results:**
+- **KaTeX overflow found and fixed.** The first narrow measurement of a post found 162px of lateral
+  scroll from three display equations (see the Post page and Responsive rows, and the methodology
+  note on the 375px row).
+- **New surfaces verified:** résumé + PDF, Projects, Playground, demo back-links in both contexts,
+  motion with reduced motion honoured. Details in "Destination surfaces".
+- **Homepage and header:** doors above the fold at 375px, header fits at 320px, 12/12 links 200.
+- **Descriptions:** every published post has its own; the build gate fails a published post
+  without one and exempts drafts (both proven).
+- **Audit:** 148 JSON-LD blocks valid, Lighthouse SEO 100/100 on home and a sample post.
+  Homepage perf 99, CLS 0.
+
+**Found after the sweep (deploy, not UI):** four pushes on 2026-09-16 failed on Cloudflare.
+Marking `themes/serene` with `update = none` (meant only for the session hook) made every clone,
+Cloudflare's included, skip the theme. Replaced with a hook-only `pinned = true` key; a fresh
+clone plus full `build.sh` passed before pushing, and the deploy of `099d03d` succeeded.
+
+**Known-benign:** Pagefind lists every redirect-alias stub (`/cv/` and the archive aliases) as
+having no `<html>` element, as in Sweep 7.
+
+**Still open:** Mermaid and `superseded_by` (wired, unexercised); active-section highlight and
+instant-nav; focus states and keyboard nav beyond the logo; light-mode fresh contrast measurement;
+image sizing; CLS on post pages; the 12 standalone demo pages have no meta description.
+
+**Verdict:** healthy and current as of Cycle 6. Every new surface verified at both widths and in
+both schemes, no regressions in the audit, and the site is deployed.

@@ -1,28 +1,28 @@
 schema  = 1
 project = "mylearnbase"
-cycle   = 5
-updated = 2026-08-30
+cycle   = 6
+updated = 2026-09-16
 
-# All five Cycle-5 tasks in tasks.md are closed. The live queue below comes from
-# three places tasks.md does not index: the un-checkboxed user notes at its foot,
-# ui-checklist.md, and the parent-synced curiosity log.
+# Cycle 6 (audience routing) shipped; every task in tasks.md is done. The live queue
+# below comes from what tasks.md only lists as notes: the user's writing-standard
+# notes at its foot, the open threads, and the untested ui-checklist rows.
 # Contract: ../../setup_files/TASK_HUB_CONTRACT.md
 
 [[task]]
 id     = "mylearnbase-0001"
-title  = "Close Cycle 5 — run the Session 6 review and the cycle-close pass"
-status = "todo"
+title  = "Close Cycle 5"
+status = "done"
 size   = "M"
-ref    = "tasks.md § Tasks 1-5; project.md status line"
-note   = "All five tasks are DONE but project.md still reads 'Cycle 5 in progress'."
+ref    = "project.md, Cycle 5 close"
+note   = "Closed 2026-09-16 without a code review (user decision); no curiosity survivors."
 
 [[task]]
 id     = "mylearnbase-0002"
 title  = "Plan Cycle 6"
-status = "blocked"
+status = "done"
 size   = "M"
-ref    = "project.md"
-blocked_by = ["mylearnbase-0001"]
+ref    = "tasks.md; project.md, Cycle 6 entry"
+note   = "Planned and run as the audience-routing plan."
 
 [[task]]
 id     = "mylearnbase-0003"
@@ -51,38 +51,94 @@ note   = "User's hypothesis: an unreasonably tight budget forces better word sel
 [[task]]
 id     = "mylearnbase-0006"
 title  = "Turn the two surviving Cycle-5 curiosities into concept posts"
-status = "todo"
+status = "cut"
 size   = "M"
 tags   = ["post-system"]
-ref    = "curiosities/mylearnbase/cycle-5.md (parent repo); editorial/concepts.md"
-note   = "Lexical vs semantic similarity on a single-author corpus; and where build-time computation should live."
+ref    = "curiosities/mylearnbase/cycle-5.md (parent repo), cycle-close review"
+note   = "Cycle-close review 2026-09-16: neither survived (user decision). Similarity is largely covered by the TF-IDF post; build placement has nothing to demo."
 
 [[task]]
 id     = "mylearnbase-0007"
-title  = "Sweep the nine ui-checklist items never tested in Sweep 7"
+title  = "Sweep the ui-checklist items still untested after Sweep 8"
 status = "todo"
 size   = "S"
-ref    = "ui-checklist.md"
-note   = "Focus states, keyboard nav, active-section, instant-nav, code-block scroll, image sizing, CLS, footer on inner pages, light-mode fresh measure."
+ref    = "ui-checklist.md, Sweep 8 'Still open'"
+note   = "Focus states and keyboard nav beyond the logo, active-section, instant-nav, code-block scroll, image sizing, CLS on post pages, footer on inner pages, light-mode fresh measure."
 
 [[task]]
 id     = "mylearnbase-0008"
-title  = "Exercise KaTeX, Mermaid and superseded_by with real content"
+title  = "Exercise Mermaid and superseded_by with real content"
 status = "todo"
 size   = "S"
-ref    = "ui-checklist.md — the three 'unexercised' rows"
-note   = "All three are wired in post.html and verified by reading, but no live post sets extra.math, extra.mermaid or superseded_by."
+ref    = "ui-checklist.md, the 'unexercised' rows"
+note   = "KaTeX is now exercised (A Flock Is a Control Loop). Both remaining features are wired in post.html but no live post uses them."
 
 [[task]]
 id     = "mylearnbase-0009"
 title  = "Implement privacy-preserving analytics"
 status = "shelved"
-ref    = "ui-checklist.md Tier 2; tasks.md § Notes — Out of scope"
+ref    = "ui-checklist.md Tier 2; project.md, Cycle 5 Task 4"
 note   = "The privacy/colophon page shipped in Cycle-5 Task 4; the analytics implementation itself was deliberately left out."
 
 [[task]]
 id     = "mylearnbase-0010"
 title  = "Rework the tagging strategy"
 status = "shelved"
-ref    = "tasks.md § Notes — Out of scope"
-note   = "Flagged volatile but deliberately not changed in Cycle 5; Task 3 was designed to avoid depending on tags."
+ref    = "project.md, Cycle 5 entry"
+note   = "Flagged volatile but deliberately not changed in Cycle 5; related posts were designed to avoid depending on tags."
+
+[[task]]
+id     = "mylearnbase-0011"
+title  = "Add meta descriptions to the standalone demo pages"
+status = "todo"
+size   = "S"
+ref    = "tasks.md § Notes, open threads"
+note   = "12 static index.html pages under static/demos/. The build's description gate only covers Zola-rendered pages."
+
+[[task]]
+id     = "mylearnbase-0012"
+title  = "Rewrite the front-matter template body for the current post forms"
+status = "todo"
+size   = "XS"
+ref    = "content/posts/.frontmatter-template.md"
+note   = "The body still describes the old Reflections/Tutorial format; the field table is current."
+
+[[task]]
+id     = "mylearnbase-0013"
+title  = "Polish the résumé PDF layout"
+status = "todo"
+size   = "S"
+ref    = "tasks.md § Notes, open threads"
+note   = "Deferred by the user. Page 2 is ~40% full, one award is listed twice, accent colour."
+
+[[task]]
+id     = "mylearnbase-0014"
+title  = "Make demos follow the site's theme toggle"
+status = "todo"
+size   = "M"
+ref    = "architecture.md, The Playground"
+note   = "Demos read prefers-color-scheme, so a visitor who toggles the site sees mismatched demos. Nine stylesheets need a theme attribute."
+
+[[task]]
+id     = "mylearnbase-0015"
+title  = "Set up an efeerhie.com email alias, then add contact email to the résumé"
+status = "shelved"
+size   = "USER"
+ref    = "project.md, Cycle 6 entry (résumé)"
+note   = "Parked by the user. No email appears on the résumé until the alias exists."
+
+[[task]]
+id     = "mylearnbase-0016"
+title  = "Close Cycle 6"
+status = "todo"
+size   = "XS"
+ref    = "project.md, Cycle 6 entry"
+note   = "Implementation complete 2026-09-16. Phase D remains: no curiosities were logged; decide whether any Cycle 6 feature wants a logbook demo."
+
+[[task]]
+id     = "mylearnbase-0017"
+title  = "Plan Cycle 7"
+status = "blocked"
+size   = "M"
+ref    = "project.md"
+blocked_by = ["mylearnbase-0016"]
