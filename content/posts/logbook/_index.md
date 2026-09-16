@@ -1,6 +1,6 @@
 +++
 title = "Logbook"
-description = "Implementation logs — feature-specific records of what shipped, why, and how to verify it works"
+description = "Implementation logs from real projects on My Learn Base. Each entry records one shipped feature, why it was built, and how to check that it works."
 sort_by = "date"
 template = "blog.html"
 page_template = "post.html"
@@ -9,7 +9,7 @@ insert_anchor_links = "right"
 [extra]
 lang = "en"
 title = "Logbook"
-subtitle = "Implementation logs — feature-specific records of what shipped, why, and how to verify it works"
+subtitle = "Implementation logs from real projects. Each entry records one shipped feature, why it was built, and how to check that it works."
 date_format = "%b %-d, %Y"
 categorized = false
 back_to_top = true

@@ -1,6 +1,6 @@
 +++
 title = "Concepts"
-description = "Interactive demos built to come to understand concepts — each post centers a runnable artifact"
+description = "Concept posts from My Learn Base. Each one works through an idea with an interactive demo you can run in the page."
 sort_by = "date"
 template = "blog.html"
 page_template = "post.html"
@@ -9,7 +9,7 @@ insert_anchor_links = "right"
 [extra]
 lang = "en"
 title = "Concepts"
-subtitle = "Interactive demos built to come to understand concepts — each post centers a runnable artifact"
+subtitle = "Ideas I wanted to understand, each worked through with an interactive demo you can run in the page."
 date_format = "%b %-d, %Y"
 categorized = false
 back_to_top = true

@@ -1,5 +1,6 @@
 +++
 title = "Dev Setup From Scratch: Claude Code, Dotfiles & Git Submodules"
+description = "Reproducing a development setup on a new machine with Claude Code, a dotfiles repo and git submodules, so work moves between computers without manual syncing."
 slug = "dev-setup-from-scratch"
 aliases = ["/posts/dev-setup-from-scratch/"]
 date = 2026-02-24

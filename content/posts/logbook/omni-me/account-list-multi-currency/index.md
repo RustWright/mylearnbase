@@ -1,5 +1,6 @@
 +++
 title = "Account list with multi-currency balance aggregation"
+description = "The omni-me Accounts screen, listing each account's balance in every currency it holds, plus one total converted to the base currency."
 slug = "account-list-multi-currency"
 date = 2026-05-23
 updated = 2026-05-24

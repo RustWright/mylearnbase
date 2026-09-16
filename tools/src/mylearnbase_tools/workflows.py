@@ -23,7 +23,9 @@ from pathlib import Path
 from . import _frontmatter, _shared
 
 
-_PRESERVED_KEYS = ("date", "draft", "taxonomies.tags", "extra.outdate_alert_days")
+# Keys written on the post rather than derived from the source doc. The
+# frontmatter is rebuilt on every publish, so anything missing here is dropped.
+_PRESERVED_KEYS = ("date", "draft", "description", "taxonomies.tags", "extra.outdate_alert_days")
 
 
 def _slugify(title: str) -> str:
@@ -67,6 +69,7 @@ def _build_fields(
     is_republish: bool,
     draft_flag: bool,
     preserved: dict[str, object],
+    description: str | None,
 ) -> dict[str, object]:
     if is_republish:
         fields: dict[str, object] = {
@@ -76,17 +79,22 @@ def _build_fields(
             "updated": today,
             "draft": draft_flag if draft_flag else preserved.get("draft", False),
         }
+        if description:
+            fields["description"] = description
         if "taxonomies.tags" in preserved:
             fields["taxonomies"] = {"tags": preserved["taxonomies.tags"]}
         if "extra.outdate_alert_days" in preserved:
             fields["extra"] = {"outdate_alert_days": preserved["extra.outdate_alert_days"]}
         return fields
-    return {
+    fields = {
         "title": title,
         "slug": slug,
         "date": today,
         "draft": draft_flag,
     }
+    if description:
+        fields["description"] = description
+    return fields
 
 
 def _render_post(fields: dict[str, object], body: str) -> str:
@@ -164,7 +172,12 @@ def cmd_publish(args: argparse.Namespace) -> int:
     if is_republish:
         preserved = _frontmatter.read_keys(dest, _PRESERVED_KEYS)
 
-    fields = _build_fields(title, final_slug, today, is_republish, args.draft, preserved)
+    description = args.description if args.description is not None else preserved.get("description")
+    fields = _build_fields(title, final_slug, today, is_republish, args.draft, preserved, description)
+    problem = _shared.description_problem(fields["draft"], fields.get("description"))
+    if problem and not args.dry_run:
+        print(f"workflows: {problem}", file=sys.stderr)
+        return 1
 
     dest.parent.mkdir(parents=True, exist_ok=True)
     body_rewritten, images_copied = _shared.copy_and_rewrite_referenced_images(
@@ -183,6 +196,8 @@ def cmd_publish(args: argparse.Namespace) -> int:
             )
         )
         print(diff or f"(no changes for {dest})")
+        if problem:
+            print(f"\n(a real publish would be refused: {problem})")
         if args.supersede_from and old_dest is not None:
             print(f"\n(supersession would also add `extra.superseded_by = \"posts/workflows/{final_slug}.md\"` to {old_dest})")
         return 0
@@ -211,6 +226,8 @@ def cmd_publish(args: argparse.Namespace) -> int:
     updated_line = f"  updated = {fields['updated']}" if "updated" in fields else ""
     print(f"  date = {fields['date']}{updated_line}")
     print(f"  draft = {'true' if fields['draft'] else 'false'}")
+    if fields.get("description"):
+        print(f"  description = {fields['description']!r}")
     if images_copied:
         print(f"  copied images: {', '.join(images_copied)}")
     if args.supersede_from and old_dest is not None:
@@ -231,6 +248,11 @@ def main(argv: list[str] | None = None) -> int:
     p_pub.add_argument("--slug", help="Override the auto-slugified slug.", default=None)
     p_pub.add_argument("--title", help="Override the title from the source doc's H1.", default=None)
     p_pub.add_argument("--draft", action="store_true", help="Publish/republish as draft=true.")
+    p_pub.add_argument(
+        "--description",
+        default=None,
+        help="One-sentence post description (search snippet and link preview). Kept on republish unless passed again. Required unless --draft.",
+    )
     p_pub.add_argument("--dry-run", action="store_true", help="Print the diff without writing.")
     p_pub.add_argument(
         "--supersede-from",

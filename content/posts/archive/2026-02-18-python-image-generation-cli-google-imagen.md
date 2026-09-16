@@ -1,5 +1,6 @@
 +++
 title = "Building a Python Image Generation CLI with Google Imagen 4"
+description = "A Python CLI for generating images with Google's Imagen 4, plus a compositor that adds speech bubbles, and a note on prototyping in Python versus Rust."
 slug = "python-image-generation-cli-google-imagen"
 aliases = ["/posts/python-image-generation-cli-google-imagen/"]
 date = 2026-02-18

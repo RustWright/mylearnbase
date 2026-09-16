@@ -1,6 +1,6 @@
 +++
 title = "omni-me Logbook"
-description = "Implementation logs for omni-me — a Rust/Tauri/Dioxus personal-data app"
+description = "Implementation logs for omni-me, an offline-first personal app built in Rust with Tauri and Dioxus."
 sort_by = "date"
 template = "blog.html"
 page_template = "post.html"
@@ -10,7 +10,7 @@ transparent = true
 [extra]
 lang = "en"
 title = "omni-me Logbook"
-subtitle = "Implementation logs for omni-me — a Rust/Tauri/Dioxus personal-data app"
+subtitle = "Implementation logs for omni-me, an offline-first personal app built in Rust with Tauri and Dioxus."
 date_format = "%b %-d, %Y"
 categorized = false
 back_to_top = true

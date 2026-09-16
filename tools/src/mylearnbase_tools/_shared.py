@@ -163,6 +163,22 @@ def strip_empty_sections(body: str, required_headers: list[str] | None = None) -
     return "".join(out).strip() + "\n"
 
 
+def description_problem(draft: object, description: object) -> str | None:
+    """Why this publish would ship a post without a description, or None if it wouldn't.
+
+    A published post's `description` is its search snippet and its link-preview
+    text, so a non-draft post must carry one. Publish tools call this BEFORE
+    writing anything, so a refused publish leaves nothing half-written. Drafts are
+    exempt: Zola does not render them.
+    """
+    if draft or description:
+        return None
+    return (
+        "a published post needs a description (it is the search snippet and the "
+        'link-preview text). Pass --description "...", or publish as a draft.'
+    )
+
+
 def zola_check(content_root: Path, skip_external_links: bool = True) -> tuple[int, str]:
     """Run `zola check` from a Zola site root. Returns (returncode, combined_output).
 

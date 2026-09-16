@@ -119,6 +119,13 @@ author hadn't made and a punctuation habit (heavy em-dashes) the
 author wouldn't use. Watch for both: better a plain honest sentence
 than a borrowed one.
 
+**The frontmatter `description` is descriptive prose too**, so the LLM
+drafts it and the author approves. Keep it to one sentence of about 160
+characters at most. It is the post's search snippet and link-preview
+text, the line a technical reader sees before deciding to open the post. Name
+the idea and what the demo lets the reader do. The site build fails on
+a published post without one.
+
 ## The demo
 
 Two cross-form notes:

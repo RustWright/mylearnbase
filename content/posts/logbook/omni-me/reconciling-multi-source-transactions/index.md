@@ -1,5 +1,6 @@
 +++
 title = "Reconciling multi-source transactions"
+description = "Matching the same money movement across receipts, bank feeds and imported statements in omni-me, so the journal stops counting it twice."
 slug = "reconciling-multi-source-transactions"
 date = 2026-05-26
 draft = false

@@ -140,6 +140,26 @@ body.homepage {
     transform: none;
   }
 }
+/* Doors arrive one after another on load. The fill mode is `backwards`, not
+   `both`: it holds the start frame through each delay and then lets go. A fill
+   that kept the end frame would keep overriding `transform`, and the hover
+   lift above would stop working. Inside no-preference, so without motion the
+   doors are simply there. */
+@media (prefers-reduced-motion: no-preference) {
+  .door,
+  .door-more {
+    animation: door-in 0.4s ease-out backwards;
+  }
+  .door:nth-child(2) { animation-delay: 0.08s; }
+  .door:nth-child(3) { animation-delay: 0.16s; }
+  .door-more { animation-delay: 0.24s; }
+}
+@keyframes door-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
 
 /* ── Homepage section headings (Now, Latest) ───────────────────── */
 .home-heading {
@@ -412,6 +432,26 @@ html[data-reader-font="dyslexic"] article.prose {
   display: block;
   width: 1.35em;
   height: 1.35em;
+}
+/* Logo hover: the spark turns and grows a little while the base bar widens.
+   `transform-box: fill-box` centres each shape's transform on the shape
+   itself. SVG content otherwise transforms about the viewBox's top-left
+   corner, which would swing the spark off the mark instead of turning it.
+   Everything sits inside no-preference, so with reduced motion there is no
+   rule to undo. */
+@media (prefers-reduced-motion: no-preference) {
+  .site-header__mark .logo-spark,
+  .site-header__mark .logo-base {
+    transform-box: fill-box;
+    transform-origin: center;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .site-header__brand:is(:hover, :focus-visible) .logo-spark {
+    transform: rotate(15deg) scale(1.1);
+  }
+  .site-header__brand:is(:hover, :focus-visible) .logo-base {
+    transform: scaleX(1.25);
+  }
 }
 
 .site-header__nav {

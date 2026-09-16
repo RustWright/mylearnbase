@@ -1,5 +1,6 @@
 +++
 title = "Two Languages, Two Bottlenecks"
+description = "Scaling a boids simulation in Python and Rust. Why NumPy beat a spatial grid below about 500 boids, and why memory layout is the last lever in Rust."
 slug = "two-languages-two-bottlenecks"
 date = 2026-08-22
 draft = false

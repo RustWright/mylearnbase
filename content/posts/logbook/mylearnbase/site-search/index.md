@@ -1,5 +1,6 @@
 +++
 title = "Site search"
+description = "Full-text search across every post, opened from the header, the / key or Cmd/Ctrl-K, and built on Pagefind so it runs entirely in the browser."
 slug = "site-search"
 date = 2026-06-25T12:00:00
 draft = false

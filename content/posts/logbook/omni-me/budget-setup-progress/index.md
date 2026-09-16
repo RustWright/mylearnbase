@@ -1,5 +1,6 @@
 +++
 title = "Budget setup with actual-vs-planned progress"
+description = "Per-category spending targets in omni-me on weekly, biweekly or monthly cycles, each with a live progress bar of actual against planned spending."
 slug = "budget-setup-progress"
 date = 2026-05-25
 draft = false

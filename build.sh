@@ -49,6 +49,12 @@ if [ -f "$RESUME_SRC" ]; then
   fi
 fi
 
+# Link-preview card drift check. Same shape as the résumé check: the PNG is
+# rendered locally from the site's own title, tagline, host and logo, and CI can
+# only notice when it no longer matches them. The script owns the hash, so the
+# rule for what counts as a change lives in one place. It warns and never fails.
+python3 scripts/build-og-card.py --check
+
 # Homepage "Now" line freshness. It states what is happening at present, and a
 # static page keeps stating it long after it stops being true. Warn, never
 # fail, for the same reason as above; the homepage prints the date regardless.

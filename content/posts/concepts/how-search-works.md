@@ -1,5 +1,6 @@
 +++
 title = "How indexing can make search faster"
+description = "Race a line-by-line scan against a prebuilt index on the same book, and find out when building the index pays for itself."
 slug = "how-search-works"
 date = 2026-06-27
 

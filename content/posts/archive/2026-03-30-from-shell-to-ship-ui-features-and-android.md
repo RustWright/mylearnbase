@@ -1,5 +1,6 @@
 +++
 title = "From Shell to Ship: UI, Features, and Android"
+description = "Taking omni-me from a headless backend to an app on a phone, with a Dioxus UI, CodeMirror notes, a routine manager and an Android build."
 slug = "from-shell-to-ship-ui-features-and-android"
 aliases = ["/posts/from-shell-to-ship-ui-features-and-android/"]
 date = 2026-04-11

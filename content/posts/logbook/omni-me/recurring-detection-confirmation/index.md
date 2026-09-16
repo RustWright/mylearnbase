@@ -1,5 +1,6 @@
 +++
 title = "Recurring transaction detection and confirmation"
+description = "How omni-me spots subscriptions and other recurring expenses in the journal, and asks you to confirm or dismiss each one."
 slug = "recurring-detection-confirmation"
 date = 2026-05-25
 draft = false

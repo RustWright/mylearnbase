@@ -1,6 +1,6 @@
 +++
 title = "Resources"
-description = "Curated references and tools — links, recommendations, and pointers worth keeping"
+description = "Curated tools and references from My Learn Base, with a note on what each one does and why it made the list."
 sort_by = "date"
 template = "blog.html"
 page_template = "post.html"
@@ -9,7 +9,7 @@ insert_anchor_links = "right"
 [extra]
 lang = "en"
 title = "Resources"
-subtitle = "Curated references and tools — links, recommendations, and pointers worth keeping"
+subtitle = "Tools and references worth keeping, with a note on what each one does and why it made the list."
 date_format = "%b %-d, %Y"
 categorized = false
 back_to_top = true

@@ -1,8 +1,9 @@
 +++
 title = "Authoring a logbook entry"
+description = "How to record one shipped feature as a logbook entry, with the capture tools, the seven sections, and a worked example from start to finish."
 slug = "authoring-a-logbook-entry"
 date = 2026-05-11
-updated = 2026-05-24
+updated = 2026-09-16
 draft = false
 +++
 
@@ -132,7 +133,11 @@ documenting:
    `./<filename>` so they resolve from the colocated page bundle.
 
 The published post is written with `draft = true` — review it, then
-flip to `false` when ready to ship.
+flip to `false` when ready to ship. Before the flip, give it a
+`description`, one sentence of about 160 characters at most that
+becomes its search snippet and link-preview text. The site build fails
+on a published post without one. Add it to the frontmatter by hand or
+pass `logbook publish --description "..."`; republishing keeps it.
 
 For the full command sequence with realistic content, see the worked
 example at the end of this doc.
@@ -307,8 +312,9 @@ The publish-time boundary. Five steps in order:
    §4 *why*, §6 *evidence*) refuse publish if empty — a structural
    integrity check.
 5. **Write the post and copy/rewrite images.** Frontmatter
-   (`title`, `slug`, `date`, `draft`, optional `updated`, optional
-   `taxonomies.tags`) followed by the body. Locally-referenced images
+   (`title`, `slug`, `date`, `draft`, `description` once it exists,
+   optional `updated`, optional `taxonomies.tags`) followed by the
+   body. Locally-referenced images
    are copied alongside `index.md` and their markdown refs are
    rewritten to `./<filename>` (the colocation form Zola resolves
    cleanly). Showboat's ` ```bash {image} ` leading code-fences get
@@ -317,10 +323,12 @@ The publish-time boundary. Five steps in order:
    - **First publish** (no existing post at the destination):
      `date = today`, `draft = true`, no `updated`.
    - **Republish** (post already at the destination, `--force` given):
-     preserves `date` and `draft` from the existing post (so a manual
-     `draft = false` flip survives, and the original ship date doesn't
-     bump just because the tool was rerun); sets `updated = today` to
-     mark the touch.
+     preserves `date`, `draft` and `description` from the existing post
+     (so a manual `draft = false` flip survives, and the original ship
+     date doesn't bump just because the tool was rerun); sets
+     `updated = today` to mark the touch. A republish that would leave a
+     published post with no description is refused before anything is
+     written.
 6. **Validate cross-post links.** `@/posts/...` references in the body
    are checked against the destination tree. Both the flat-file form
    (`<slug>.md`) and the page-bundle form (`<slug>/index.md`) resolve;
@@ -331,8 +339,8 @@ Then `zola check` (skipping external links by default for speed;
 `--full-check` includes them).
 
 **Reviewing the draft.** Preview with `zola serve --drafts` from inside
-the mylearnbase repo, then flip the frontmatter to `draft = false` when
-ready to ship.
+the mylearnbase repo, then add a `description` and flip the frontmatter
+to `draft = false` when ready to ship.
 
 **If your draft includes cite blocks**, push the cite-anchor commit to
 `origin` before running `logbook publish`. The no-push-during-cycle

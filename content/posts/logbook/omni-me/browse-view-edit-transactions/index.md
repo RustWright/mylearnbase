@@ -1,5 +1,6 @@
 +++
 title = "Browse, view, and edit recorded transactions"
+description = "Filtering the transactions recorded in omni-me, opening one to see its postings and attached receipt, and fixing its category or tags inline."
 slug = "browse-view-edit-transactions"
 date = 2026-05-23
 updated = 2026-05-23

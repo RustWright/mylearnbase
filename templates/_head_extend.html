@@ -1,9 +1,10 @@
 {# Project head injection hook (overrides theme's empty _head_extend.html).
-   Included by themes/serene/templates/_base.html inside <head>, after the theme's
-   own CSS — so the stylesheet below wins on equal specificity, and these meta
-   tags sit alongside the theme's <title> / <meta name="description">.
+   Included by templates/_base.html inside <head>, after the theme's own CSS —
+   so the stylesheet below wins on equal specificity. It also owns the page's
+   description (see "Per-page metadata" below); templates do not set one.
    Rendered in the child template's context: `page` is defined on post pages,
-   `section` on section/home pages, neither on special pages (404). #}
+   `section` on section/home pages, `taxonomy` on tag and series pages, none of
+   them on special pages (404). #}
 <link rel="stylesheet" href="{{ get_url(path='css/custom.css') }}">
 
 {# Crisp SVG favicon (modern browsers prefer it; adapts to browser dark mode).
@@ -26,23 +27,56 @@
   })();
 </script>
 
-{# ── Per-page metadata: canonical + OpenGraph + Twitter cards ─────────── #}
+{# ── Per-page metadata: description, canonical, OpenGraph, Twitter ────────
+   meta_desc is chosen HERE and only here, then used by <meta name="description">,
+   og, twitter and JSON-LD alike. Each template used to fill the theme's `desc`
+   block with its own fallback, and the two chains drifted: a post with no
+   description got the /posts/ section's text for search and the site tagline for
+   link previews. A published page has no fallback: without a description the
+   build fails, because a missing one ships silently (until September 2026 no post
+   had one, and nothing said so). Drafts, rendered only by `zola serve --drafts`, fall back
+   to the site description so a work in progress can still be previewed. A page
+   never borrows its section's description: a section describes a collection.
+   The taxonomy branch comes before `section` because the tag and series templates
+   set a local `section` (the /posts/ section) for their layout config. #}
 {%- if page is defined -%}
   {%- set meta_title = page.title -%}
   {%- set meta_url = page.permalink -%}
   {%- set og_type = "article" -%}
   {%- if page.description -%}
     {%- set meta_desc = page.description -%}
-  {%- elif page.summary -%}
-    {%- set meta_desc = page.summary | striptags | trim | truncate(length=200) -%}
-  {%- else -%}
+  {%- elif page.draft -%}
     {%- set meta_desc = config.description -%}
+  {%- else -%}
+    {{- throw(message=page.relative_path ~ " is published without a `description`. Add one to its front matter: it is the post's search snippet and link-preview text. (Publish tools take --description.)") -}}
+  {%- endif -%}
+{%- elif taxonomy is defined -%}
+  {%- set meta_url = config.base_url -%}
+  {%- set og_type = "website" -%}
+  {%- if term is defined -%}
+    {%- set meta_title = term.name -%}
+    {%- if taxonomy.name == "series" -%}
+      {%- set meta_desc = "Posts in the “" ~ term.name ~ "” series on " ~ config.title ~ "." -%}
+    {%- else -%}
+      {%- set meta_desc = "Posts on " ~ config.title ~ " tagged “" ~ term.name ~ "”." -%}
+    {%- endif -%}
+  {%- else -%}
+    {%- set meta_title = taxonomy.name | capitalize -%}
+    {%- if taxonomy.name == "series" -%}
+      {%- set meta_desc = "Every series on " ~ config.title ~ "." -%}
+    {%- else -%}
+      {%- set meta_desc = "Every tag used on " ~ config.title ~ "." -%}
+    {%- endif -%}
   {%- endif -%}
 {%- elif section is defined -%}
   {%- set meta_title = section.title | default(value=config.title) -%}
   {%- set meta_url = section.permalink -%}
   {%- set og_type = "website" -%}
-  {%- set meta_desc = section.description | default(value=config.description) -%}
+  {%- if section.description -%}
+    {%- set meta_desc = section.description -%}
+  {%- else -%}
+    {%- set meta_desc = config.description -%}
+  {%- endif -%}
 {%- else -%}
   {%- set meta_title = config.title -%}
   {%- set meta_url = config.base_url -%}
@@ -57,6 +91,7 @@
    shadowed by that local set, so prefer it for canonical + og:url. #}
 {%- if current_url is defined and current_url -%}{%- set meta_url = current_url -%}{%- endif -%}
 
+<meta name="description" content="{{ meta_desc }}">
 <link rel="canonical" href="{{ meta_url }}">
 
 <meta property="og:site_name" content="{{ config.title }}">
@@ -68,7 +103,7 @@
 <meta property="og:image" content="{{ get_url(path='img/og-default.png') }}">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="{{ config.title }} — {{ config.description }}">
+<meta property="og:image:alt" content="{{ config.title }} logo, name and tagline">
 
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="{{ meta_title }}">

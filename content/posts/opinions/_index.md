@@ -1,6 +1,6 @@
 +++
 title = "Opinions"
-description = "Stances and perspectives — judgment calls and takes, with the reasoning behind them"
+description = "Opinion posts from My Learn Base on tools, practices, and trade-offs, with the reasoning behind each position."
 sort_by = "date"
 template = "blog.html"
 page_template = "post.html"
@@ -9,7 +9,7 @@ insert_anchor_links = "right"
 [extra]
 lang = "en"
 title = "Opinions"
-subtitle = "Stances and perspectives — judgment calls and takes, with the reasoning behind them"
+subtitle = "Where I stand on tools, practices, and trade-offs, with the reasoning behind each position."
 date_format = "%b %-d, %Y"
 categorized = false
 back_to_top = true

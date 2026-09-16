@@ -9,6 +9,7 @@ Frontmatter blocks are TOML, delimited by `+++` lines (Zola convention).
 
 from __future__ import annotations
 
+import re
 from pathlib import Path
 from typing import Any, Iterable, Sequence
 
@@ -40,8 +41,10 @@ def _parse_value(raw: str) -> Any:
     and inline string arrays. Anything else falls through as the raw string.
     """
     s = raw.strip()
-    if (s.startswith('"') and s.endswith('"')) or (s.startswith("'") and s.endswith("'")):
-        return s[1:-1]
+    if len(s) >= 2 and s.startswith('"') and s.endswith('"'):
+        return _unescape_basic(s[1:-1])
+    if len(s) >= 2 and s.startswith("'") and s.endswith("'"):
+        return s[1:-1]  # TOML literal string: no escapes
     if s == "true":
         return True
     if s == "false":
@@ -59,6 +62,20 @@ def _parse_value(raw: str) -> Any:
             items.append(_parse_value(item))
         return items
     return s
+
+
+_BASIC_ESCAPES = {'"': '"', "\\": "\\", "n": "\n", "t": "\t", "r": "\r"}
+_BASIC_ESCAPE_RE = re.compile(r'\\(["\\ntr])')
+
+
+def _unescape_basic(body: str) -> str:
+    """Undo the escapes `_format_value` writes into a TOML basic string.
+
+    Without this a value that contains a quote or backslash reads back still
+    escaped, and each republish escapes it again: `\\"` becomes `\\\\\\"`, and so on.
+    Preserved keys (description, tags) go through that round trip every time.
+    """
+    return _BASIC_ESCAPE_RE.sub(lambda m: _BASIC_ESCAPES[m.group(1)], body)
 
 
 def _split_array(inner: str) -> list[str]:
@@ -154,7 +171,7 @@ def _format_value(value: Any) -> str:
     raise TypeError(f"unsupported frontmatter value type: {type(value).__name__}")
 
 
-_TOP_LEVEL_ORDER = ("title", "slug", "date", "updated", "draft")
+_TOP_LEVEL_ORDER = ("title", "description", "slug", "date", "updated", "draft")
 
 
 def render(fields: dict[str, Any]) -> str:

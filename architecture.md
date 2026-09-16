@@ -109,6 +109,21 @@ The write-up/demo association is computed in both templates (the page renders it
 
 **The header is the real router, because most visitors land on a post and never see the doors.** `extra.nav` lists Projects · Playground · Posts · Résumé. On phones four items do not fit, so an item marked `phone = false` hides below 575px and the wordmark gives way to the logo mark. Posts is the item dropped because it is the one with other routes (the logo leads home to Latest, search finds any post, every post links related ones); the other three are reachable only from the header. Tags left the header at every width. **575px is measured, not a device guess:** the full row needs 505px of content width. Adding a nav item means measuring again. The mark is `static/img/logo.svg` inlined through `load_data`, so it takes `currentColor`; an `<img>` renders it black.
 
+**Motion stays on the front door and the header; the reading surface stays still.** Two pieces, both pure CSS, and both written inside `@media (prefers-reduced-motion: no-preference)` so reduced motion has no rule to undo:
+
+- **Logo hover** (and keyboard focus): the spark (`.logo-spark`) turns 15° and grows 10% while the base bar (`.logo-base`) widens 25%. Each shape needs `transform-box: fill-box`; SVG content otherwise transforms about the viewBox's top-left corner and the spark would swing off the mark. The transformed spark stays inside the 100×100 viewBox (checked on the painted outline, not the bounding box, which overstates a rotated shape), so the SVG's own clipping never cuts a tip.
+- **Door stagger on load:** each door, then the Posts link, fades up 8px, 80ms apart. The fill mode is `backwards`: it holds the hidden first frame through each delay and then lets go. `both` would keep the last frame applied indefinitely, and an animation's value outranks the hover rule's `transform`, so the doors would stop lifting on hover. The largest paint on the homepage is the Now paragraph, which does not animate: Lighthouse is unchanged (99, LCP 1.8s, CLS 0).
+
+### Page descriptions and the link-preview card
+
+**A page's description is chosen in exactly one place, `templates/_head_extend.html`,** and feeds `<meta name="description">`, `og:description`, `twitter:description` and the JSON-LD `description` alike. No template fills the theme's `desc` block any more. Two chains used to exist and disagreed: `post.html` (the theme's) fell back to the `/posts/` section's description on every post, because it looks up `config.extra.blog_section_path` rather than the post's own form, while `_head_extend.html` fell back to `config.description`. Until September 2026 no post had a description of its own, so all of them shipped one of those two generic lines, and nothing reported it.
+
+- **Branch order:** page, then taxonomy, then section. The taxonomy branch must come before `section` because the tag and series templates set a local `section` (the `/posts/` one) for layout config. Tag pages read "Posts on My Learn Base tagged “rust”"; list pages "Every tag used on My Learn Base."
+- **A published page without `description` fails the build** (`throw` in the page branch). Fail rather than warn: this gap is introduced by an edit, unlike résumé drift or a stale Now line, which decay with time. Drafts fall back to `config.description`, so `zola serve --drafts` still previews one. A page never borrows its section's description, because a section describes a collection. **`zola check` does not catch it** (verified: it does not render templates); `zola build` and `zola serve` do.
+- **The publish tools own the field too.** `logbook publish` and `workflows publish` take `--description`, keep it on republish (it lives on the post, not in the capture or source doc), and refuse before writing when a non-draft post would have none. `_frontmatter.py` unescapes basic strings on read; before that, a preserved value containing `"` gained backslashes on every republish.
+
+**The link-preview card (`static/img/og-default.png`) is rendered from the site, not drawn once.** It used to be a one-off PNG with no source, so it kept the old tagline after the homepage changed. `scripts/build-og-card.py` fills `scripts/og-card.html` with `zola.toml`'s title and `canonical_url` host, `content/_index.md`'s `bio`, and `static/img/logo.svg`, screenshots it with headless Chrome, and writes the filled document's hash to `static/img/.og-card-hash`. `build.sh` runs it with `--check` and warns when the hash no longer matches. Local and committed for the same reason as the résumé PDF (no browser guaranteed in CI). The template's sizes were measured off the original card, which it reproduces to within a pixel; it names "DejaVu Sans" and the script refuses to render without that font rather than fall back silently.
+
 ---
 
 ## Project Structure
@@ -124,7 +139,7 @@ mylearnbase/
 │   ├── blog.html                 # section listing
 │   ├── post.html                 # single post (prev/next, TOC, reader controls)
 │   ├── posts_aggregator.html     # /posts cross-form index + form guide
-│   ├── _head_extend.html         # JSON-LD structured data, verification meta
+│   ├── _head_extend.html         # the one description chain, OG/Twitter, JSON-LD, verification meta
 │   ├── _footer.html
 │   ├── robots.txt
 │   ├── series/{list,single}.html # custom — theme ships no series templates
@@ -135,11 +150,16 @@ mylearnbase/
 │   ├── css/custom.css
 │   ├── demos/<project>/<name>/   # self-contained interactive demos (concepts, mylearnbase)
 │   ├── fonts/                    # OpenDyslexic (reader-controls typeface)
-│   ├── img/                      # favicons, logo, og-default.png (social cards)
+│   ├── img/                      # favicons, logo, og-default.png (rendered by scripts/build-og-card.py)
 │   ├── llms.txt                  # crawl guidance for AI agents
 │   └── giallo-*.css              # syntax-highlight CSS (generated; gitignored)
 ├── scripts/
-│   └── seo-audit.sh              # SEO/meta audit (compute-related.py lands in Cycle 5 Task 3)
+│   ├── compute-related.py        # TF-IDF related posts → related.json (runs in build.sh)
+│   ├── build-demo-index.py       # derived demo index → demos.json (runs in build.sh)
+│   ├── build-resume-pdf.sh       # résumé page → committed PDF (local)
+│   ├── capture-demo-posters.py   # Playground posters for heavy demos (local)
+│   ├── build-og-card.py          # og-card.html → og-default.png (local; --check runs in build.sh)
+│   └── seo-audit.sh              # SEO/meta audit
 ├── themes/serene/                # git submodule, v5.6.1
 ├── docs/                         # mdBook source → GitHub Pages (docs/book/ gitignored)
 ├── tools/                        # cross-project Python tooling (pyproject.toml + uv)

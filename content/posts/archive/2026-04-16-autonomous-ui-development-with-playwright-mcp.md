@@ -1,5 +1,6 @@
 +++
 title = "Autonomous UI Development with Playwright MCP"
+description = "Letting an AI coding assistant see and iterate on a Tauri and Dioxus UI on its own, using mock data, dx serve and Playwright MCP."
 slug = "autonomous-ui-development-with-playwright-mcp"
 aliases = ["/posts/autonomous-ui-development-with-playwright-mcp/"]
 date = 2026-04-18

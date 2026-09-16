@@ -1,0 +1,34 @@
+<!doctype html>
+<!--
+  Source of static/img/og-default.png, the 1200×630 link-preview card.
+  Rendered by scripts/build-og-card.py, which fills the {{…}} slots from the site
+  (zola.toml title and canonical_url, the homepage tagline, static/img/logo.svg)
+  so the card cannot keep saying something the site no longer says.
+  Sizes were measured off the original June 2026 card, which this reproduces.
+-->
+<meta charset="utf-8">
+<style>
+  html, body { margin: 0; }
+  body {
+    width: 1200px;
+    height: 630px;
+    box-sizing: border-box;
+    background: #fff;
+    border-left: 14px solid #5871a2;
+    padding-left: 110px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    /* Named, not generic: the build script refuses to render without it, so the
+       card never silently switches typeface on another machine. */
+    font-family: "DejaVu Sans";
+  }
+  .lockup { display: flex; align-items: center; gap: 34px; }
+  .lockup svg { flex: none; width: 120px; height: 120px; color: #5871a2; }
+  h1 { margin: 0; font-size: 84px; font-weight: 700; line-height: 1; letter-spacing: -0.005em; color: #2f3030; }
+  .tagline { margin: 30px 0 0; font-size: 42px; line-height: 1.2; color: #767676; }
+  .host { margin: 28px 0 0; font-size: 29px; font-weight: 700; line-height: 1.2; letter-spacing: 0.07em; text-transform: uppercase; color: #5871a2; }
+</style>
+<div class="lockup">{{LOGO}}<h1>{{TITLE}}</h1></div>
+<p class="tagline">{{TAGLINE}}</p>
+<p class="host">{{HOST}}</p>

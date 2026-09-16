@@ -461,7 +461,16 @@ def cmd_publish(args: argparse.Namespace) -> int:
     is_republish = dest.exists()
     preserved: dict[str, object] = {}
     if is_republish:
-        preserved = _frontmatter.read_keys(dest, ("date", "draft"))
+        preserved = _frontmatter.read_keys(dest, ("date", "draft", "description"))
+
+    # The description is written on the post, not in the capture, so a republish
+    # must carry it forward or the rebuilt frontmatter silently drops it.
+    draft = preserved.get("draft", True)
+    description = args.description if args.description is not None else preserved.get("description")
+    problem = _shared.description_problem(draft, description)
+    if problem:
+        print(f"logbook: {problem}", file=sys.stderr)
+        return 1
 
     project_index = project_dir / "_index.md"
     project_index_created = False
@@ -475,8 +484,10 @@ def cmd_publish(args: argparse.Namespace) -> int:
         "title": title,
         "slug": slug,
         "date": preserved.get("date", today),
-        "draft": preserved.get("draft", True),
+        "draft": draft,
     }
+    if description:
+        fields["description"] = description
     if is_republish:
         fields["updated"] = today
     if tags:
@@ -512,6 +523,7 @@ def cmd_publish(args: argparse.Namespace) -> int:
     else:
         print(f"  draft = true (review, then flip to false in frontmatter)")
     print(f"  tags = {tags or '(none — pass --tags or edit frontmatter)'}")
+    print(f"  description = {description!r}" if description else "  description = (none; add one before setting draft = false)")
     print(f"  showboat verify: {verify_label}")
     print(f"  zola check: {check_label}")
     if images_copied:
@@ -561,6 +573,11 @@ def main(argv: list[str] | None = None) -> int:
     p_pub.add_argument("capture_file", help="Capture path or bare slug.")
     p_pub.add_argument("--slug", help="Override the slug from metadata.", default=None)
     p_pub.add_argument("--tags", help="Comma-separated tags; overrides the capture's metadata blockquote.", default=None)
+    p_pub.add_argument(
+        "--description",
+        default=None,
+        help="One-sentence post description (search snippet and link preview). Kept on republish unless passed again. Required once the post is not a draft.",
+    )
     p_pub.add_argument("--force", action="store_true", help="Overwrite the destination if it exists.")
     p_pub.add_argument(
         "--full-check",

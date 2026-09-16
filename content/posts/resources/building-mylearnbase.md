@@ -1,5 +1,6 @@
 +++
 title = "Resources used to build mylearnbase"
+description = "The tools and references behind My Learn Base, from Zola and Pagefind to hosting and SEO audits, with what each one does and how it fits the site."
 slug = "building-mylearnbase"
 date = 2026-06-30
 draft = false

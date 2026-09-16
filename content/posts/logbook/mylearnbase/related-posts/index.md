@@ -1,5 +1,6 @@
 +++
 title = "Content-based related posts"
+description = "How the two Related links under each post are chosen by comparing the words posts use, replacing links that only pointed to the nearest posts by date."
 slug = "related-posts"
 date = 2026-06-30
 draft = false

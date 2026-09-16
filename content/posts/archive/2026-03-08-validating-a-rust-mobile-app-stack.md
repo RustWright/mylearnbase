@@ -1,5 +1,6 @@
 +++
 title = "Validating a Rust Mobile App Stack: Tauri + Dioxus + SurrealDB + CodeMirror"
+description = "Five proof-of-concept tests of Tauri, Dioxus, SurrealDB and CodeMirror for a Rust mobile app, through to an APK running on an Android phone."
 slug = "validating-a-rust-mobile-app-stack"
 aliases = ["/posts/validating-a-rust-mobile-app-stack/"]
 date = 2026-03-08

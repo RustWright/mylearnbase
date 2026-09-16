@@ -125,8 +125,8 @@ next republish, because the body is replaced wholesale every time.
 
 ```
 workflows publish <source-doc-path> [--slug] [--title] [--draft]
-                                    [--dry-run] [--supersede-from]
-                                    [--full-check]
+                                    [--description] [--dry-run]
+                                    [--supersede-from] [--full-check]
 ```
 
 | Flag | Purpose |
@@ -134,6 +134,7 @@ workflows publish <source-doc-path> [--slug] [--title] [--draft]
 | `--title` | Override the title extracted from the source doc's H1. Rarely needed. |
 | `--slug` | Override the auto-slugified slug. Honored on first publish; treated as identity on republish (mismatched values trigger orphan-prevention error). |
 | `--draft` | Publish as `draft = true`. Default is `false` — the source doc is the canonical artifact, so if it's ready for the source, it's ready to publish. |
+| `--description` | The post's one-sentence description, about 160 characters at most. It becomes the search snippet and the link-preview text. Required unless `--draft`, and a publish without one is refused before anything is written. The tool keeps it on every republish, so pass it once. |
 | `--dry-run` | Print the unified diff against the current published post (or against empty for a first publish). No write. |
 | `--supersede-from <old-slug>` | Treat this publish as superseding an existing post. Writes the new post + adds an `extra.superseded_by` banner to the old post. |
 | `--full-check` | Run `zola check` with external link probing (slow). Default skips external links. |
@@ -145,15 +146,15 @@ to existing posts:
 
 | Mode | Trigger | Behaviour |
 |---|---|---|
-| **First publish** | No post exists at the destination slug | Writes fresh frontmatter (`title`, `slug`, `date = today`, `draft = false`) |
-| **Republish** | Post exists at the destination slug | Preserves `date`, `draft`, `taxonomies.tags`, `extra.outdate_alert_days`; sets `updated = today`; replaces body wholesale |
+| **First publish** | No post exists at the destination slug | Writes fresh frontmatter (`title`, `description`, `slug`, `date = today`, `draft = false`) |
+| **Republish** | Post exists at the destination slug | Preserves `date`, `draft`, `description`, `taxonomies.tags`, `extra.outdate_alert_days`; sets `updated = today`; replaces body wholesale |
 | **Supersession** | `--supersede-from <old-slug>` is passed; new slug differs from old | Writes new post (first-publish frontmatter); reads old post; adds `extra.superseded_by = "posts/workflows/<new-slug>.md"`; writes back |
 
 The asymmetry between first-publish and republish is what makes
-`taxonomies.tags` a legitimate post-side hand-edit: the source doc has
-no tag concept; tags are added to the post after first publish, and
-the tool preserves them across every subsequent republish. That's the
-*only* post-side hand-edit that survives.
+`taxonomies.tags` and `description` legitimate post-side hand-edits:
+the source doc has no concept of either, so they live on the post, and
+the tool preserves them across every subsequent republish. Nothing
+else hand-edited on the post survives.
 
 ### Automatic transformations
 
@@ -491,7 +492,8 @@ repo, replace the path; the tool runs the same way.)
 
 ```bash
 workflows publish editorial/workflows.md --dry-run    # preview
-workflows publish editorial/workflows.md              # land it
+workflows publish editorial/workflows.md \
+  --description "How to publish a process doc from a project repo as a workflows post."
 ```
 
 The dry-run shows a diff against an empty current post (since none
@@ -503,15 +505,16 @@ content/posts/workflows/authoring-a-workflows-post.md
   published: title = 'Authoring a workflows post', slug = 'authoring-a-workflows-post'
   date = 2026-05-13
   draft = false
+  description = 'How to publish a process doc from a project repo as a workflows post.'
   zola check: clean (internal links only)
 ```
 
 What landed:
 
 - `content/posts/workflows/authoring-a-workflows-post.md` — the new
-  post, with frontmatter `title`, `slug`, `date = today`,
-  `draft = false`, and the body as the source doc with H1 stripped
-  and any Zola shortcodes escaped.
+  post, with frontmatter `title`, `description`, `slug`,
+  `date = today`, `draft = false`, and the body as the source doc
+  with H1 stripped and any Zola shortcodes escaped.
 - Any local images referenced in the body would be copied alongside;
   this doc has none.
 
@@ -534,6 +537,7 @@ content/posts/workflows/authoring-a-workflows-post.md
   republished: title = 'Authoring a workflows post', slug = 'authoring-a-workflows-post'
   date = 2026-05-13  updated = 2026-05-20
   draft = false
+  description = 'How to publish a process doc from a project repo as a workflows post.'
   zola check: clean (internal links only)
 ```
 
@@ -541,6 +545,7 @@ What changed:
 
 - `date` is unchanged from the first publish — preserved automatically.
 - `updated` is set to today.
+- `description` carried over without being passed again.
 - `taxonomies.tags`, if any had been hand-added after the first
   publish, would survive untouched.
 - The body is replaced wholesale with the new source.
@@ -558,8 +563,12 @@ post (revised)"* and runs:
 
 ```bash
 workflows publish editorial/workflows.md \
-  --supersede-from authoring-a-workflows-post
+  --supersede-from authoring-a-workflows-post \
+  --description "The revised guide to publishing a process doc as a workflows post."
 ```
+
+A superseding post is a first publish, so it needs its own
+`--description`.
 
 Output (illustrative):
 
@@ -568,6 +577,7 @@ content/posts/workflows/authoring-a-workflows-post-revised.md
   published (superseding): title = 'Authoring a workflows post (revised)', slug = 'authoring-a-workflows-post-revised'
   date = 2026-05-13
   draft = false
+  description = 'The revised guide to publishing a process doc as a workflows post.'
   superseded: content/posts/workflows/authoring-a-workflows-post.md now banners → authoring-a-workflows-post-revised
   zola check: clean (internal links only)
 ```
@@ -590,6 +600,7 @@ After step 1:
 ```toml
 +++
 title = "Authoring a workflows post"
+description = "How to publish a process doc from a project repo as a workflows post."
 slug = "authoring-a-workflows-post"
 date = 2026-05-13
 draft = false
@@ -601,6 +612,7 @@ After step 2 (republish):
 ```toml
 +++
 title = "Authoring a workflows post"
+description = "How to publish a process doc from a project repo as a workflows post."
 slug = "authoring-a-workflows-post"
 date = 2026-05-13
 updated = 2026-05-20
@@ -613,6 +625,7 @@ After step 3 (the old post, with the banner added):
 ```toml
 +++
 title = "Authoring a workflows post"
+description = "How to publish a process doc from a project repo as a workflows post."
 slug = "authoring-a-workflows-post"
 date = 2026-05-13
 updated = 2026-05-20

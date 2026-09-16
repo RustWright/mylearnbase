@@ -1,5 +1,6 @@
 +++
 title = "Building the Foundation: Rust Workspace, Database Layer, and CI/CD"
+description = "Turning proof-of-concept code into the omni-me Rust workspace, with a SurrealDB connection layer, an Axum server skeleton and CI on GitHub Actions."
 slug = "building-the-foundation-rust-workspace-and-infrastructure"
 aliases = ["/posts/building-the-foundation-rust-workspace-and-infrastructure/"]
 date = 2026-03-27

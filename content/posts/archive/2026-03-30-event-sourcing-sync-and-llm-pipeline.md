@@ -1,5 +1,6 @@
 +++
 title = "Event Sourcing, Sync Protocol, and the LLM Pipeline"
+description = "Building omni-me's append-only event store, its sync protocol between devices, and an LLM pipeline that pulls tasks, moods and expenses out of journal notes."
 slug = "event-sourcing-sync-and-llm-pipeline"
 aliases = ["/posts/event-sourcing-sync-and-llm-pipeline/"]
 date = 2026-04-11

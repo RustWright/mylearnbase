@@ -76,7 +76,7 @@ shape is a spectrum.
 | 4. Substantive feedback | Tier 1 default-suggest; tiers 2/3 on request; tier 4 deferred | Reviewer per requested tier; user reworks the prose themselves | Tier 1 suggest-then-decide; tiers 2-4 on request |
 | 5. Revision | User revises; can loop back to phase 4 | Silent unless asked | — |
 | 6. Mechanical pass | Grammar, typos, awkward phrasing, broken links, title revisit (time-boxed) | Returns suggestions; on approval, implements directly | Default-on before publish |
-| 7. Publish | Flip `draft = false`, run `zola check` | Tool-driven | — |
+| 7. Publish | Add a `description`, flip `draft = false`, run `zola check` and `zola build` | LLM may draft the description; user approves | — |
 
 The asymmetry between Phase 4 and Phase 6 is deliberate. Substantive
 feedback names observations the user has to act on themselves (their
@@ -240,7 +240,12 @@ surface-level and unambiguous once approved.
 
 ### Phase 7 — Publish
 
-Flip `draft = false`. Run `zola check`.
+Add a `description` to the frontmatter. It is one sentence of about
+160 characters at most, and it becomes the post's search snippet and
+link-preview text. It summarises the take rather than voicing it, so
+the LLM can draft it for you to approve. Then flip `draft = false` and
+run `zola check` and `zola build`. Only the build catches a missing
+description, and it fails on one.
 
 ## Entry points
 
@@ -400,7 +405,7 @@ You: approve all typo and phrasing fixes; keep working title.
 LLM: [implements the approved fixes directly in the post]
 ```
 
-**Phase 7 — Publish:** flip `draft = false`, run `zola check`.
+**Phase 7 — Publish:** add a `description`, flip `draft = false`, run `zola check` and `zola build`.
 
 ### Variant: entry at Phase 3 (clear-idea-then-feedback)
 
@@ -421,6 +426,7 @@ implements; you publish.
 ```markdown
 +++
 title = "..."  # working title - revisit before publish, don't agonize
+description = "..."  # required before publish: search snippet and link preview
 slug = "..."
 date = ...
 draft = true

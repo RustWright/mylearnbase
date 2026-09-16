@@ -28,9 +28,6 @@
 {%- if page.extra.lang %}{{ page.extra.lang }}{% else %}{{ page.lang }}{% endif -%}
 {%- endblock lang %}
 {% block title %}{{ page.title }}{% endblock title %}
-{% block desc %}
-  <meta name="description" content="{% if page.description %}{{ page.description }}{% else %}{{ config.description }}{% endif %}">
-{% endblock desc %}
 
 {% block content %}
 {#- A page template has no `section`, but _footer.html reads section.path to

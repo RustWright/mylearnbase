@@ -20,10 +20,6 @@
 {%- if section.extra.lang %}{{ section.extra.lang }}{% else %}{{ section.lang }}{% endif -%}
 {%- endblock lang %}
 {% block title %}{{ section.title }}{% endblock title %}
-{% block desc %}
-  {% if section.description %}{% set desc = section.description %}{% else %}{% set desc = config.description %}{% endif %}
-  <meta name="description" content="{{ desc }}">
-{% endblock desc %}
 
 {% block head %}
 {#- Print styles as a media-gated stylesheet rather than an @media print block.

@@ -1,5 +1,6 @@
 +++
 title = "Capture a transaction with its receipt"
+description = "Recording a transaction in omni-me from a photo, PDF, email or typed form, with an extractor drafting the entry and the original receipt kept on the record."
 slug = "capture-transaction-with-receipt"
 date = 2026-05-17
 updated = 2026-05-24

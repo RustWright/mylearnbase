@@ -1,5 +1,6 @@
 +++
 title = "Four Code Reviews After Cycle 1"
+description = "Four focused code reviews of a Rust app built at full speed with an AI assistant, turning up 56 findings across security, performance, bloat and logic."
 slug = "post-cycle-code-reviews"
 aliases = ["/posts/post-cycle-code-reviews/"]
 date = 2026-04-15

@@ -1,5 +1,6 @@
 +++
 title = "Tagging strategy"
+description = "How posts on My Learn Base are tagged, by topic rather than form, so that two or three tags together narrow things down to the post you want."
 slug = "tagging-strategy"
 date = 2026-05-16
 draft = false

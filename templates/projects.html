@@ -15,10 +15,6 @@
 {%- if section.extra.lang %}{{ section.extra.lang }}{% else %}{{ section.lang }}{% endif -%}
 {%- endblock lang %}
 {% block title %}{{ section.title }}{% endblock title %}
-{% block desc %}
-  {% if section.description %}{% set desc = section.description %}{% else %}{% set desc = config.description %}{% endif %}
-  <meta name="description" content="{{ desc }}">
-{% endblock desc %}
 
 {% block content %}
 {%- set demo_index = load_data(path="static/demos/_shared/demos.json", required=false) -%}

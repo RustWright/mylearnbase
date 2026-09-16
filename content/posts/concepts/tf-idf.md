@@ -1,5 +1,6 @@
 +++
 title = "Measuring document similarity with TF-IDF"
+description = "How TF-IDF scores words and compares documents, the method behind this site's Related links. Explore it on twelve Wikipedia articles or your own text."
 slug = "tf-idf"
 date = 2026-07-01
 draft = false

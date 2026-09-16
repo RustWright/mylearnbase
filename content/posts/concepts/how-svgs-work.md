@@ -1,5 +1,6 @@
 +++
 title = "How SVGs actually work"
+description = "What an SVG file actually contains, taken apart through this site's logo. Zoom it against a pixel copy, step through its path, then write your own shapes."
 slug = "how-svgs-work"
 date = 2026-07-11
 draft = false

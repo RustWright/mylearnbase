@@ -66,6 +66,7 @@ Cross-form tools that apply:
 ```
 +++
 title = "Weather APIs"
+description = "The weather APIs behind a forecasting project, with what each one covers and where its free tier runs out."
 date = 2026-05-14
 draft = true
 
@@ -75,7 +76,10 @@ tags = ["weather", "apis"]
 ```
 
 `updated` and `extra.superseded_by` get added later if/when they
-apply.
+apply. `description` is required before publish. It is one sentence of
+about 160 characters at most, and it becomes the search snippet and
+link-preview text. The site build fails on a published post without
+one.
 
 **Per-bullet structure (§4):**
 
@@ -151,7 +155,8 @@ work; only the trigger and §5 backlink differ.
    logbook post to link back to the resources post. Both directions
    or neither — a unidirectional link leaves one of the two future-you
    entry points dark.
-7. **Publish.** `zola check`, flip `draft = false`, commit.
+7. **Publish.** Confirm the `description` still fits the finished
+   list, flip `draft = false`, run `zola check` and `zola build`, commit.
 
 ### Collection-driven path
 

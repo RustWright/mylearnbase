@@ -1,5 +1,6 @@
 +++
 title = "Persistent site header"
+description = "A slim header on every page that tucks away as you scroll down and returns when you scroll up, carrying navigation, search and the theme toggle."
 slug = "site-header"
 date = 2026-06-25
 draft = false

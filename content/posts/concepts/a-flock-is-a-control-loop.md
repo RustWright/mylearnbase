@@ -1,5 +1,6 @@
 +++
 title = "A Flock Is a Control Loop"
+description = "The three boids flocking rules, read as feedback controllers. Tune each gain in a live simulation and see how pushing one too far destabilises the flock."
 slug = "a-flock-is-a-control-loop"
 date = 2026-08-03
 draft = false

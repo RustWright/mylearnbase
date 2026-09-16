@@ -1,5 +1,6 @@
 +++
 title = "Financial-health dashboard"
+description = "One omni-me screen for where your finances stand, with net worth, unmatched transactions, a monthly trend, recurring bills and a can-I-afford-it check."
 slug = "financial-health-dashboard"
 date = 2026-05-23
 updated = 2026-05-24

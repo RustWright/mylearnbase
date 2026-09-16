@@ -1,5 +1,6 @@
 +++
 title = "Project Development Process"
+description = "The six-phase process I use to build projects with heavy AI collaboration, running initiation to code review once, then looping planning, building and review."
 slug = "project-development-process"
 date = 2026-05-16
 updated = 2026-08-28

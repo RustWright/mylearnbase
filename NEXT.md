@@ -1,40 +1,40 @@
 # NEXT — mylearnbase
 
-**Updated:** 2026-09-16 · Cycle 6. Parts 0, 1a–1d and 2 shipped: KaTeX fix, résumé, Projects, Playground,
-demo back-links, homepage router + header nav + Now line.
+**Updated:** 2026-09-16 · Cycle 6. Parts 0–4 of the plan shipped: KaTeX fix, résumé, Projects, Playground, demo
+back-links, homepage router + header, hero flock, logo hover + door stagger, post descriptions + preview card.
 
 ## Next action
-**First (user's call, 2026-09-16): remove em dashes from section subtitles/descriptions** in
-`content/posts/{logbook,concepts,workflows,opinions,resources}/_index.md` and `logbook/omni-me/_index.md`.
-No colons as stand-ins. Show the user the rewrites. **Then `3b` logo hover, `3c` door stagger-in.** Plan:
-`~/.claude/plans/could-you-look-into-abstract-kahn.md`. Then Sweep 8 in `ui-checklist.md`, then cycle bookkeeping.
+**Sweep 8 in `ui-checklist.md`**, recording the Cycle 6 verification already done (see "Do NOT re-survey"; no
+re-run needed). **Then cycle bookkeeping:** close Cycle 5 per `PROJECT_PROCESS.md` § Cycle Closure (every Cycle 5
+task is done), write the Cycle 6 `tasks.md` from the plan, update `project.md`'s session log, and delete the
+`mylearnbase-site-backlog.md` memory note plus its `MEMORY.md` line. Plan: `~/.claude/plans/could-you-look-into-abstract-kahn.md`.
 
 ## Decisions in force
-- **Homepage copy:** tagline "I build things to learn, then write down how." The old intro became the `/posts/`
-  subtitle. Both chosen by the user 2026-09-16. Door copy follows the approved prototype.
-- **Homepage = doors (Projects · Playground · Résumé) + quiet Posts link → Now line → Latest 5.** The form
-  guide lives on `/posts/`; its `guide` array is the only list of forms (order + descriptions).
-- **Now line: wording approved by the user** (2026-09-16). It is dated (`now_updated`) and `build.sh` warns after 90 days.
-- **Header nav:** `phone = false` hides Posts below **575px (measured: the full row needs 505px)**; the mark
-  replaces the wordmark there. Re-measure if a nav item is added. Tags is gone at every width.
-- **Hero flock:** top band sized from `--hero-band`, not a percentage; pointer tracked on `window`, since the
-  canvas sits under content. No click-through to the full demo (a background that navigates on tap is a trap).
-- **Résumé is structured data**, one template for page and PDF; polish deferred by the user (2026-09-16).
-- **Anything naming the site on paper reads `extra.canonical_url`**; build and PDF script both guard it.
-- **Projects:** authored facts, derived evidence; copy approved. Link public repos only (never `boids-private`).
-- **Playground:** heavy demos (>150KB) show content-addressed posters; rerun `capture-demo-posters.py`
-  after changing one. `noindex` hides a demo from search and gallery (only `hero-flock`).
-- **File sizes on downloads only. Search stays posts-only. `demos.json` is derived.**
+- **Copy approved by the user (2026-09-16):** tagline, `/posts/` subtitle, Now line, form copy, all 32 descriptions.
+- **Descriptions:** chosen once in `_head_extend.html`. A published page without one fails the build (drafts fall
+  back). Publish tools take `--description`, keep it, and refuse before writing. `zola check` does NOT catch it.
+- **Link-preview card** is rendered from source (`scripts/build-og-card.py` + `og-card.html`); `build.sh` warns stale.
+- **Homepage = doors → Now line → Latest 5**; form guide on `/posts/`. **Header:** Posts hides below 575px (measured).
+- **Motion only on the front door and header chrome**, inside `prefers-reduced-motion: no-preference`; approved by
+  the user. Door stagger fill is `backwards` (`both`/`forwards` kill the hover lift). Flock: no click-through.
+- **Résumé is structured data**, one template for page and PDF. Anything naming the site on paper reads
+  `extra.canonical_url` (guarded). **Projects:** authored facts, derived evidence; public repos only (never `boids-private`).
+- **Playground:** heavy demos show content-addressed posters (rerun `capture-demo-posters.py` after changing
+  one); `noindex` hides a demo (only `hero-flock`). File sizes on downloads only; search posts-only.
 - **No email on the résumé** until an efeerhie.com forwarding alias exists; **no phone/address ever.**
 - **`themes/serene` is pinned** (`update = none`); restore with `git submodule update --init --checkout themes/serene`.
 
 ## Do NOT re-survey
-- **Verified at 1280/375, both schemes:** KaTeX, flocks, PDF pipeline, demo chrome, Playground, Projects,
-  homepage, `/posts/`, header (also 320px). Predator proven deterministically (pointer over a door changes
-  the sim). SEO audit passes (Lighthouse SEO 100). Homepage perf 99–100; the flock costs 0ms TBT.
-- ⚠️ Local testing: `python -m http.server` sends no `Cache-Control`; clear the browser cache after CSS edits.
+- **Verified:** KaTeX, flocks, PDF, demo chrome, Playground, Projects, homepage, `/posts/`, header, motion
+  (1280/375, both schemes, reduced motion, Lighthouse 99/CLS 0). 35 post/project pages: unique descriptions,
+  search/og/twitter/JSON-LD agree. Gate proven (fails build, drafts exempt). Tools tested in a scratch site.
+  SEO audit passes (Lighthouse SEO 100). Editorial guides republished and in sync with their posts.
+- ⚠️ Minified HTML omits `</head>`. `http.server` sends no `Cache-Control`. Extra Playwright contexts need `bringToFront()`.
 
 ## Open threads
+- **`~/.dotfiles` uncommitted:** `claude/commands/create-post.md` (description guidance, this session) plus a
+  `claude/settings.json` change that predates it. Hooks don't commit dotfiles; the user's call (`/sync-dotfiles`).
+- **Standalone demo pages (12) have no meta description** (static HTML). **Front-matter template body** still
+  describes the old Reflections/Tutorial post format.
 - **Résumé polish, deferred:** page 2 ~40% full; "Best Graduating Student" listed twice; accent colour.
 - **Demo/site theme mismatch, pre-existing:** demos follow `prefers-color-scheme`, the site has a toggle.
-- **Cycle 5 never formally closed.** Close it, write Cycle 6 `tasks.md`, retire `mylearnbase-site-backlog.md`.

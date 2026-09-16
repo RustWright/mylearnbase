@@ -1,5 +1,6 @@
 +++
 title = "Building My Learn Base - MVP"
+description = "How this site began, with why it exists and a step-by-step tutorial for rebuilding its first version with Zola, Cloudflare Pages and mdBook."
 slug = "building-my-learnbase-mvp"
 aliases = ["/posts/building-my-learnbase-mvp/"]
 date = 2026-02-11

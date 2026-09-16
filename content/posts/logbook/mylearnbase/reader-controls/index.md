@@ -1,5 +1,6 @@
 +++
 title = "Reader text-size & typeface controls"
+description = "A floating Aa button on every post that resizes the article text from 14 to 28px and switches its typeface, including OpenDyslexic, remembered in the browser."
 slug = "reader-controls"
 date = 2026-06-24
 draft = false
