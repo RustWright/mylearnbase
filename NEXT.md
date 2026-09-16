@@ -22,7 +22,8 @@ task is done), write the Cycle 6 `tasks.md` from the plan, update `project.md`'s
 - **Playground:** heavy demos show content-addressed posters (rerun `capture-demo-posters.py` after changing
   one); `noindex` hides a demo (only `hero-flock`). File sizes on downloads only; search posts-only.
 - **No email on the résumé** until an efeerhie.com forwarding alias exists; **no phone/address ever.**
-- **`themes/serene` is pinned** (`update = none`); restore with `git submodule update --init --checkout themes/serene`.
+- **`themes/serene` is pinned to v5.6.1 by its recorded commit.** `pinned = true` in `.gitmodules` only stops the session
+  hook fast-forwarding it. **Never `update = none`:** clones obey it, so Cloudflare built without the theme.
 
 ## Do NOT re-survey
 - **Verified:** KaTeX, flocks, PDF, demo chrome, Playground, Projects, homepage, `/posts/`, header, motion
@@ -32,9 +33,6 @@ task is done), write the Cycle 6 `tasks.md` from the plan, update `project.md`'s
 - ⚠️ Minified HTML omits `</head>`. `http.server` sends no `Cache-Control`. Extra Playwright contexts need `bringToFront()`.
 
 ## Open threads
-- **`~/.dotfiles` uncommitted:** `claude/commands/create-post.md` (description guidance, this session) plus a
-  `claude/settings.json` change that predates it. Hooks don't commit dotfiles; the user's call (`/sync-dotfiles`).
-- **Standalone demo pages (12) have no meta description** (static HTML). **Front-matter template body** still
-  describes the old Reflections/Tutorial post format.
+- **Unscheduled:** 12 standalone demo pages lack a meta description; front-matter template body is the old format.
 - **Résumé polish, deferred:** page 2 ~40% full; "Best Graduating Student" listed twice; accent colour.
 - **Demo/site theme mismatch, pre-existing:** demos follow `prefers-color-scheme`, the site has a toggle.

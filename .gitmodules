@@ -1,4 +1,7 @@
 [submodule "themes/serene"]
 	path = themes/serene
 	url = https://github.com/isunjn/serene.git
-	update = none
+	# Only ~/.dotfiles/scripts/session-start.sh reads `pinned` (it stops the theme
+	# being fast-forwarded). Never `update = none`: every clone obeys that one,
+	# Cloudflare's included, and the deploy builds with no theme.
+	pinned = true
