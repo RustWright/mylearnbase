@@ -17,17 +17,18 @@
   {# No in-content back-link — header nav + browser Back cover it (see post.html). #}
   {% include "_section_title.html" %}
   <main class="layout-list">
-    {# Aggregator: list recent posts per form, with archive at the bottom.
-       Each form's recent posts come from its own subsection of /posts/.
-       Form ordering: logbook first (most active cadence), then the rest, archive last. #}
-    {% set forms = ["logbook", "concepts", "workflows", "opinions", "resources", "archive"] %}
+    {# Aggregator: list recent posts per form, each under a one-line description
+       of what that form is. The forms, their order and their descriptions all
+       come from section.extra.guide (content/posts/_index.md), the single list;
+       get_section fails the build if an entry names a missing subsection. #}
     {% set per_form_limit = 10 %}
-    {% for form in forms %}
-      {% set form_section = get_section(path="posts/" ~ form ~ "/_index.md") %}
+    {% for form in section.extra.guide %}
+      {% set form_section = get_section(path="posts/" ~ form.name ~ "/_index.md") %}
       {# Project subsections (e.g. logbook/omni-me/) use transparent = true, so Zola bubbles their pages into form_section.pages — no recursion needed. #}
       {% set sorted_form_pages = form_section.pages | sort(attribute="date") | reverse %}
       <section class="form-group">
         <h2 class="form-heading"><a class="instant" href="{{ form_section.permalink }}">{{ form_section.title }}</a></h2>
+        <p class="form-desc">{{ form.desc }}</p>
         {% if sorted_form_pages | length == 0 %}
           <p class="empty-form-note"><em>No posts in this form yet.</em></p>
         {% else %}

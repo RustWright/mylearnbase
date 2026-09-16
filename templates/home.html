@@ -39,52 +39,66 @@
 {% block content %}
 <div id="wrapper">
   <main>
-    <section id="info">
-      {% if section.extra.avatar %}
-      <img src="{{ get_url(path=section.extra.avatar) }}" alt="avatar">
-      {% endif %}
-      <div id="text">
-        <div>
-          <span id="name">{{ section.extra.name }}</span>
-          {% if section.extra.id %}
-          <span id="id">@{{ section.extra.id }}</span>
+    {#- The hero: profile, then the doors, over the live flock. The canvas sits
+        behind in its own layer and is sized by the hero, never the reverse (see
+        .hero-flock in custom.css). -#}
+    <div class="hero">
+      <canvas id="hero-flock" class="hero-flock" aria-hidden="true"></canvas>
+      <section id="info">
+        {% if section.extra.avatar %}
+        <img src="{{ get_url(path=section.extra.avatar) }}" alt="avatar">
+        {% endif %}
+        <div id="text">
+          <div>
+            <span id="name">{{ section.extra.name }}</span>
+            {% if section.extra.id %}
+            <span id="id">@{{ section.extra.id }}</span>
+            {% endif %}
+          </div>
+          {% if section.extra.bio %}
+          <div id="bio"> {{ section.extra.bio }} </div>
+          {% endif %}
+          {# Social icons fold into the profile block. Nav lives in the sticky
+             site header (templates/_base.html, config.extra.nav). #}
+          {% if section.extra.links %}
+          <div id="profile-links">
+            {% for link in section.extra.links %}
+            <a href="{{ link.url }}" aria-label="{{ link.name }}" target="_blank" rel='noreferrer noopener{% if link.rel_me %} me{% endif %}'>
+              {% set icon = load_data(path="icon/" ~ link.icon ~ ".svg") %}
+              {{ icon | safe }}
+            </a>
+            {% endfor %}
+          </div>
           {% endif %}
         </div>
-        {% if section.extra.bio %}
-        <div id="bio"> {{ section.extra.bio }} </div>
-        {% endif %}
-        {# Social icons fold into the profile block. The bare nav row and the
-           in-page theme toggle were retired here: nav now lives in the sticky
-           site header (templates/_base.html, config.extra.nav) and the guide
-           cards below are the homepage's discovery surface. #}
-        {% if section.extra.links %}
-        <div id="profile-links">
-          {% for link in section.extra.links %}
-          <a href="{{ link.url }}" aria-label="{{ link.name }}" target="_blank" rel='noreferrer noopener{% if link.rel_me %} me{% endif %}'>
-            {% set icon = load_data(path="icon/" ~ link.icon ~ ".svg") %}
-            {{ icon | safe }}
+      </section>
+
+      {#- Doors: one per reason to be here. Reading is the quieter fourth route,
+          since Latest below and the header both lead there too. -#}
+      {% if section.extra.doors %}
+      <nav id="doors" aria-label="Start here">
+        <div class="door-list">
+          {% for door in section.extra.doors %}
+          <a class="door instant" href="{{ get_url(path=door.path) }}">
+            <span class="door-name">{{ door.name }}</span>
+            <span class="door-desc">{{ door.desc }}</span>
           </a>
           {% endfor %}
         </div>
-        {% endif %}
-      </div>
-    </section>
-    <section id="brief" class="prose">
-      {{ section.content | trim | safe }}
-    </section>
-    {% if section.extra.guide %}
-    <section id="guide">
-      <h2 class="guide-title">What you'll find here</h2>
-      <div class="guide-list">
-        {% for item in section.extra.guide %}
-        <a class="guide-item instant" href="{{ get_url(path=item.path) }}">
-          <span class="guide-name">{{ item.name }}</span>
-          <span class="guide-desc">{{ item.desc }}</span>
-        </a>
-        {% endfor %}
-      </div>
+        <a class="door-more instant" href="{{ get_url(path='@/posts/_index.md') }}">Or browse every post, grouped by form →</a>
+      </nav>
+      {% endif %}
+    </div>
+
+    {#- The "Now" line is this section's markdown body; its date is front matter.
+        See the note in content/_index.md. -#}
+    {% if section.content %}
+    <section id="now">
+      <h2 class="home-heading">Now{% if section.extra.now_updated %} · {{ section.extra.now_updated | date(format="%B %Y") }}{% endif %}</h2>
+      <div class="prose">{{ section.content | trim | safe }}</div>
     </section>
     {% endif %}
+
     {% if section.extra.recent %}
     {# Project-level override: aggregate recent posts across all form subsections of /posts/. Project subsections (e.g. logbook/omni-me/) use transparent = true, so Zola already bubbles their pages into the parent form's section.pages — no recursion needed. #}
     {% set blog_section = get_section(path="posts/_index.md") %}
@@ -95,7 +109,7 @@
     {% endfor %}
     {% set sorted_pages = all_pages | sort(attribute="date") | reverse %}
     <section class="layout-list">
-      <h2 class="guide-title">Latest</h2>
+      <h2 class="home-heading">Latest</h2>
       <div class="post-list">
         {% for post in sorted_pages | slice(end=section.extra.recent_max) %}
         <a class="post instant {% if post.extra.featured %}featured{% endif %}" href="{{ post.permalink }}">
@@ -124,4 +138,13 @@
   mermaid.initialize({ startOnLoad: true });
 </script>
 {% endif %}
+{#- Deferred, so the flock never holds up first paint. Deferred scripts run
+    before DOMContentLoaded, which is why the mount waits for that event. -#}
+<script defer src="{{ get_url(path='js/hero-flock.js') }}"></script>
+<script>
+  // Opacity 0.2 plus the top-band mask in custom.css is the approved treatment.
+  document.addEventListener('DOMContentLoaded', function () {
+    window.HeroFlock.mount(document.getElementById('hero-flock'), { opacity: 0.2 });
+  });
+</script>
 {% endblock script %}

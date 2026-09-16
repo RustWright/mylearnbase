@@ -17,63 +17,169 @@
 #info img {
   border-radius: 0;
   object-fit: contain;
+  /* A flex item's minimum width is unknown until the image loads, so an
+     avatar still loading can shrink and then snap back, shifting the name
+     beside it. Lighthouse caught that as a layout shift. */
+  flex-shrink: 0;
 }
 
-/* ── "What you'll find here" forms guide ────────────────────────
-   A described map of the post forms — turns the bare nav words into an
-   explained orientation, and surfaces `concepts` even while it's empty. */
-#guide {
-  margin-top: 2.5em;
+/* The theme centres the homepage vertically in the viewport. A router page
+   reads top-down instead, and the flock band has to start under the header. */
+body.homepage #wrapper {
+  justify-content: flex-start;
+}
+body.homepage main {
+  padding-top: 0;
 }
 
-.guide-title {
+/* Full-bleed canvas (below) is 100vw, which counts a desktop scrollbar the
+   page does not have room for. Clip that sliver rather than scroll sideways.
+   Set on body, this propagates to the viewport, so the sticky header, which
+   needs its ancestors unclipped, keeps working. */
+body.homepage {
+  overflow-x: clip;
+}
+
+/* ── Hero flock (static/js/hero-flock.js) ───────────────────────
+   Out of flow on purpose: a canvas's intrinsic size is its width/height
+   attributes, which the script sets from the measured box, so an in-flow
+   canvas grows the box it is measured against on every resize. Absolute
+   positioning makes size flow one way: the hero's content sets the height,
+   the canvas fills it. */
+.hero {
+  --hero-band: 3.5em;          /* the strip above the text where the flock shows */
+  position: relative;
+  padding-top: var(--hero-band);
+}
+.hero > :not(.hero-flock) {
+  position: relative;          /* paint above the canvas */
+}
+.hero-flock {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 100vw;
+  height: 100%;
+  transform: translateX(-50%);
+  display: block;
+  /* Top band: solid above the text, gone before the doors. Measured from the
+     band's own height, NOT as a percentage of the hero as the prototype did.
+     The hero is much taller on a phone, where the doors stack, and a
+     percentage band grows with it until the flock sits over the text. The
+     offsets reproduce the approved desktop look at every width. */
+  -webkit-mask-image: linear-gradient(to bottom, #000 0, #000 calc(var(--hero-band) + 0.5em), transparent calc(var(--hero-band) + 7.5em));
+          mask-image: linear-gradient(to bottom, #000 0, #000 calc(var(--hero-band) + 0.5em), transparent calc(var(--hero-band) + 7.5em));
+}
+
+/* ── Doors: route by what the visitor came for ─────────────────── */
+#doors {
+  margin: 1.75em 15px 0;
+}
+.door-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75em;
+}
+.door {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15em;
+  padding: 0.7em 0.9em 0.8em;
+  border: 1.5px solid var(--text-decoration-color);
+  border-radius: 6px;
+  /* Translucent, so the fading flock tail reads as passing behind the card. */
+  background: color-mix(in srgb, var(--bg-color) 82%, transparent);
+  color: var(--text-color);
+  text-decoration: none;
+  transition: border-color 0.18s ease, transform 0.18s ease;
+}
+.door:hover,
+.door:focus-visible {
+  border-color: var(--primary-color);
+  transform: translateY(-2px);
+}
+.door-name {
+  color: var(--primary-color);
+  font-weight: 600;
+}
+.door-desc {
+  font-size: 0.85em;
+  line-height: 1.45;
+  color: var(--text-pale-color);
+}
+.door-more {
+  display: inline-block;
+  margin-top: 0.9em;
+  font-size: 0.9em;
+  color: var(--text-pale-color);
+  text-decoration: none;
+  border-bottom: 1.5px solid transparent;
+}
+.door-more:hover {
+  color: var(--primary-color);
+  border-bottom-color: var(--primary-color);
+}
+@media (max-width: 600px) {
+  .door-list {
+    grid-template-columns: 1fr;
+    gap: 0.6em;
+  }
+}
+@media (max-width: 425px) {
+  .hero {
+    --hero-band: 2.5em;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .door {
+    transition: none;
+  }
+  .door:hover,
+  .door:focus-visible {
+    transform: none;
+  }
+}
+
+/* ── Homepage section headings (Now, Latest) ───────────────────── */
+.home-heading {
   font-size: 0.9em;
   font-weight: 400;
   color: var(--text-pale-color);
-  margin: 0 15px 0.75em;
+  margin: 0 0 0.6em;
+}
+.layout-list .home-heading {
+  margin: 2.5em 15px 0.75em;
 }
 
-/* The "Latest" heading lives inside .layout-list (the guide heading does not),
-   so this separates the recent-posts block from the forms guide above it. */
-.layout-list .guide-title {
-  margin-top: 2.5em;
-}
-
-#guide .guide-list {
+#now {
+  margin-top: 2em;
   padding: 0 15px;
-  display: flex;
-  flex-direction: column;
-  gap: 0.85em;
+}
+#now .prose p {
+  margin: 0;
 }
 
-#guide .guide-item {
-  display: grid;
-  grid-template-columns: 8em 1fr;
-  gap: 1em;
-  align-items: baseline;
-  text-decoration: none;
+/* ── /posts/: a heading and one line per form ──────────────────── */
+.form-heading {
+  margin: 2.25em 15px 0.15em;
+  font-size: 1em;
+  font-weight: 600;
+}
+.form-group:first-child .form-heading {
+  margin-top: 0.75em;          /* the section title above already spaces it */
+}
+.form-heading a {
   color: var(--text-color);
-  border-bottom: 1.5px solid transparent;
-  padding-bottom: 0.15em;
+  text-decoration: none;
 }
-
-#guide .guide-item:hover {
-  border-bottom-color: var(--primary-color);
-}
-
-#guide .guide-name {
+.form-heading a:hover {
   color: var(--primary-color);
 }
-
-#guide .guide-desc {
+.form-desc {
+  margin: 0 15px 0.6em;
+  font-size: 0.9em;
   color: var(--text-pale-color);
-}
-
-@media (max-width: 425px) {
-  #guide .guide-item {
-    grid-template-columns: 1fr;
-    gap: 0.15em;
-  }
 }
 
 /* OpenDyslexic — self-hosted, loaded ON DEMAND. A browser only fetches these
@@ -287,6 +393,9 @@ html[data-reader-font="dyslexic"] article.prose {
 .site-header__brand {
   margin: 0;                  /* override theme `header a` */
   padding: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
   font-weight: 600;
   white-space: nowrap;
   color: var(--text-color);
@@ -294,6 +403,15 @@ html[data-reader-font="dyslexic"] article.prose {
 }
 .site-header__brand:hover {
   color: var(--primary-color);
+}
+.site-header__mark {
+  color: var(--primary-color);
+  line-height: 0;
+}
+.site-header__mark svg {
+  display: block;
+  width: 1.35em;
+  height: 1.35em;
 }
 
 .site-header__nav {
@@ -364,6 +482,18 @@ html {
   }
   .site-header__nav {
     gap: 0.8em;
+  }
+}
+
+/* Phone header: the mark alone, and the nav minus the items marked
+   `phone = false` in zola.toml. The breakpoint is measured, not a device
+   guess: the full row needs 505px of content width, which a 543px viewport
+   just provides. 576px and up leaves 33px of slack, so add a nav item and
+   this number has to move. */
+@media (max-width: 575px) {
+  .site-header__wordmark,
+  .site-header__wide-only {
+    display: none;
   }
 }
 

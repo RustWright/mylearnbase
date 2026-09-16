@@ -1,40 +1,40 @@
 # NEXT — mylearnbase
 
-**Updated:** 2026-09-16 · Cycle 6. KaTeX, résumé (restructured), demo back-links, Playground, Projects shipped.
+**Updated:** 2026-09-16 · Cycle 6. Parts 0, 1a–1d and 2 shipped: KaTeX fix, résumé, Projects, Playground,
+demo back-links, homepage router + header nav + Now line.
 
 ## Next action
-**`Part 2`: homepage router + header nav + "Now" line.** Every destination it links to now exists
-(`/projects/`, `/playground/`, `/resume/`), which is why it had to come last: Zola validates internal
-links at build. Then `3b`/`3c` motion. Plan: `~/.claude/plans/could-you-look-into-abstract-kahn.md`.
-**Discuss with the user first, in Part 2:** the em dashes in `content/_index.md` — the tagline
-(`bio`, line 10: "I build things to learn — and write down how.") and the intro at line 29. It bugs them.
+**First (user's call, 2026-09-16): remove em dashes from section subtitles/descriptions** in
+`content/posts/{logbook,concepts,workflows,opinions,resources}/_index.md` and `logbook/omni-me/_index.md`.
+No colons as stand-ins. Show the user the rewrites. **Then `3b` logo hover, `3c` door stagger-in.** Plan:
+`~/.claude/plans/could-you-look-into-abstract-kahn.md`. Then Sweep 8 in `ui-checklist.md`, then cycle bookkeeping.
 
 ## Decisions in force
-- **Résumé is structured data** (records in `content/resume/_index.md` front matter), rendered by one
-  template as both the page and the PDF. Chosen over a print-only stylesheet because markdown cannot put
-  dates on the role's line. User: "good enough for now" (2026-09-16); further polish is deliberately deferred.
-- **Anything naming the site on paper reads `extra.canonical_url`, never `base_url`** — the PDF build
-  overrides `base_url` with localhost. The build fails if the two disagree; the PDF script fails on any
-  localhost address in the PDF's text *or* its link annotations (each check is blind to the other).
-- **Résumé copy must work on paper**: no "this site", no "here". PDF typeface is bundled Source Sans 3.
-- **Projects: authored facts, derived evidence.** `status` is `active`|`complete` or the build fails.
-  One lead demo per write-up. **Project copy read and approved by the user** (2026-09-16). Link a repo
-  only if public: boids links `boids-flocking-sim`, never `boids-private`.
-- **Playground:** light demos preview live, heavy (>150KB, measured) show a content-addressed poster with
-  the play button over it; rerun `capture-demo-posters.py` after changing a heavy demo. A tile opens the
-  standalone demo. `noindex` keeps a demo out of search *and* the gallery (only `hero-flock`).
-- **File sizes on downloads only.** **Site search stays posts-only.** **`demos.json` is derived.** **Header nav.** Desktop `Projects · Playground · Posts · Résumé`; **phones drop Posts**, use the logo
-  mark. **Tags leaves at every width.** Logo hover is `3b`. Hero flock: top band, opacity 0.2.
-- **No email on the résumé** until a forwarding alias exists on **efeerhie.com**; **no phone/address ever.**
+- **Homepage copy:** tagline "I build things to learn, then write down how." The old intro became the `/posts/`
+  subtitle. Both chosen by the user 2026-09-16. Door copy follows the approved prototype.
+- **Homepage = doors (Projects · Playground · Résumé) + quiet Posts link → Now line → Latest 5.** The form
+  guide lives on `/posts/`; its `guide` array is the only list of forms (order + descriptions).
+- **Now line: wording approved by the user** (2026-09-16). It is dated (`now_updated`) and `build.sh` warns after 90 days.
+- **Header nav:** `phone = false` hides Posts below **575px (measured: the full row needs 505px)**; the mark
+  replaces the wordmark there. Re-measure if a nav item is added. Tags is gone at every width.
+- **Hero flock:** top band sized from `--hero-band`, not a percentage; pointer tracked on `window`, since the
+  canvas sits under content. No click-through to the full demo (a background that navigates on tap is a trap).
+- **Résumé is structured data**, one template for page and PDF; polish deferred by the user (2026-09-16).
+- **Anything naming the site on paper reads `extra.canonical_url`**; build and PDF script both guard it.
+- **Projects:** authored facts, derived evidence; copy approved. Link public repos only (never `boids-private`).
+- **Playground:** heavy demos (>150KB) show content-addressed posters; rerun `capture-demo-posters.py`
+  after changing one. `noindex` hides a demo from search and gallery (only `hero-flock`).
+- **File sizes on downloads only. Search stays posts-only. `demos.json` is derived.**
+- **No email on the résumé** until an efeerhie.com forwarding alias exists; **no phone/address ever.**
 - **`themes/serene` is pinned** (`update = none`); restore with `git submodule update --init --checkout themes/serene`.
 
 ## Do NOT re-survey
-- **KaTeX, flocks, PDF pipeline, demo chrome, Playground, Projects: verified** at 1280/375, both schemes.
-  Résumé PDF 2 pages, leak guards proven to fire. SEO audit passes (148 JSON-LD valid, Lighthouse 100).
+- **Verified at 1280/375, both schemes:** KaTeX, flocks, PDF pipeline, demo chrome, Playground, Projects,
+  homepage, `/posts/`, header (also 320px). Predator proven deterministically (pointer over a door changes
+  the sim). SEO audit passes (Lighthouse SEO 100). Homepage perf 99–100; the flock costs 0ms TBT.
 - ⚠️ Local testing: `python -m http.server` sends no `Cache-Control`; clear the browser cache after CSS edits.
 
 ## Open threads
-- **Résumé polish, deferred by the user** so as not to get bogged down: page 2 is ~40% full (one page
-  means cutting ~a third); "Best Graduating Student" is listed twice; accent colour (site blue vs old red).
-- **Demo/site theme mismatch, pre-existing:** demos follow `prefers-color-scheme`, the site has its own toggle.
-- **Cycle 5 never formally closed** though every `tasks.md` task is done. Close it, write Cycle 6.
+- **Résumé polish, deferred:** page 2 ~40% full; "Best Graduating Student" listed twice; accent colour.
+- **Demo/site theme mismatch, pre-existing:** demos follow `prefers-color-scheme`, the site has a toggle.
+- **Cycle 5 never formally closed.** Close it, write Cycle 6 `tasks.md`, retire `mylearnbase-site-backlog.md`.

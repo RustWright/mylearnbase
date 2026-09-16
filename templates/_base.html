@@ -39,10 +39,16 @@
       wired by static/js/search.js in a later step. -#}
   <header id="site-header" class="site-header">
     <nav class="site-header__inner" aria-label="Primary">
-      <a class="site-header__brand instant" href="{{ get_url(path='/') }}">{{ config.title }}</a>
+      {#- The mark is static/img/logo.svg inlined, so it takes currentColor (an
+          <img> would render it black). On phones the wordmark hides to make
+          room for the nav, so the link carries its name in aria-label. -#}
+      <a class="site-header__brand instant" href="{{ get_url(path='/') }}" aria-label="{{ config.title }} home">
+        <span class="site-header__mark" aria-hidden="true">{{ load_data(path="img/logo.svg") | safe }}</span>
+        <span class="site-header__wordmark">{{ config.title }}</span>
+      </a>
       <ul class="site-header__nav">
         {% for item in config.extra.nav %}
-        <li><a class="instant" href="{{ get_url(path=item.path) }}">{{ item.name }}</a></li>
+        <li{% if item.phone is defined and not item.phone %} class="site-header__wide-only"{% endif %}><a class="instant" href="{{ get_url(path=item.path) }}">{{ item.name }}</a></li>
         {% endfor %}
       </ul>
       <div class="site-header__actions">

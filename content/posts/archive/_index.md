@@ -1,6 +1,6 @@
 +++
 title = "Archive"
-description = "Pre-Cycle-2 posts that predate the five-form post system. Original URLs preserved via aliases."
+description = "Earlier writing from My Learn Base, from before the site sorted posts into forms. Original URLs still work."
 sort_by = "date"
 template = "blog.html"
 page_template = "post.html"
@@ -9,7 +9,7 @@ insert_anchor_links = "right"
 [extra]
 lang = "en"
 title = "Archive"
-subtitle = "Posts that predate the five-form post system (Cycle 1 era; pre-2026-05). Original URLs preserved via aliases."
+subtitle = "Earlier writing, from before the site sorted posts into forms. Original URLs still work."
 date_format = "%b %-d, %Y"
 categorized = false
 back_to_top = true

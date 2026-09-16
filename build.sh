@@ -49,6 +49,21 @@ if [ -f "$RESUME_SRC" ]; then
   fi
 fi
 
+# Homepage "Now" line freshness. It states what is happening at present, and a
+# static page keeps stating it long after it stops being true. Warn, never
+# fail, for the same reason as above; the homepage prints the date regardless.
+python3 - <<'PY'
+import datetime, re
+from pathlib import Path
+
+m = re.search(r'^now_updated\s*=\s*"(\d{4}-\d{2}-\d{2})"', Path("content/_index.md").read_text(), re.M)
+if m:
+    age = (datetime.date.today() - datetime.date.fromisoformat(m.group(1))).days
+    if age > 90:
+        print(f"WARNING: the homepage Now line is {age} days old (now_updated = {m.group(1)}).")
+        print("         Rewrite the body of content/_index.md and bump now_updated.")
+PY
+
 # Download sizes. A download link states its file size, the way a page link does
 # not: someone saving a file thinks about what they are getting, and Zola has no
 # template function that can read a file's size (its file helpers are get_hash,

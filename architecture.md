@@ -35,7 +35,7 @@ Personal website for documenting learning journeys, showcasing projects, and hos
 
 ```
 content/
-├── _index.md                 # homepage content
+├── _index.md                 # homepage: doors, dated Now line (see § Homepage and header)
 ├── projects/                 # /projects/ hub + one page per project (see § Projects below)
 ├── playground/_index.md      # /playground/ gallery of every demo (see § Interactive Demos)
 ├── resume/_index.md          # /resume/, canonical résumé; the PDF is generated from it
@@ -101,6 +101,14 @@ The write-up/demo association is computed in both templates (the page renders it
 
 **Copy must work on paper.** Nothing in the résumé may say "this site" or "here"; a printed page has no here.
 
+### Homepage and header
+
+**The homepage routes by what a visitor came for, not by how the writing is filed.** Under the profile sit three doors (Projects, Playground, Résumé) and a quieter link to `/posts/`; then a dated "Now" line; then the five latest posts. The doors are a `doors` array in `content/_index.md` with `@/` paths, so a renamed destination fails the build. The post-form guide moved to `/posts/`, where the reader has already chosen to read. `content/posts/_index.md`'s `guide` array is now the only list of forms: `posts_aggregator.html` iterates it for which forms appear, their order, and the line describing each.
+
+**The "Now" line is the homepage's markdown body, and it is dated** (`now_updated`, printed as "Now · September 2026"). It is a claim about the present on a static page, the same failure mode as a résumé that says "present": true when written, false later, with nothing to say so. The printed date lets a reader judge it, and `build.sh` warns once it is 90 days old.
+
+**The header is the real router, because most visitors land on a post and never see the doors.** `extra.nav` lists Projects · Playground · Posts · Résumé. On phones four items do not fit, so an item marked `phone = false` hides below 575px and the wordmark gives way to the logo mark. Posts is the item dropped because it is the one with other routes (the logo leads home to Latest, search finds any post, every post links related ones); the other three are reachable only from the header. Tags left the header at every width. **575px is measured, not a device guess:** the full row needs 505px of content width. Adding a nav item means measuring again. The mark is `static/img/logo.svg` inlined through `load_data`, so it takes `currentColor`; an `<img>` renders it black.
+
 ---
 
 ## Project Structure
@@ -112,10 +120,10 @@ mylearnbase/
 ├── content/                      # see Content Organization
 ├── templates/                    # project overrides on top of Serene
 │   ├── _base.html                # page shell, header nav
-│   ├── home.html                 # homepage + form guide cards
+│   ├── home.html                 # homepage: hero flock, doors, Now line, Latest
 │   ├── blog.html                 # section listing
 │   ├── post.html                 # single post (prev/next, TOC, reader controls)
-│   ├── posts_aggregator.html     # /posts cross-form index
+│   ├── posts_aggregator.html     # /posts cross-form index + form guide
 │   ├── _head_extend.html         # JSON-LD structured data, verification meta
 │   ├── _footer.html
 │   ├── robots.txt
@@ -123,7 +131,7 @@ mylearnbase/
 │   ├── tags/{list,single}.html
 │   └── shortcodes/demo.html      # {{ demo() }} iframe embed
 ├── static/
-│   ├── js/                       # header.js, reader-controls.js, search.js
+│   ├── js/                       # header.js, reader-controls.js, search.js, hero-flock.js
 │   ├── css/custom.css
 │   ├── demos/<project>/<name>/   # self-contained interactive demos (concepts, mylearnbase)
 │   ├── fonts/                    # OpenDyslexic (reader-controls typeface)
@@ -256,6 +264,14 @@ It is a hand port of the flocking rules from the boids project's Rust core (`dem
 - **Units-per-pixel is the fixed quantity** (`K = 1.25`), not the world width. Fixing the world width instead makes zoom a function of viewport width — 3px boids on a phone against 12px on a laptop. Holding `K` fixed keeps boid size, rule radii, and boids-per-pixel identical at every width; the world dimensions follow from the canvas. Measured: 81 boids/megapixel at 1280px, 80 at 375px.
 
 Accessibility and cost: `prefers-reduced-motion: reduce` paints one settled frame and never starts the animation loop; the loop also stops on `visibilitychange` and when an `IntersectionObserver` reports the canvas off-screen.
+
+**On the homepage** the canvas is full-bleed behind the profile and doors, clipped to a **top band**: solid above the text, faded out before the doors. The band is measured from the hero's top padding (`--hero-band`), not as a percentage of the hero as the prototype did. The hero is much taller on a phone, where the doors stack, and a percentage band grows with it until the flock sits over the text. Three wiring decisions:
+
+- **The pointer is tracked on `window`, bounds-checked against the canvas.** The canvas sits behind content, so its own events stop wherever text or a door covers it, and the predator would vanish exactly over the doors. Touch is ignored, since a finger dragging to scroll is not hovering.
+- **A `ResizeObserver` on the canvas, not a window resize listener.** The hero's height also changes when its content reflows, and a bitmap that no longer matches its box renders stretched.
+- **The script is deferred.** Measured with Lighthouse (mobile, 4× CPU throttle), the flock costs 0ms of blocking time. The homepage scores 99–100 with or without it; the 0.1s first-paint difference from the old homepage comes from its added markup and CSS.
+
+The design-review prototype stays at `/demos/mylearnbase/hero-flock/`, marked `noindex`, with the treatment switcher that chose the band.
 
 ---
 

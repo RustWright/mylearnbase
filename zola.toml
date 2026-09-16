@@ -44,13 +44,20 @@ author_url = "https://www.linkedin.com/in/efe-erhie"
 google_site_verification = "lVCWcpiroGyahah4QBMEOkCFFj9TFedrUItIU87WYN8"
 bing_site_verification = ""
 
-# Header nav (templates/_base.html) — slim, kept to active/populated surfaces.
-# Empty forms (concepts/opinions/resources) are intentionally left off the
-# follow-you-everywhere header; they stay linked on the homepage guide cards.
+# Header nav (templates/_base.html). Most visitors land on a post, not the
+# homepage, so this row is the site's real router: it names the destinations
+# each kind of visitor came for. `@/` paths fail the build if a page moves.
+#
+# `phone = false` drops an item below the header's phone breakpoint, where four
+# items do not fit. Posts is the one to go because it is the one with other
+# routes (the logo leads home to Latest, search finds any post, and every post
+# links related ones); the other three are reachable only from here.
+# Tags left the header at every width; posts and search both reach it.
 nav = [
-  { name = "Posts", path = "/posts" },
-  { name = "Logbook", path = "/posts/logbook" },
-  { name = "Tags", path = "/tags" },
+  { name = "Projects", path = "@/projects/_index.md" },
+  { name = "Playground", path = "@/playground/_index.md" },
+  { name = "Posts", path = "@/posts/_index.md", phone = false },
+  { name = "Résumé", path = "@/resume/_index.md" },
 ]
 blog_section_path = "/posts"
 

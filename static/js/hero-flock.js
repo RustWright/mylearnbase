@@ -249,7 +249,16 @@
     function stop() { running = false; cancelAnimationFrame(rafId); }
 
     resize();
-    window.addEventListener("resize", function () { resize(); draw(); });
+    draw();   // paint now: the loop only starts once the observer below reports
+
+    // Watch the canvas's own box, not the window. The hero's height also moves
+    // when its content reflows, and a bitmap that no longer matches its box
+    // renders stretched.
+    if ("ResizeObserver" in window) {
+      new ResizeObserver(function () { resize(); draw(); }).observe(canvas);
+    } else {
+      window.addEventListener("resize", function () { resize(); draw(); });
+    }
 
     if (reduced) {
       for (var w = 0; w < 240; w++) step();   // one settled frame, no loop
@@ -266,11 +275,18 @@
         start();
       }
 
-      canvas.addEventListener("pointermove", function (e) {
+      // Listen on the window, not the canvas. The canvas sits BEHIND the hero's
+      // text and doors, so its own events stop wherever content covers it and
+      // the predator would vanish exactly over the doors. Touch is excluded: a
+      // finger dragging to scroll is not a pointer hovering over the flock.
+      window.addEventListener("pointermove", function (e) {
+        if (e.pointerType === "touch") return;
         var r = canvas.getBoundingClientRect();
-        predator = { x: (e.clientX - r.left) * K, y: (e.clientY - r.top) * K };
-      });
-      canvas.addEventListener("pointerleave", function () { predator = null; });
+        var x = e.clientX - r.left, y = e.clientY - r.top;
+        predator = (x >= 0 && y >= 0 && x <= r.width && y <= r.height)
+          ? { x: x * K, y: y * K } : null;
+      }, { passive: true });
+      document.documentElement.addEventListener("pointerleave", function () { predator = null; });
     }
 
     return {
