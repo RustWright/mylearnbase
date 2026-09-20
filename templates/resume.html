@@ -128,10 +128,25 @@
         {%- for e in r.experience %}
         <div class="rs-entry">
           <h3 class="rs-primary">{{ e.org }}</h3>
+          {#- Two shapes, one entry. A role held under a single title uses `role`
+              + `dates`. A promotion at the same employer uses `roles`, a list of
+              title/date pairs newest first, so the ORGANISATION is named once and
+              the titles stack beneath it. Repeating the org as a second entry
+              would read as two jobs at two places, which is the thing a promotion
+              is not. The bullets below cover the whole tenure either way. -#}
+          {%- if e.roles %}
+          {%- for ro in e.roles %}
+          <div class="rs-line">
+            <span class="rs-secondary">{{ ro.role }}</span>
+            <span class="rs-dates">{{ ro.dates }}</span>
+          </div>
+          {%- endfor %}
+          {%- else %}
           <div class="rs-line">
             <span class="rs-secondary">{{ e.role }}</span>
             <span class="rs-dates">{{ e.dates }}</span>
           </div>
+          {%- endif %}
           {%- if e.bullets %}
           <ul class="rs-bullets">
             {%- for b in e.bullets %}
@@ -182,6 +197,18 @@
           <li class="rs-line"><span>{{ a.name }}</span><span class="rs-dates">{{ a.dates }}</span></li>
           {%- endfor %}
         </ul>
+      </section>
+      {%- endif %}
+
+      {%- if r.interests %}
+      {#- Last section, and one line of it. The shared affiliation is appended
+          in muted type rather than repeated per item; its separator is a CSS
+          ::before, the same idiom the contact list uses. -#}
+      <section class="rs-section">
+        <h2>Interests</h2>
+        <p class="rs-interests">{{ r.interests.items | join(sep=" · ") }}
+          {%- if r.interests.context %}<span class="rs-interests-context">{{ r.interests.context }}</span>{% endif -%}
+        </p>
       </section>
       {%- endif %}
 

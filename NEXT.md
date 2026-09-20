@@ -1,39 +1,40 @@
 # NEXT — mylearnbase
 
-**Updated:** 2026-09-16 · Cycle 6 (Audience Routing) implementation complete and deployed (`099d03d`); Sweep 8
-recorded; Cycle 5 closed. Tracker `tasks.md`, queue `.omni/tasks.toml`, history `project.md`.
+**Updated:** 2026-09-20 · Résumé edits + code review + visitor-experience audit; **4 of 7 findings applied**.
 
 ## Next action
-**Not chosen yet: ask the user.** Derived from state, not priority: Cycle 6 is still open (hub `0016`, XS: Phase D
-only; no curiosities were logged, so just the logbook-demo question), then Cycle 7 planning (`0017`). The biggest
-standing item is the user's ASD-STE100 writing standard (`0003`, notes at the foot of `tasks.md`).
+**Not chosen: ask the user.** (1) The 3 deferred findings below, all low-urgency. (2) Close Cycle 6 Phase D, then
+Cycle 7 planning (`0017`). Biggest standing item is still ASD-STE100 (`0003`). Queued: `0011`, `0012`, `0013`,
+`0014`, `0007`, `0008` (`.omni/tasks.toml`).
 
 ## Decisions in force
-- **Cycle 5 closed with no code review, and none is scheduled** (user, 2026-09-16). That choice was made for
-  Cycle 5; ask before assuming it for Cycle 6. Cycle 5 curiosities: no survivors (`0006` cut).
-- **Copy approved by the user (2026-09-16):** tagline, `/posts/` subtitle, Now line, form copy, all 32 descriptions.
-- **Descriptions:** chosen once in `_head_extend.html`. A published page without one fails the build (drafts fall
-  back). Publish tools take `--description`, keep it, and refuse before writing. `zola check` does NOT catch it.
-- **Link-preview card** is rendered from source (`scripts/build-og-card.py` + `og-card.html`); `build.sh` warns stale.
-- **Homepage = doors → Now line → Latest 5**; form guide on `/posts/`. **Header:** Posts hides below 575px (measured).
-- **Motion only on the front door and header chrome**, inside `prefers-reduced-motion: no-preference`; approved by
-  the user. Door stagger fill is `backwards` (`both`/`forwards` kill the hover lift). Flock: no click-through.
-- **Résumé is structured data**, one template for page and PDF. Anything naming the site on paper reads
-  `extra.canonical_url` (guarded). **Projects:** authored facts, derived evidence; public repos only (never `boids-private`).
-- **Playground:** heavy demos show content-addressed posters (rerun `capture-demo-posters.py` after changing
-  one); `noindex` hides a demo (only `hero-flock`). File sizes on downloads only; search posts-only.
-- **No email on the résumé** until an efeerhie.com forwarding alias exists; **no phone/address ever.**
-- **`themes/serene` is pinned to v5.6.1 by its recorded commit.** `pinned = true` in `.gitmodules` only stops the session
-  hook fast-forwarding it. **Never `update = none`:** clones obey it, so Cloudflare built without the theme.
+- **`custom.css` now lives at `sass/css/custom.scss`.** `compile_sass` mirrors folder structure, so it emits
+  `public/css/custom.css` at the SAME URL, minified (gzipped 11,516 → 4,192 bytes, verified rule-for-rule
+  equivalent). `resume-print.css` stays in `static/`, print-only. **`zola check` deliberately NOT in `build.sh`**
+  (reversing my own earlier suggestion): it hits external links, coupling deploys to other people's uptime.
+- **Zola shortcodes links pinned to the `v0.22.1` GitHub tag.** The page was removed from upstream Zola after
+  0.22.1, so it exists at no getzola.org URL and no branch tip. That tag is also what `build.sh` pins.
+- **`compute-related.py` extracts headings after code fences, before inline-code.** Why, and the cost of moving
+  it either way, is in the comment above that line.
+- **An experience entry may carry `roles` (title/date pairs, newest first) instead of `role` + `dates`:** a
+  promotion names the org ONCE, titles stacked. Antec uses it; the other three keep single-`role`.
+- **Antec: both titles, real dates each** (user, 2026-09-20). They rejected final-title-only as dishonest and
+  rejected repeating the org. Bullets are NOT split by title. **Interests** section shipped (their word choice).
+- ⚠️ **Page 1 of the résumé is FULL: y=750 of 758 usable.** Any Education/Experience addition pushes a whole
+  entry over (`.rs-entry` is `break-inside: avoid`). Cutting Antec's test-equipment bullet buys two lines back.
+- 2026-09-16 handoff holds: no email until a forwarding alias exists, no phone/address ever, theme pinned v5.6.1.
 
 ## Do NOT re-survey
-- **Sweep 8 is the verification record** (`ui-checklist.md`): KaTeX, résumé/PDF, Projects, Playground, demo chrome,
-  homepage, header, motion, descriptions, SEO audit (148 JSON-LD, Lighthouse SEO 100), homepage perf 99 / CLS 0.
-- **Live site checked after the fix deploy:** home, `/resume/`, `/projects/`, `/playground/`, a post, the card.
-- ⚠️ Minified HTML omits `</head>` and puts `content` before `name`. Extra Playwright contexts need `bringToFront()`.
-- ⚠️ `PROJECT_PROCESS.md` has no "§ Cycle Closure"; closing a cycle is Session 6 (Phases A–D).
+- **Lighthouse on a POST page, 2026-09-20: a11y 100, best-practices 100, perf 98, CLS 0.** Closes
+  `ui-checklist.md`'s focus-states and CLS/image-sizing gaps; not yet written there. Automated a11y catches ~1/3.
+- **Harness artifacts, not findings:** cache-lifetime / latency / render-blocking warnings come from
+  `python3 -m http.server` sending no cache headers. Likewise the 78KB "unused CSS": `giallo-dark.css` must
+  preload or the toggle flashes. Clean on review: `hero-flock.js`, `header.js`, `tools/src/`.
+- `bash build.sh` end to end after all four fixes: clean, 12/12 demo back-links, 32 pages indexed. Résumé PDF
+  rebuilt after the CSS move, still 2 pages, passing its assertions.
 
 ## Open threads
-- All queued in `.omni/tasks.toml`: demo-page meta descriptions (`0011`), stale front-matter template body (`0012`),
-  résumé polish (`0013`, deferred by the user), demo theme toggle (`0014`), untested checklist rows (`0007`, `0008`).
-- **Untested:** whether the door stagger shows after a speculation-rules prerender of `/`.
+- **Deferred findings (3).** `search.js` double-mounts Pagefind if the overlay closes inside the load window
+  (cache the promise, not the boolean); `build-resume-pdf.sh` + `capture-demo-posters.py` bind fixed ports
+  unchecked and assert only negatives, so a wrong-page PDF would pass; 24 of 30 images lack width/height, left
+  because CLS measured 0. **ACM link** in `tf-idf.md` 403s to curl even with a browser UA; unverified, left.

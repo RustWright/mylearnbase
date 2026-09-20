@@ -33,9 +33,17 @@ details = ["GPA 4.36 / 4.50", "Best Graduating Student, Department of Mechanical
 
 [[extra.experience]]
 org = "Antec Controls"
-role = "Manufacturing Specialist"
-dates = "Nov 2022 – Aug 2026"
+# A promotion at one employer, so `roles` (newest first) rather than `role`: the
+# organisation is named once and the titles stack under it. Two separate
+# experience entries would repeat "Antec Controls" and read as two jobs at two
+# places. The bullets below cover the whole tenure and are not split by title.
+roles = [
+  { role = "Intermediate Manufacturing Specialist", dates = "Jan 2026 – Aug 2026" },
+  { role = "Manufacturing Specialist", dates = "Nov 2022 – Jan 2026" },
+]
 bullets = [
+  "Led the project that established manufacturing at a new site, meeting country-of-origin and domestic-content requirements the existing facility could not satisfy.",
+  "Planned the setup end to end and executed it on site, taking the new space to a peak of 200 valves in a single day within its first week.",
   "Operated and maintained automated test equipment for airflow testing of valves used in critical environments.",
   "Owned technical documentation and calibration procedures maintaining NVLAP accreditation for airflow measurement systems.",
   "Supported planning and execution of a production facility relocation into a space twice the size of the previous one.",
@@ -125,4 +133,13 @@ dates = "2019 – 2021"
 [[extra.awards]]
 name = "Grettir Eggertson Memorial Scholarship"
 dates = "2019 – 2021"
+
+# One line, deliberately. This section says who the person is away from the
+# work, and it stops paying the moment it competes for space with the sections
+# above it. A plain table, not an array-of-tables like the rest of this file:
+# the entries carry no per-item fields, and the affiliation they share is held
+# once in `context` rather than repeated into every entry.
+[extra.interests]
+items = ["Archery", "Dragon boat"]
+context = "University of Waterloo clubs"
 +++

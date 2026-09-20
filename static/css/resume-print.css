@@ -220,3 +220,11 @@ body.resume .rs-skills dt { font-weight: 600; }
 body.resume .rs-skills dd { margin: 0; }
 
 body.resume .rs-awards li { margin: 0 0 2pt; }
+
+body.resume .rs-interests { margin: 0; font-size: 9.75pt; }
+body.resume .rs-interests-context { color: var(--rs-muted) !important; }
+body.resume .rs-interests-context::before {
+  content: "·";
+  margin: 0 0.55em;
+  color: var(--rs-rule) !important;
+}
