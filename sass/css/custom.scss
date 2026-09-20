@@ -792,6 +792,16 @@ body.search-open {
 .resume-body .rs-awards { list-style: none; padding: 0; margin: 0; }
 .resume-body .rs-awards li { margin: 0 0 0.3em; }
 
+/* Interests: one line. The shared affiliation trails the items in muted type,
+   its separator generated the way .resume-contact generates its own. */
+.resume-body .rs-interests { margin: 0; }
+.resume-body .rs-interests-context { color: var(--text-pale-color); }
+.resume-body .rs-interests-context::before {
+  content: "·";
+  margin: 0 0.5em;
+  color: var(--text-pale-color);
+}
+
 /* Two renderings per contact link: the name on screen, the URL on paper. */
 .rs-print { display: none; }
 

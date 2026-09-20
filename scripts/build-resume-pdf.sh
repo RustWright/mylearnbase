@@ -69,7 +69,7 @@ done
 echo "Printing /resume/ with $CHROME…"
 # --headless=old is REQUIRED, and it is not interchangeable with plain --headless.
 # Chrome's new headless renders --print-to-pdf against SCREEN media, so the
-# @media print block in static/css/custom.css is ignored entirely and the PDF
+# print rules (static/css/resume-print.css) are ignored entirely and the PDF
 # comes out carrying the site nav, the theme toggle and a "Download PDF" button
 # inside the download. Verified on Chrome 151 by printing with a red background
 # forced under @media print: the PDF stayed white.

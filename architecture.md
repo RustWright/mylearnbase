@@ -145,9 +145,11 @@ mylearnbase/
 │   ├── series/{list,single}.html # custom — theme ships no series templates
 │   ├── tags/{list,single}.html
 │   └── shortcodes/demo.html      # {{ demo() }} iframe embed
+├── sass/
+│   └── css/custom.scss           # → public/css/custom.css, MINIFIED by compile_sass
 ├── static/
 │   ├── js/                       # header.js, reader-controls.js, search.js, hero-flock.js
-│   ├── css/custom.css
+│   ├── css/resume-print.css      # copied verbatim; print-only, so not worth the move
 │   ├── demos/<project>/<name>/   # self-contained interactive demos (concepts, mylearnbase)
 │   ├── fonts/                    # OpenDyslexic (reader-controls typeface)
 │   ├── img/                      # favicons, logo, og-default.png (rendered by scripts/build-og-card.py)

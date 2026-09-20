@@ -385,7 +385,7 @@ Serene has no series templates — these are built from scratch, modeled after t
 
 Both follow the same pattern as the tag templates: extend `_base.html`, use the same CSS classes (`layout-list`, `post-list`, `tags`), and include the standard footer. Copy `templates/tags/list.html` and `templates/tags/single.html` as starting points and adjust the title, description, and variable names (`terms`/`term` stay the same since Zola uses these for all taxonomies).
 
-[^tera-escape]: Tera template syntax (`{{/*..*/}}` and `{%/*...*/%}`) inside Zola markdown content requires special escaping, which makes it impractical to inline full template files in blog posts. This is a known Zola limitation — see the [shortcodes documentation](https://www.getzola.org/documentation/content/shortcodes/#shortcodes-without-body) for escape syntax details.
+[^tera-escape]: Tera template syntax (`{{/*..*/}}` and `{%/*...*/%}`) inside Zola markdown content requires special escaping, which makes it impractical to inline full template files in blog posts. This is a known Zola limitation — see the [shortcodes documentation](https://github.com/getzola/zola/blob/v0.22.1/docs/content/documentation/content/shortcodes.md#shortcodes-without-body) for escape syntax details.
 
 ---
 

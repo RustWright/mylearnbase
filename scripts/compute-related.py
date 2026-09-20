@@ -127,10 +127,26 @@ def parse_post(path: Path) -> tuple[str, list[str]] | None:
     title = title_match.group(1) if title_match else path.stem
 
     body = raw[fm_match.end():] if fm_match else raw
-    headings = " ".join(HEADING_RE.findall(body))
 
     body = IMAGE_RE.sub(" ", body)
     body = CODE_FENCE_RE.sub(" ", body)
+
+    # Headings come out HERE: after the fences, before everything else.
+    #
+    # After the fences, because `#` starts a comment in shell, Python, TOML and
+    # YAML, so a fenced block full of them reads as a run of markdown headings
+    # and every token inside gets HEADING_WEIGHT. Measured on this repo when the
+    # extraction sat above this line: 548 captured headings, 79 of them code
+    # comments, concentrated in the archive posts.
+    #
+    # Before everything else, because the remaining substitutions damage real
+    # headings. INLINE_CODE_RE is the worst of them: it would turn
+    # "Scaffolding — `logbook init`" into "Scaffolding —", dropping exactly the
+    # vocabulary that makes a heading worth up-weighting. Moving the extraction
+    # to the bottom of this block was tried and cost 13 headings outright and 34
+    # more partially.
+    headings = " ".join(HEADING_RE.findall(body))
+
     body = INLINE_CODE_RE.sub(" ", body)
     body = SHORTCODE_RE.sub(" ", body)
     body = LINK_RE.sub(r"\1", body)

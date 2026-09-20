@@ -5,6 +5,10 @@
    Rendered in the child template's context: `page` is defined on post pages,
    `section` on section/home pages, `taxonomy` on tag and series pages, none of
    them on special pages (404). #}
+{# The SOURCE is sass/css/custom.scss, not static/. Zola's compile_sass mirrors
+   the folder structure and minifies, so it emits public/css/custom.css at this
+   exact URL — 40KB of readable CSS became 17.5KB, and get_url is unchanged.
+   It is plain CSS in a .scss file; nothing in it uses Sass syntax. #}
 <link rel="stylesheet" href="{{ get_url(path='css/custom.css') }}">
 
 {# Crisp SVG favicon (modern browsers prefer it; adapts to browser dark mode).

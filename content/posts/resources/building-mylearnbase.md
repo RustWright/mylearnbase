@@ -18,9 +18,11 @@ tags = ["zola", "static-sites", "tooling"]
   site is built on. Single Rust binary, no plugin ecosystem to manage; Markdown
   in, HTML out. Its **[Tera](https://keats.github.io/tera/)** templating language
   is what every layout and shortcode here is written in.
-  The [shortcodes documentation](https://www.getzola.org/documentation/content/shortcodes/)
+  The [shortcodes documentation](https://github.com/getzola/zola/blob/v0.22.1/docs/content/documentation/content/shortcodes.md)
   earned its own bookmark — it's where the rule that `{{/* */}}`-style escaping
-  is needed inside code blocks finally became clear.
+  is needed inside code blocks finally became clear. That link is pinned to the
+  v0.22.1 tag on purpose: the page was dropped from getzola.org's published docs
+  after that release, and the tag is the version this site actually builds with.
 - **[Serene](https://github.com/isunjn/serene)** — the theme the design started
   from. Pulled in as a pinned git submodule and then heavily customized: the
   persistent header, site search, reader controls, and post chrome are all

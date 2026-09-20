@@ -26,12 +26,34 @@
 
   function clamp(n) { return Math.min(MAX, Math.max(MIN, n)); }
 
+  /* localStorage THROWS rather than returning null when a browser blocks site
+     data (Chrome's "block all cookies", some private modes, enterprise policy).
+     Unguarded, the first read below aborted this whole IIFE before it could run
+     `container.hidden = false`, so the control silently never appeared — for
+     exactly the readers whose privacy settings suggest they care most about
+     controlling their own experience. The no-FOUC script in
+     templates/_head_extend.html already wraps its reads this way; this is the
+     same guard applied to its twin.
+
+     Degrading, not failing: a reader who cannot persist still gets working
+     controls for the page they are on, they just start from the default on the
+     next one. Writes are guarded too, since a full quota throws on set. */
+  function readStore(key) {
+    try { return localStorage.getItem(key); } catch (e) { return null; }
+  }
+  function writeStore(key, value) {
+    try { localStorage.setItem(key, value); } catch (e) { /* not persisted */ }
+  }
+  function clearStore(key) {
+    try { localStorage.removeItem(key); } catch (e) { /* nothing to clear */ }
+  }
+
   function currentSize() {
-    var n = parseInt(localStorage.getItem("reader-size"), 10);
+    var n = parseInt(readStore("reader-size"), 10);
     return isNaN(n) ? DEFAULT : clamp(n);
   }
   function currentFont() {
-    return localStorage.getItem("reader-font") || "sans";
+    return readStore("reader-font") || "sans";
   }
 
   function applySize(n) {
@@ -50,11 +72,11 @@
 
   function setSize(n) {
     n = clamp(n);
-    localStorage.setItem("reader-size", n);
+    writeStore("reader-size", n);
     applySize(n);
   }
   function setFont(key) {
-    localStorage.setItem("reader-font", key);
+    writeStore("reader-font", key);
     applyFont(key);
   }
   function openPanel(open) {
@@ -74,8 +96,8 @@
     b.addEventListener("click", function () { setFont(b.dataset.font); });
   });
   reset.addEventListener("click", function () {
-    localStorage.removeItem("reader-size");
-    localStorage.removeItem("reader-font");
+    clearStore("reader-size");
+    clearStore("reader-font");
     root.style.removeProperty("--reader-font-size");
     applySize(DEFAULT);
     applyFont("sans");
