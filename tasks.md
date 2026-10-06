@@ -56,6 +56,10 @@ Order that held: KaTeX → flock prototype (review gate) → résumé → projec
 - **Carried from Cycle 5:** all five Cycle 5 tasks shipped (doc refresh, Sweep 7, TF-IDF related posts, colophon, content batch). Their detail is in `project.md` and git history.
 - **Open, unscheduled:** the 12 standalone demo pages have no meta description; the front-matter template body describes the old post format; résumé polish (page 2 ~40% full, a duplicated award line, accent colour); demos follow `prefers-color-scheme` while the site has a toggle.
 - **Out of scope this cycle:** the ASD-STE100 writing standard below, and the editorial-voice initiative.
+- **Concepts post candidate: building the Coriolis matrix $C$ from Christoffel symbols** (added 2026-10-06, user decision to post). The demo draft is `~/waterloo_grad_courses/ME_641/demos/christoffel_indices.html` (private course repo); it would move to `static/demos/<slug>/`. The concept failed across several ME 641 sessions as formulas and prose. The step-through "watch C get built" view made it click: each $M$ entry flies from its cell, is differentiated, combined, multiplied by $\dot q_i$, and lands in its cell of $C$, with the final $C$ visible as the target. Curiosity entry: `waterloo_grad_courses/.curiosities/current.md`. Cleanup before posting:
+  - **UI:** boxes grow with their text and overlap (workbench slots, badges, the mission card).
+  - **Mission order:** group the puck missions and the cart–pendulum missions back to back.
+  - **Strip personal context** so a fresh reader has everything: the ME 641 framing, the "your leg, on paper" mission, private file names (`Plant_Modeling_Reference.md`), and any reference that assumes earlier sessions.
 
 
 - We need to make our own version of https://www.asd-ste100.org/about.html
