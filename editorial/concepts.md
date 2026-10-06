@@ -173,6 +173,18 @@ Two cross-form notes:
   yields to the sticky table-of-contents on wide screens, and the
   self-sizing-on-mobile mechanics live in `static/css/custom.css` and
   the demo's own JS.
+- **Reveal the demo in step with the missions.** *(Christoffel-index
+  demo draft, 2026-10-06.)* The first build showed every panel,
+  explanation and control on load, and the author's first reaction,
+  before reading a word, was that it was too much at once. The fix:
+  each mission shows only the panels it uses, and a new panel slides
+  in when its mission arrives. All instructions live in one place (a
+  mission card), not scattered across panel headings and prompts.
+  The explanation of *why* stays hidden until the reader has made a
+  first attempt, and folds away again afterwards. Related trap: a
+  "predict first" mode must hide whatever the prediction is testing.
+  That first build displayed the substituted formula during the
+  prediction, which gave the answer away.
 
 ## The curiosity log mechanism
 
