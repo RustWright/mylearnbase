@@ -119,17 +119,32 @@ def main() -> int:
              "--output-dir", str(build_dir), "--force"],
             check=True, stdout=subprocess.DEVNULL,
         )
+        # The port must be FREE, and the server must be OURS. If something else
+        # already listens on PORT, http.server fails to bind and exits silently,
+        # the readiness probe below succeeds against the stranger, and every
+        # poster is a capture of whatever that server returns. Fail loudly.
+        import socket
+        with socket.socket() as s:
+            try:
+                s.bind(("127.0.0.1", PORT))
+            except OSError:
+                sys.exit(f"error: port {PORT} is already in use. Stop whatever is on it; "
+                         "capturing would photograph that server's pages instead.")
         server = subprocess.Popen(
             [sys.executable, "-m", "http.server", str(PORT),
              "--directory", str(build_dir), "--bind", "127.0.0.1"],
             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
         )
         for _ in range(50):
+            if server.poll() is not None:
+                sys.exit(f"error: the local server on port {PORT} exited at startup.")
             try:
                 urllib.request.urlopen(f"http://127.0.0.1:{PORT}/", timeout=0.3)
                 break
             except Exception:
                 time.sleep(0.1)
+        else:
+            sys.exit(f"error: the local server on port {PORT} never became ready.")
 
         failures = []
         for e in todo:

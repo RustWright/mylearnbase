@@ -38,6 +38,14 @@ fi
 
 mkdir -p "$OUT_DIR"
 
+# The port must be FREE. If anything already listens on it, our http.server
+# fails to bind and exits silently, the readiness probe below succeeds against
+# the stranger, and Chrome prints the stranger's page into the résumé.
+if curl -s -o /dev/null --max-time 1 "http://127.0.0.1:$PORT/"; then
+  echo "error: port $PORT is already in use. Stop whatever is on it, or set RESUME_PDF_PORT." >&2
+  exit 1
+fi
+
 # Print from a real HTTP server rather than a file:// path. The page pulls CSS and
 # fonts through absolute site-root URLs (/css/custom.css), which file:// resolves
 # against the filesystem root and silently fails to load — producing an unstyled
@@ -60,11 +68,15 @@ python3 -m http.server "$PORT" --directory "$BUILD_DIR" --bind 127.0.0.1 >/dev/n
 SERVER_PID=$!
 trap 'kill "$SERVER_PID" 2>/dev/null || true; rm -rf "$BUILD_DIR"' EXIT
 
-# Wait for readiness instead of sleeping a guessed interval.
+# Wait for readiness instead of sleeping a guessed interval, and fail if the
+# server died or never answered rather than printing whatever is (not) there.
+READY=""
 for _ in $(seq 1 50); do
-  if curl -fsS "http://127.0.0.1:$PORT/resume/" >/dev/null 2>&1; then break; fi
+  kill -0 "$SERVER_PID" 2>/dev/null || { echo "error: the local server on :$PORT exited at startup." >&2; exit 1; }
+  if curl -fsS "http://127.0.0.1:$PORT/resume/" >/dev/null 2>&1; then READY=1; break; fi
   sleep 0.1
 done
+[ -n "$READY" ] || { echo "error: the local server on :$PORT never served /resume/." >&2; exit 1; }
 
 echo "Printing /resume/ with $CHROME…"
 # --headless=old is REQUIRED, and it is not interchangeable with plain --headless.
@@ -110,6 +122,20 @@ if command -v pdftotext >/dev/null 2>&1; then
     exit 1
   fi
   echo "Verified: no screen-only chrome in the PDF text."
+
+  # The checks above only prove what is ABSENT, so a wrong page with no nav bar
+  # would pass them. Assert the résumé is actually THERE.
+  MISSING=""
+  for marker in "Efe-Oghene Erhie" "EDUCATION" "EXPERIENCE"; do
+    printf '%s' "$TXT" | grep -q -i -F "$marker" || MISSING="$MISSING  - $marker"$'\n'
+  done
+  if [ -n "$MISSING" ]; then
+    echo "error: the PDF is missing résumé content, so it printed the wrong page:" >&2
+    printf '%s' "$MISSING" >&2
+    rm -f "$OUT"
+    exit 1
+  fi
+  echo "Verified: the PDF carries the résumé's name and sections."
 else
   echo "warning: pdftotext not found — could not verify the print stylesheet applied." >&2
 fi

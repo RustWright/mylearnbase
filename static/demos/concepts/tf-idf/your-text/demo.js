@@ -178,8 +178,8 @@
 
     $("sharednote").innerHTML = "They share <b>" + stats.shared + "</b> words. " +
       "<b>" + stats.onlyA + "</b> words appear only in A and <b>" + stats.onlyB +
-      "</b> only in B &mdash; those multiply against a zero and add nothing. " +
-      "(Rarity is scored against the earlier demos&rsquo; 12-document library plus your two texts.)";
+      "</b> only in B. Those multiply against a zero and add nothing. " +
+      "(Rarity is scored against a library of 12 Wikipedia articles plus your two texts.)";
     fit();
   }
 

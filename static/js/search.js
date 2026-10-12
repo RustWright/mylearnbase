@@ -14,15 +14,17 @@
   // dead button).
   toggle.hidden = false;
 
-  var uiLoaded = false;
+  // The PROMISE is cached, not a "loaded" flag. A flag only flips once the
+  // script has loaded, so open → close → open inside that window started a
+  // second load and mounted a second PagefindUI into the same element. Every
+  // open during the load now shares the one in flight. A failed load clears
+  // the cache so a later open can retry rather than stay broken.
+  var uiPromise = null;
   var lastFocus = null;
 
   function loadPagefindUI() {
-    return new Promise(function (resolve, reject) {
-      if (uiLoaded) {
-        resolve();
-        return;
-      }
+    if (uiPromise) return uiPromise;
+    uiPromise = new Promise(function (resolve, reject) {
       var css = document.createElement("link");
       css.rel = "stylesheet";
       css.href = "/pagefind/pagefind-ui.css";
@@ -32,17 +34,23 @@
       script.src = "/pagefind/pagefind-ui.js";
       script.onload = function () {
         /* global PagefindUI */
+        mount.replaceChildren();   // drop a previous failure's message, if any
         new PagefindUI({
           element: "#search-ui",
           showSubResults: true,
           showImages: false,
         });
-        uiLoaded = true;
         resolve();
       };
-      script.onerror = reject;
+      script.onerror = function (e) {
+        script.remove();
+        css.remove();
+        uiPromise = null;
+        reject(e);
+      };
       document.body.appendChild(script);
     });
+    return uiPromise;
   }
 
   function open() {
@@ -52,6 +60,7 @@
     document.body.classList.add("search-open");
     loadPagefindUI()
       .then(function () {
+        if (overlay.hidden) return;   // closed while loading: don't steal focus
         var input = overlay.querySelector("input");
         if (input) input.focus();
       })
