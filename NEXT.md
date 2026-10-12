@@ -1,16 +1,16 @@
 # NEXT — mylearnbase
 
-**Updated:** 2026-10-12 · Morning list DONE: efeerhie.com, `efe@` alias, résumé QR, Christoffel post, card.
+**Updated:** 2026-10-12 · Morning list shipped; all 7 review findings resolved; **Cycle 6 CLOSED**.
 
 ## Next action
-**Close Cycle 6** (`0016`, XS), then **plan Cycle 7 in a FRESH session** (user's order, 2026-10-12). Cycle 7's
-proposed core is the skills↔projects mapping (L, user's idea, not yet scoped). Standing: ASD-STE100 (`0003`).
-- **Build pipeline now SIZES IMAGES** (`scripts/size-images.py`, after `zola build` in `build.sh`): writes
-  intrinsic width/height onto every local `<img>` (Zola can't), fails on a missing file. Keep authoring plain
-  Markdown images; never hand-add dimensions. Search loads Pagefind once (cached promise); PDF/poster scripts
-  refuse a busy port.
+**Plan Cycle 7** (`0017`), in this fresh session (user's order). Proposed core, the user's idea and NOT yet
+scoped: map skills to projects so the résumé can show which project exercises which skill, and route résumé
+readers into the projects. Candidate from the Cycle 6 close: a front-door logbook entry (doors + hero flock)
+embedding the orphan `mylearnbase/hero-flock` demo. Standing: ASD-STE100 (`0003`). Queue: `.omni/tasks.toml`.
 
 ## Decisions in force
+- **`build.sh` sizes every local `<img>`** (`scripts/size-images.py`; Zola can't, fails on a missing file):
+  author plain Markdown images, never hand-add dimensions. PDF/poster scripts refuse a busy port.
 - ⚠️ **Never "Engineer" as the user's title** (Ontario PEO; unlicensed, MB EIT lapsing, user 2026-10-12).
   Degree wording only: résumé subtitle, JSON-LD jobTitle, card. `build-card-pdf.sh` blocks the word.
 - **efeerhie.com = 301** to mylearnbase.com (`http*://*efeerhie.com/*` → `https://mylearnbase.com/${3}`,

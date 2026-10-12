@@ -1,7 +1,7 @@
 schema  = 1
 project = "mylearnbase"
 cycle   = 6
-updated = 2026-09-16
+updated = 2026-10-12
 
 # Cycle 6 (audience routing) shipped; every task in tasks.md is done. The live queue
 # below comes from what tasks.md only lists as notes: the user's writing-standard
@@ -130,15 +130,15 @@ note   = "2026-10-12: efe@efeerhie.com via Cloudflare Email Routing (receive-onl
 [[task]]
 id     = "mylearnbase-0016"
 title  = "Close Cycle 6"
-status = "todo"
+status = "done"
 size   = "XS"
-ref    = "project.md, Cycle 6 entry"
-note   = "Implementation complete 2026-09-16. Phase D remains: no curiosities were logged; decide whether any Cycle 6 feature wants a logbook demo."
+ref    = "project.md, Cycle 6 close (2026-10-12)"
+note   = "Closed 2026-10-12 on the 2026-09-20 combined review, all 7 findings resolved (user decision). No curiosities. Logbook-demo candidate: the front door (doors + hero flock), which would embed the orphan hero-flock demo."
 
 [[task]]
 id     = "mylearnbase-0017"
 title  = "Plan Cycle 7"
-status = "blocked"
+status = "todo"
 size   = "M"
-ref    = "project.md"
-blocked_by = ["mylearnbase-0016"]
+ref    = "project.md, Cycle 6 close + Between cycles (2026-10-12)"
+note   = "In a FRESH session (user, 2026-10-12). Proposed core: map skills to projects so the résumé can show which project exercises which skill. Candidate: front-door logbook entry."
