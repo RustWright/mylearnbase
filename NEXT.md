@@ -3,9 +3,12 @@
 **Updated:** 2026-10-12 · Morning list DONE: efeerhie.com, `efe@` alias, résumé QR, Christoffel post, card.
 
 ## Next action
-**Not chosen: ask the user.** Candidates, none picked: close Cycle 6 (`0016`, XS) then plan Cycle 7 (`0017`),
-whose proposed core is the skills↔projects mapping (L, user's 2026-10-12 idea, not yet scoped); the open
-threads below; standing ASD-STE100 (`0003`). Queue: `.omni/tasks.toml`.
+**Close Cycle 6** (`0016`, XS), then **plan Cycle 7 in a FRESH session** (user's order, 2026-10-12). Cycle 7's
+proposed core is the skills↔projects mapping (L, user's idea, not yet scoped). Standing: ASD-STE100 (`0003`).
+- **Build pipeline now SIZES IMAGES** (`scripts/size-images.py`, after `zola build` in `build.sh`): writes
+  intrinsic width/height onto every local `<img>` (Zola can't), fails on a missing file. Keep authoring plain
+  Markdown images; never hand-add dimensions. Search loads Pagefind once (cached promise); PDF/poster scripts
+  refuse a busy port.
 
 ## Decisions in force
 - ⚠️ **Never "Engineer" as the user's title** (Ontario PEO; unlicensed, MB EIT lapsing, user 2026-10-12).
@@ -33,7 +36,5 @@ threads below; standing ASD-STE100 (`0003`). Queue: `.omni/tasks.toml`.
 - Zola minifies HTML: attribute quotes are stripped, so grep built pages without assuming `="`.
 
 ## Open threads
-- TF-IDF `vector-space` demo opens "The last demo turned…": breaks the standalone-demo rule. One sentence.
-- Deferred findings (3): `search.js` Pagefind double-mount; fixed ports unchecked in two scripts; 24/30 images
-  lack width/height (CLS 0). ACM link in `tf-idf.md` 403s to curl. `0013` résumé polish open.
+- ACM link in `tf-idf.md` 403s to curl (unverified, left). `0013` résumé polish open.
 - The user orders the card at W Print themselves (double-sided, 3.5×2in); a reprint follows any URL change.

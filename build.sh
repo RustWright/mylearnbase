@@ -103,6 +103,12 @@ python3 scripts/build-demo-index.py
 echo "Building site with ${ZOLA}…"
 "$ZOLA" build
 
+# Zola emits Markdown images with no width/height, so the browser cannot reserve
+# their box and the page jumps when they load. Write in each file's intrinsic
+# dimensions; fails the build if a local image is missing or unreadable.
+echo "Sizing images…"
+python3 scripts/size-images.py public
+
 # Assert the derived back-links actually resolve in what was just built.
 #
 # This is the one link class Zola cannot check: the demo bar is injected by
