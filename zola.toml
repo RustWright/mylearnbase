@@ -66,16 +66,22 @@ blog_section_path = "/posts"
 # Deliberately NO phone number and NO postal address: the source CV carries both,
 # and neither belongs on a page that is public and search-indexed.
 #
-# NO personal email either, for now. A mailto: on an indexed page is harvested,
-# and a personal address once scraped cannot be withdrawn. LinkedIn carries the
-# contact path in the meantime. The intended fix is a forwarding alias on the
-# efeerhie.com domain (Cloudflare Email Routing, free) — an address that can be
-# rotated or switched off without touching the personal inbox. Add it here once
-# it exists.
+# The email is a FORWARDING ALIAS (Cloudflare Email Routing on efeerhie.com),
+# never the personal inbox. A mailto: on an indexed page is harvested, and a
+# scraped personal address cannot be withdrawn; the alias can be rotated or
+# switched off without touching the inbox. build-resume-pdf.sh fails the PDF if
+# any other address appears in it.
 resume_links = [
+  { name = "Email", url = "mailto:efe@efeerhie.com" },
   { name = "LinkedIn", url = "https://www.linkedin.com/in/efe-erhie", external = true },
   { name = "GitHub", url = "https://github.com/RustWright", external = true },
 ]
+
+# The address PRINTED on paper (résumé, business card) and encoded in the QR
+# code. A name-based domain that 301s to canonical_url at Cloudflare, path and
+# query kept, so a printed address outlives any rename of the site itself.
+# Bare domain only: scripts/build-qr.py uppercases it to shrink the QR grid.
+print_url = "https://efeerhie.com"
 
 # The site's REAL address, deliberately a copy of base_url above.
 #

@@ -109,6 +109,34 @@ body.resume .section-title p {
   margin: 0;
 }
 
+/* QR code in the masthead's empty right corner. Absolutely positioned so it adds
+   NO height: page 1 is full to its last line, and anything in flow pushes a whole
+   experience entry onto page 2. 0.8in holds a version-1 grid (21 modules) at
+   ~1mm a module, coarse enough for a phone to read off an office print. The SVG
+   has NO quiet zone of its own: the page margins above and right, and the gap
+   to EDUCATION below, supply the required 4 modules (~4mm). Keep that gap. */
+body.resume main { position: relative; }
+/* The extra class outranks `.rs-print`'s display:inline above; both are
+   !important, so specificity decides. */
+body.resume .rs-qr-block.rs-print {
+  display: flex !important;
+  position: absolute;
+  top: 0;
+  right: 0;
+  align-items: center;
+  gap: 4mm;
+}
+body.resume .rs-qr-caption {
+  font-size: 8pt;
+  line-height: 1.25;
+  text-align: right;
+  color: var(--rs-muted);
+}
+body.resume .rs-qr {
+  width: 0.8in;
+  height: 0.8in;
+}
+
 /* The gap below the masthead lives HERE, not on the first section: the screen
    sheet zeroes .rs-section:first-child's top margin with a more specific
    selector, which silently won and pressed EDUCATION against the contact line. */

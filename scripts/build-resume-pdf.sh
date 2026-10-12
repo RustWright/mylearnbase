@@ -136,6 +136,21 @@ if { pdftotext "$OUT" - 2>/dev/null; cat "$OUT"; } | LC_ALL=C grep -a -q -E "$LO
 fi
 echo "Verified: no localhost address in the PDF text or its links."
 
+# Only the forwarding alias's domain may appear as an email address. The résumé
+# source CV carries a personal address, and a PDF is handed to people who keep
+# it: an address leaked here cannot be withdrawn. Same two-place search as above.
+ALLOWED_MAIL_DOMAIN="efeerhie.com"
+STRAY="$({ pdftotext "$OUT" - 2>/dev/null; cat "$OUT"; } \
+  | LC_ALL=C grep -a -o -E "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}" \
+  | grep -v -i "@${ALLOWED_MAIL_DOMAIN}\$" | sort -u || true)"
+if [ -n "$STRAY" ]; then
+  echo "error: the PDF carries an email address outside @$ALLOWED_MAIL_DOMAIN:" >&2
+  printf '%s\n' "$STRAY" | sed 's/^/  - /' >&2
+  rm -f "$OUT"
+  exit 1
+fi
+echo "Verified: every email address in the PDF is @$ALLOWED_MAIL_DOMAIN."
+
 # Record what the PDF was built FROM, so build.sh can tell when the page has moved
 # on without it. Hashing the source (not the PDF) is the point: the PDF's bytes
 # change on every run from timestamps, so it cannot be its own witness.

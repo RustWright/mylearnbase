@@ -122,10 +122,10 @@ note   = "Demos read prefers-color-scheme, so a visitor who toggles the site see
 [[task]]
 id     = "mylearnbase-0015"
 title  = "Set up an efeerhie.com email alias, then add contact email to the résumé"
-status = "shelved"
+status = "done"
 size   = "USER"
-ref    = "project.md, Cycle 6 entry (résumé)"
-note   = "Parked by the user. No email appears on the résumé until the alias exists."
+ref    = "zola.toml resume_links; scripts/build-resume-pdf.sh email guard"
+note   = "2026-10-12: efe@efeerhie.com via Cloudflare Email Routing (receive-only), test mail arrived. On the résumé; the PDF build fails on any address outside @efeerhie.com."
 
 [[task]]
 id     = "mylearnbase-0016"
