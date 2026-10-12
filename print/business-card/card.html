@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Business card</title>
+<!--
+  Business card, front and back, printed to PDF by scripts/build-card-pdf.sh.
+
+  Lives in print/, outside content/ and static/, so Zola never publishes it.
+  Every asset path is RELATIVE, because the script prints from file://: the
+  résumé's absolute-path trap (/css/... resolving against the filesystem root)
+  does not apply here. Fonts and the QR come from static/, so the card always
+  matches the résumé's typeface and the code build-qr.py last verified.
+
+  GEOMETRY (W Print: 3.5 x 2 in, 100# uncoated cover). Each page is the trimmed
+  card plus 0.125in BLEED on every side, 3.75 x 2.25in. Anything that must not
+  be trimmed sits at least 0.125in inside the trim line, i.e. 0.25in from the
+  page edge (--safe). W Print publishes no bleed spec; this is the industry
+  standard, and their free file inspection checks it before printing.
+
+  TITLE: degree wording ONLY. In Ontario an unlicensed person may not use a
+  title implying they can practise engineering (PEO); "Mechanical Engineer"
+  must never appear here. See NEXT.md.
+
+  LINKEDIN: the official [in] bug, unmodified, blue on white, as LinkedIn's
+  brand rules require for business cards (with the profile link beside it).
+  Never recolour it to the accent.
+-->
+<style>
+@font-face { font-family: "Card Sans"; font-weight: 400; src: url("../../static/fonts/source-sans-3-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "Card Sans"; font-weight: 600; src: url("../../static/fonts/source-sans-3-latin-600-normal.woff2") format("woff2"); }
+@font-face { font-family: "Card Sans"; font-weight: 700; src: url("../../static/fonts/source-sans-3-latin-700-normal.woff2") format("woff2"); }
+
+@page { size: 3.75in 2.25in; margin: 0; }
+:root {
+  --ink: #1b1d22; --muted: #555b66; --accent: #5871a2; --rule: #c9d1e0;  /* the résumé's print tokens */
+  --bleed: 0.125in; --safe: 0.25in;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: #fff; }
+body { font-family: "Card Sans", sans-serif; color: var(--ink); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+.page {
+  width: 3.75in; height: 2.25in; position: relative; overflow: hidden;
+  page-break-after: always; break-after: page;
+}
+.page:last-child { page-break-after: auto; break-after: auto; }
+/* The accent band runs INTO the bleed, so a slightly-off trim never leaves a
+   white sliver at the card's edge. */
+.band { position: absolute; left: 0; top: 0; bottom: 0; width: calc(var(--bleed) + 0.09in); background: var(--accent); }
+.safe { position: absolute; inset: var(--safe); }
+
+/* ── Front ── */
+.front .safe { left: calc(var(--safe) + 0.12in); display: flex; flex-direction: column; justify-content: space-between; }
+.name { font-weight: 700; font-size: 14pt; line-height: 1.05; color: var(--accent); letter-spacing: -0.01em; }
+.title { margin-top: 3pt; font-size: 7.5pt; line-height: 1.3; color: var(--muted); }
+.title b { font-weight: 600; color: var(--ink); }
+.contacts { list-style: none; font-size: 7.5pt; line-height: 1; }
+.contacts li { display: flex; align-items: center; gap: 5pt; }
+.contacts li + li { margin-top: 4.5pt; }
+.ico { width: 8.5pt; height: 8.5pt; flex: 0 0 auto; color: var(--accent); }
+.ico.li { object-fit: contain; }
+
+/* ── Back ── */
+.back .safe { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6pt; }
+/* 1.2in = 29 modules at ~1.05mm. The SVG carries NO quiet zone; the white card
+   around it supplies the required 4 modules (~4mm) on every side. */
+.qr { width: 1.2in; height: 1.2in; }
+.cap { text-align: center; line-height: 1.25; }
+.cap .lead { font-size: 8pt; font-weight: 600; }
+.cap .url { font-size: 7pt; color: var(--muted); }
+
+/* Preview only (open card.html?preview): show the trim line, so the layout can
+   be checked against what survives the cut. Gated by a URL flag, NOT @media
+   screen: headless Chrome's --print-to-pdf renders against SCREEN media (see
+   scripts/build-resume-pdf.sh), so a screen-only block would print. */
+body.preview { background: #e6e6e6; padding: 20px; display: grid; gap: 20px; justify-content: start; }
+body.preview .page { box-shadow: 0 1px 4px rgba(0,0,0,.25); }
+body.preview .page::after { content: ""; position: absolute; inset: var(--bleed); outline: 1px dashed #d33; pointer-events: none; }
+</style>
+</head>
+<body>
+<script>if (location.search.indexOf('preview') !== -1) document.body.classList.add('preview');</script>
+
+<section class="page front">
+  <div class="band"></div>
+  <div class="safe">
+    <div>
+      <div class="name">Efe-Oghene Erhie</div>
+      <div class="title"><b>MEng Candidate, Mechanical &amp; Mechatronics Engineering</b><br>University of Waterloo</div>
+    </div>
+    <ul class="contacts">
+      <li>
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="5" width="19" height="14" rx="2"/><path d="M3 6.5l9 6.5 9-6.5"/></svg>
+        efe@efeerhie.com
+      </li>
+      <li>
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><path d="M2.5 12h19M12 2.5c2.8 2.6 4.2 5.8 4.2 9.5s-1.4 6.9-4.2 9.5M12 2.5C9.2 5.1 7.8 8.3 7.8 12s1.4 6.9 4.2 9.5"/></svg>
+        efeerhie.com
+      </li>
+      <li>
+        <img class="ico li" src="assets/linkedin-in-bug.png" alt="LinkedIn">
+        linkedin.com/in/efe-erhie
+      </li>
+    </ul>
+  </div>
+</section>
+
+<section class="page back">
+  <div class="safe">
+    <img class="qr" src="../../static/img/resume-qr.svg" alt="QR code linking to efeerhie.com/resume">
+    <div class="cap">
+      <div class="lead">Scan for my résumé</div>
+      <div class="url">efeerhie.com/resume</div>
+    </div>
+  </div>
+</section>
+
+</body>
+</html>
