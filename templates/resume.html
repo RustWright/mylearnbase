@@ -41,7 +41,10 @@
   "@type": "Person",
   "name": {{ config.extra.author | json_encode | safe }},
   "url": {{ get_url(path="/resume/") | json_encode | safe }},
-  "jobTitle": "Mechanical Engineer",
+  {#- NOT "Mechanical Engineer": in Ontario an unlicensed person may not use a
+      title implying they can practise engineering (Professional Engineers Act;
+      PEO). The degree is a fact; the title is a licence claim. -#}
+  "jobTitle": "MEng Candidate, Mechanical and Mechatronics Engineering",
   "description": {{ section.extra.subtitle | json_encode | safe }},
   "alumniOf": [
     { "@type": "CollegeOrUniversity", "name": "University of Waterloo" },

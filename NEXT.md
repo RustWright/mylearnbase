@@ -25,7 +25,8 @@ whose proposed core is the skills↔projects mapping (L). Not yet chosen: confir
 - **One QR: `static/img/site-qr.svg`** from `scripts/build-qr.py`, `print_url` UPPERCASED → version 1, EC M,
   decode-verified, NO quiet zone in the file. Résumé: top-right masthead, 0.8in, captioned to its LEFT
   ("Scan for projects & live demos"), zero added height. Email = alias only; PDF build fails on any other.
-- ⚠️ **Résumé page 1 is FULL.** `.rs-entry` is `break-inside: avoid`. Never phone/address.
+- ⚠️ **Never "Engineer" as the user's title** (Ontario PEO; unlicensed, MB EIT lapsing, user 2026-10-12):
+  degree wording only, on résumé, card, JSON-LD. ⚠️ Résumé page 1 is FULL. Never phone/address.
 - `custom.css` is `sass/css/custom.scss`; `zola check` NOT in `build.sh`; theme v5.6.1. Failed deploy: Retry first.
 
 ## Do NOT re-survey

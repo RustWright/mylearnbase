@@ -1,6 +1,6 @@
 +++
 title = "Résumé"
-description = "Efe-Oghene Erhie, a mechanical engineer moving into robotics software. MEng at Waterloo, four years in manufacturing test and automation, and a public portfolio of simulation and systems work."
+description = "Efe-Oghene Erhie, an MEng candidate at Waterloo moving from mechanical engineering into robotics software, with four years in manufacturing test and automation and a public portfolio of simulation and systems work."
 template = "resume.html"
 aliases = ["/cv/"]
 
@@ -16,7 +16,7 @@ aliases = ["/cv/"]
 
 [extra]
 title = "Efe-Oghene Erhie"
-subtitle = "Mechanical engineer moving into robotics software. MEng candidate at Waterloo."
+subtitle = "MEng candidate at Waterloo, moving from mechanical engineering into robotics software."
 pdf = "/resume/efe-oghene-erhie-resume.pdf"
 
 [[extra.education]]
