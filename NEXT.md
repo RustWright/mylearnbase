@@ -1,39 +1,39 @@
 # NEXT — mylearnbase
 
-**Updated:** 2026-10-12 · efeerhie.com 301 + `efe@` alias live; résumé QR (captioned) + email shipped.
+**Updated:** 2026-10-12 · efeerhie.com + `efe@` alias + résumé QR + Christoffel concepts post all shipped.
 
 ## Next action
-**Christoffel concepts post** (user-chosen order, 2026-10-12): domain ✓ → résumé QR ✓ → Christoffel → business
-card. `0013` résumé polish still open. Skills↔projects mapping = proposed core of Cycle 7 (L), after closing
-Cycle 6 (`0016`). Phone scan passed (user, 2026-10-12); the caption came from their test, a bare code reads as noise.
+**Business card** (user's morning list, last item): reuse `static/img/site-qr.svg`; needs UW print-centre
+specs (size, bleed, file format) from the user or their site. Then close Cycle 6 (`0016`) and plan Cycle 7,
+whose proposed core is the skills↔projects mapping (L). Not yet chosen: confirm order with the user.
 
 ## Decisions in force
-- **efeerhie.com = 301 redirect, NOT a second copy** (user, 2026-10-12; the bar shows mylearnbase.com). Zone on
-  the same Cloudflare account, Porkbun → `jihoon`/`ligia`. Proxied `AAAA @` + `AAAA www` → `100::`; Redirect
-  Rule wildcard `http*://*efeerhie.com/*` → `https://mylearnbase.com/${3}`, 301, query kept. Verified: apex,
-  www, http, deep path, query all 1 hop. The dashboard's "may not proxy `http`" warning is a FALSE alarm (it
-  reads `http` as the hostname); never create the record it offers. Print material points at efeerhie.com.
-- **Christoffel demo: recommend NO Rust/WASM** (47 KB single HTML, KaTeX only, already site-loaded; a
-  wasm-bindgen bundle would be larger). Not yet confirmed by the user. Cleanup list is in `tasks.md` § Notes.
-- **One QR for all paper: `static/img/site-qr.svg`** from `scripts/build-qr.py`, encoding `print_url`
-  (zola.toml) UPPERCASED → version 1 (21×21), EC M, decode-verified. **No quiet zone in the SVG**: each
-  placement leaves ≥4 modules of white. Résumé: absolute, top-right masthead, 0.8in, zero added height, captioned
-  "Scan for projects & live demos" (user's pick) to its LEFT, never below (that gap is the quiet zone).
-  Paper prints efeerhie.com; PDF hrefs stay canonical. JSON-LD lifts mailto into `email`, not `sameAs`.
-- ⚠️ **Page 1 of the résumé is FULL** (unchanged by the QR). `.rs-entry` is `break-inside: avoid`. Email =
-  the alias only (build guard enforces); never phone/address.
-- **`custom.css` lives at `sass/css/custom.scss`** (emitted at the same URL, minified). `zola check` NOT in
-  `build.sh`: external links would couple deploys to other people's uptime. Theme pinned v5.6.1.
-- **Experience entries may carry `roles`** (title/date pairs, newest first): Antec, both real titles, org once.
-- **A Cloudflare deploy can fail transiently AFTER `build.sh` succeeds:** Retry the same commit first.
+- **Christoffel post** "Where the indices go in a Coriolis matrix" (user's title), all 7 editing.md passes.
+  **Three standalone demos** (user, 2026-10-12): `build/` (watch C built), `predict/` (which three
+  cells, cancellation), `check/` (indices vs no-indices, Ṁ−2C skew). Shared `christoffel.{js,css}`. **Each must
+  stand alone** (own framing, no "the last demo"). **No WASM:** a 2×2 finite difference is the heaviest
+  compute. Demos self-size their iframe via `frameElement` at ALL widths (+ border); verified 0px nested scroll.
+  Cell scrollbars had TWO causes: 150px side columns (now 280px floor, 3-col at ≥1240) AND KaTeX's φ̇ accent
+  overhanging 2px (span padding .25em). Sweep clean 375–1920. In-post the iframe is ≤736px, so always stacked.
+- **Post facts verified against the user's Spong PDF** (`~/Downloads`, a 2004 PRE-PRINT of the 1st ed.): Eq.
+  6.58 slot order, k = equation (6.60), Prop. 6.1 skew only for Christoffel C. Book writes D(q), not M; G is a
+  VECTOR. Cite without section numbers. Link = authors' page `faculty.cc.gatech.edu/~seth/SHV/` (1st ed.).
+  Tags `robotics`, `dynamics` only (user dropped `control-systems`); flock link cut as shoehorned.
+- **Check demo** (mutation-tested): only Check 1 catches an index swap; zero velocity passes any C, so it says so.
+- **efeerhie.com = 301** to mylearnbase.com (`http*://*efeerhie.com/*` → `https://mylearnbase.com/${3}`, proxied
+  `AAAA 100::` at @ and www). Dashboard's "may not proxy `http`" warning is a FALSE alarm. Paper prints it.
+- **One QR: `static/img/site-qr.svg`** from `scripts/build-qr.py`, `print_url` UPPERCASED → version 1, EC M,
+  decode-verified, NO quiet zone in the file. Résumé: top-right masthead, 0.8in, captioned to its LEFT
+  ("Scan for projects & live demos"), zero added height. Email = alias only; PDF build fails on any other.
+- ⚠️ **Résumé page 1 is FULL.** `.rs-entry` is `break-inside: avoid`. Never phone/address.
+- `custom.css` is `sass/css/custom.scss`; `zola check` NOT in `build.sh`; theme v5.6.1. Failed deploy: Retry first.
 
 ## Do NOT re-survey
-- **Lighthouse on a post page, 2026-09-20: a11y 100, BP 100, perf 98, CLS 0.** Cache/latency/render-blocking
-  warnings come from `python3 -m http.server`; the 78KB "unused CSS" is `giallo-dark.css`. Clean on review:
-  `hero-flock.js`, `header.js`, `tools/src/`. `build.sh` verified in-tree, fresh clone, and on Cloudflare.
+- Lighthouse on a post page (2026-09-20): a11y 100, BP 100, perf 98, CLS 0. `http.server` cache warnings and
+  `giallo-dark.css` "unused CSS" are harness artifacts.
+- `tag1`/`tag2`/`""` in the tag-inventory grep are example front matter INSIDE post bodies, not real tags.
 
 ## Open threads
-- **Deferred findings (3):** `search.js` double-mounts Pagefind if the overlay closes mid-load (cache the
-  promise); `build-resume-pdf.sh` + `capture-demo-posters.py` bind fixed ports unchecked; 24/30 images lack
-  width/height (CLS 0). ACM link in `tf-idf.md` 403s to curl; unverified.
-- Business card: needs UW print centre specs (size, bleed, format) from the user or their site.
+- TF-IDF `vector-space` demo opens "The last demo turned…": breaks the standalone rule. One-sentence fix.
+- Deferred findings (3): `search.js` Pagefind double-mount; fixed ports unchecked in two scripts; 24/30 images
+  lack width/height (CLS 0). ACM link in `tf-idf.md` 403s to curl. `0013` résumé polish open.

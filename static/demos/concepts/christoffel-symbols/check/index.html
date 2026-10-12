@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Christoffel symbols: trust the recipe</title>
+<meta name="description" content="Drag the state of a puck or a cart-pendulum and check, live, that the Coriolis matrix built from Christoffel symbols matches a direct calculation with no indices, and that M-dot minus 2C stays skew-symmetric.">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="../christoffel.css">
+<style>
+.sl{display:grid;grid-template-columns:2.5em minmax(0,1fr) 3.5em;gap:8px;align-items:center;margin:4px 0}
+.sl input{width:100%}
+.sl output{font-variant-numeric:tabular-nums;text-align:right}
+#sysbtns button.on{color:var(--k)}
+</style>
+</head>
+<body>
+<main>
+  <section class="panel" id="objective">
+    <div class="head">
+      <div class="row"><span class="otitle" id="otitle"></span><span class="dots" id="dots"></span></div>
+      <div class="row"><span id="sysbtns" class="row"></span><button id="prev" class="hidden">◀</button><button id="next" class="hidden">next ▶</button></div>
+    </div>
+    <div class="otext" id="otext"></div>
+    <div class="sysline" id="sysline"></div>
+    <div id="prompt"></div>
+  </section>
+
+  <div class="cols">
+    <section class="panel">
+      <h2>State: positions and velocities</h2>
+      <div id="sliders"></div>
+    </section>
+    <section class="panel">
+      <h2>$C$ from the recipe</h2>
+      <div class="fx" id="Cmat"></div>
+    </section>
+  </div>
+
+  <section class="panel">
+    <h2>Check 1: the recipe vs a calculation with no indices</h2>
+    <div class="fx" id="chk1"></div>
+    <h2 style="margin-top:.8rem">Check 2: $\dot M - 2C$ is skew-symmetric</h2>
+    <div class="fx" id="chk2"></div>
+  </section>
+</main>
+
+<script src="../christoffel.js"></script>
+<script>
+const STEPS = [
+  { title: "Trust it",
+    text: `The equations of motion stack as $M\\ddot q + C\\dot q + G = \\tau$, where $C$ collects the velocity-times-velocity terms. The Christoffel recipe builds $C$ from partial derivatives of $M$ using three indices, $c_{${I("i")}${J("j")}${K("k")}}$, and three indices are easy to put in the wrong slot.<br><b>Check 1</b> computes the same terms with no indices at all: $C\\dot q$ must equal $\\dot M\\dot q - \\partial T/\\partial q$, straight from Lagrange. <b>Check 2</b> tests a property only the Christoffel choice of $C$ has: many matrices give the same $C\\dot q$, but this one makes $\\dot M - 2C$ skew-symmetric, which is what passivity-based robot controllers rely on.<br>Drag any slider, switch systems, and try to make either check fail.` },
+];
+
+const st = { sys: "polar" };
+const qv = { q: [1, 0.5], qd: [0.7, 1.2] };
+
+function renderSliders() {
+  const S = SYS[st.sys], box = $("sliders"); box.innerHTML = "";
+  const mk = (label, min, max, val, set) => {
+    const r = document.createElement("div"); r.className = "sl";
+    const l = document.createElement("label"); l.textContent = label;
+    const inp = Object.assign(document.createElement("input"), { type: "range", min, max, step: 0.01, value: val });
+    inp.setAttribute("aria-label", label);
+    const o = document.createElement("output"); o.textContent = (+val).toFixed(2);
+    inp.oninput = () => { set(+inp.value); o.textContent = (+inp.value).toFixed(2); renderCheck(); };
+    r.append(l, inp, o); box.appendChild(r);
+  };
+  S.sliders.forEach(([n, a, b], c) => mk(n, a, b, qv.q[c], v => qv.q[c] = v));
+  S.dots.forEach((n, c) => mk(n, -2, 2, qv.qd[c], v => qv.qd[c] = v));
+}
+
+function renderCheck() {
+  const S = SYS[st.sys], p = S.p, q = qv.q, qd = qv.qd, h = 1e-5;
+  // Independent path: differentiate the NUMERIC M by central differences. No
+  // dM table, no indices, so it cannot share a slot mistake with the recipe.
+  const dMdq = c => { const qp = q.slice(), qm = q.slice(); qp[c] += h; qm[c] -= h;
+    const A = S.Mnum(qp, p), B = S.Mnum(qm, p); return A.map((r, a) => r.map((x, b) => (x - B[a][b]) / (2 * h))); };
+  const D = [dMdq(0), dMdq(1)];
+  const Mdot = [0, 1].map(a => [0, 1].map(b => D[0][a][b] * qd[0] + D[1][a][b] * qd[1]));
+  const left = [0, 1].map(k => Mdot[k][0] * qd[0] + Mdot[k][1] * qd[1]
+    - 0.5 * [0, 1].reduce((s, a) => s + [0, 1].reduce((t, b) => t + D[k][a][b] * qd[a] * qd[b], 0), 0));
+  const at = S.atomNum(q, p);
+  const C = [1, 2].map(k => [1, 2].map(j => [1, 2].reduce((s, i) => s + cijk(st.sys, i, j, k) * at * qd[i-1], 0)));
+  const Cq = C.map(r => r[0] * qd[0] + r[1] * qd[1]);
+  const f = x => (Math.abs(x) < 5e-7 ? 0 : x).toFixed(3);
+  const ok1 = Math.max(...left.map((x, n) => Math.abs(x - Cq[n]))) < 1e-4;
+  const N = Mdot.map((r, a) => r.map((x, b) => x - 2 * C[a][b]));
+  const ok2 = Math.abs(N[0][0]) < 1e-4 && Math.abs(N[1][1]) < 1e-4 && Math.abs(N[0][1] + N[1][0]) < 1e-4;
+  tex($("chk1"), `\\dot M\\dot q - \\tfrac{\\partial T}{\\partial q} = \\begin{bmatrix}${f(left[0])}\\\\${f(left[1])}\\end{bmatrix}
+    \\ \\ C\\dot q = \\begin{bmatrix}${f(Cq[0])}\\\\${f(Cq[1])}\\end{bmatrix}\\ \\
+    \\htmlClass{${ok1 ? "okc" : "badc"}}{\\text{${ok1 ? "agree " : "differ"}}${ok1 ? "\\checkmark" : ""}}`);
+  tex($("chk2"), `\\dot M - 2C = \\begin{bmatrix}${f(N[0][0])} & ${f(N[0][1])}\\\\ ${f(N[1][0])} & ${f(N[1][1])}\\end{bmatrix}\\ \\
+    \\htmlClass{${ok2 ? "okc" : "badc"}}{\\text{${ok2 ? "skew " : "not skew"}}${ok2 ? "\\checkmark" : ""}}`);
+  // At rest every velocity product is 0, so ANY C passes both checks. Say so,
+  // rather than let a green tick at zero velocity look like evidence.
+  setPrompt(Math.abs(qd[0]) < 0.05 && Math.abs(qd[1]) < 0.05
+    ? `Both velocities are (nearly) zero, so every velocity-times-velocity term vanishes and <b>any</b> $C$ would pass. Give the system some speed to make the checks mean something.` : "");
+}
+
+function renderSys() {
+  renderSystem($("sysline"), st.sys);
+  tex($("Cmat"), `C = \\begin{bmatrix} ${Ckj(st.sys, 1, 1)} & ${Ckj(st.sys, 1, 2)} \\\\ ${Ckj(st.sys, 2, 1)} & ${Ckj(st.sys, 2, 2)} \\end{bmatrix}`);
+  $("sysbtns").innerHTML = "";
+  for (const key in SYS) {
+    const b = document.createElement("button"); b.textContent = key === "polar" ? "Puck" : "Cart–pendulum";
+    b.className = key === st.sys ? "on" : "";
+    b.onclick = () => { st.sys = key; qv.q = SYS[key].sliders.map(s => s[3]); renderSys(); renderSliders(); renderCheck(); };
+    $("sysbtns").appendChild(b);
+  }
+}
+
+const steps = stepper(STEPS, () => { renderSys(); renderSliders(); renderCheck(); });
+document.querySelectorAll("h2").forEach(renderMathIn);
+steps.go(0);
+</script>
+<script src="/demos/_shared/demo-chrome.js" defer></script>
+</body>
+</html>

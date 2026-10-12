@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Christoffel symbols: watch C get built</title>
+<meta name="description" content="Step through the Christoffel recipe one move at a time: each entry of the mass matrix M is picked, differentiated, combined and multiplied by a velocity, then lands in its cell of the Coriolis matrix C.">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="../christoffel.css">
+<style>
+/* Three columns, M -> workbench -> C, only when there is room for them; the
+   workbench is the widest thing on the page and gets the middle. The side
+   columns' 280px floor is measured, not guessed: each holds a 2x2 grid plus row
+   labels, and the widest entry (-m_p l sin(theta) theta-dot) is ~95px of KaTeX
+   plus the cell span's accent padding, ~103px. 280 gives ~116px cells; 250 left
+   it 6px short. At the old 150px floor a cell was 55px and every long entry
+   grew a scrollbar. 1240px = 2x280 sides + ~580 workbench row + gaps/padding. */
+.flow{display:grid;grid-template-columns:minmax(0,1fr);gap:16px}
+@media (min-width:1240px){.flow{grid-template-columns:minmax(280px,1fr) minmax(0,2.4fr) minmax(280px,1fr);align-items:start}}
+.flab{font-weight:600;font-size:.88rem;color:var(--mute);margin-bottom:6px}
+.fgrid .cell{min-height:58px}
+#fC .cell{cursor:pointer}
+#fC .cell:hover{border-color:var(--mute)}
+#fC .cell.ghost > span:first-child{opacity:.28}
+#fC .cell.cur{outline:2.5px solid var(--k);outline-offset:-2px}
+#fC .cell.built{background:var(--hl)}
+#fM .cell.src{outline:2.5px solid var(--ink);outline-offset:-2px}
+/* Each workbench row wraps as a unit of whole slots, never squeezing one slot
+   until its text spills over its border (the draft's overlap bug). */
+.brow{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:.55rem 0;padding:.5rem;border-radius:10px;border:1px solid var(--line)}
+.brow.active{border-color:var(--i);box-shadow:0 0 0 1px var(--i) inset}
+.op{color:var(--mute);font-size:1.05rem}
+.slot{flex:0 0 auto;min-width:96px;min-height:66px;border:1.5px dashed var(--line);border-radius:8px;padding:4px 8px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:.92em;transition:border-color .3s}
+.slot .lab{font-size:.8em;color:var(--mute)}
+.slot.filled{border-style:solid;border-color:var(--mute)}
+.slot.neg{border-color:var(--neg)}
+.res{flex:0 0 auto;min-width:70px;min-height:40px;border:1.5px dashed var(--line);border-radius:8px;padding:3px 8px;display:flex;align-items:center;justify-content:center}
+.res.filled{border-style:solid;border-color:var(--k)}
+#bsum{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:.4rem}
+.flytoken{position:fixed;z-index:50;pointer-events:none;background:var(--hl);border:1.5px solid var(--ink);border-radius:7px;padding:3px 8px;box-shadow:0 6px 16px -6px rgba(0,0,0,.4)}
+#narr{margin-top:.7rem;padding:.55rem .8rem;border-radius:8px;background:var(--cell);min-height:2.6em;overflow-wrap:anywhere}
+</style>
+</head>
+<body>
+<main>
+  <section class="panel" id="objective">
+    <div class="head">
+      <div class="row"><span class="otitle" id="otitle"></span><span class="dots" id="dots"></span></div>
+      <div class="row"><button id="prev">◀</button><button id="next">next ▶</button></div>
+    </div>
+    <div class="otext" id="otext"></div>
+    <div class="sysline" id="sysline"></div>
+    <div id="prompt"></div>
+  </section>
+
+  <section class="panel">
+    <div class="row" style="justify-content:space-between;margin-bottom:.4rem">
+      <h2 style="margin:0">Build $C$ one entry at a time</h2>
+      <div class="row"><button id="fplay">▶ Play</button><button id="fstep">Step ▸</button><button id="freset">↺ Restart entry</button></div>
+    </div>
+    <div class="flow">
+      <div>
+        <div class="flab">Start: $M(q)$</div>
+        <div class="grid2 fgrid" id="fM"></div>
+        <div class="fx note" id="fq"></div>
+      </div>
+      <div>
+        <div class="flab">Workbench</div>
+        <div class="fx" id="bhead"></div>
+        <div id="bench"></div>
+      </div>
+      <div>
+        <div class="flab">Target: $C$ <span class="note">(click an entry to build it)</span></div>
+        <div class="grid2 fgrid" id="fC"></div>
+      </div>
+    </div>
+    <div id="narr"></div>
+  </section>
+</main>
+
+<script src="../christoffel.js"></script>
+<script>
+const STEPS = [
+  { sys: "polar", fk: 1, fj: 2, title: "Watch C get built",
+    text: `A puck slides freely on a table, described in polar coordinates $q = (r, \\varphi)$. Its kinetic energy gives the mass matrix $M$. The equations of motion take the shape $M\\ddot q + C\\dot q + G = \\tau$, and $C$ collects every term where two velocities multiply. <b>The answer, $C$, is already on the page</b> under <b>Target</b>, faded until each entry is built.<br>Each entry $C_{${K("k")}${J("j")}}$ is built the same way. For each ${"<b class='xi'>i</b>"} = 1, 2, three entries of $M$ are picked, differentiated, combined, and multiplied by $\\dot q_{${I("i")}}$; the two pieces add up to the entry. Press <b>Step</b> and watch where each piece comes from and where it goes. Then click the other faded entries and build them too, zeros included.` },
+  { sys: "cart", fk: 2, fj: 1, title: "Again, with a twist",
+    text: `A cart on a horizontal track (position $x$) with a pendulum hanging from it (angle $\\theta$ from vertical). Its $M$ depends only on $\\theta$. Build all four entries of $C$.<br>Watch $C_{21}$ and $C_{22}$ especially: nonzero pieces of $M$ get picked and differentiated, and then they <b>cancel</b>. That's why the pendulum's own equation (equation 2) has no velocity-times-velocity term.` },
+];
+
+/* ---------- flow view: M entry -> differentiate -> combine -> C entry ---------- */
+const flow = { sys: "polar", k: 1, j: 2, steps: [], idx: 0, busy: false, playing: false, built: {} };
+const roleTex = [I, J, K];                      // term t differentiates by q_i, q_j, q_k
+const fCell = (id, a, b) => document.querySelector(`#${id} .cell[data-a="${a}"][data-b="${b}"]`);
+
+function addBadge(cell, n) {
+  const b = document.createElement("span");
+  b.className = "badge" + (n === 3 ? " neg" : "");
+  b.textContent = n === 3 ? "−3" : "+" + n;
+  cell.querySelector(".badges").appendChild(b);
+}
+
+function flowGrid(id, content, onclick) {
+  const g = $(id); g.innerHTML = "";
+  g.appendChild(Object.assign(document.createElement("div"), { className: "hd" }));
+  for (let b = 1; b <= 2; b++) g.appendChild(Object.assign(document.createElement("div"), { className: "hd", textContent: "col " + b }));
+  for (let a = 1; a <= 2; a++) {
+    g.appendChild(Object.assign(document.createElement("div"), { className: "hd", textContent: "row " + a }));
+    for (let b = 1; b <= 2; b++) {
+      const cell = document.createElement("div"); cell.className = "cell"; cell.dataset.a = a; cell.dataset.b = b;
+      const span = document.createElement("span"); span.innerHTML = ktex(content(a, b)); cell.appendChild(span);
+      const bd = document.createElement("div"); bd.className = "badges"; cell.appendChild(bd);
+      if (onclick) cell.onclick = () => onclick(a, b);
+      g.appendChild(cell);
+    }
+  }
+}
+
+function makeSteps(k, j) {
+  const s = [];
+  for (let i = 1; i <= 2; i++) {
+    slotsFor(i, j, k).forEach(([a, b, c], t) => s.push({ type: "pick", i, t, a, b, c }));
+    s.push({ type: "combine", i });
+  }
+  s.push({ type: "sum" });
+  return s;
+}
+
+function renderFlow() {
+  const S = SYS[flow.sys];
+  flowGrid("fM", (a, b) => S.Mcell[a-1][b-1]);
+  $("fq").innerHTML = ktex(`q_1 = ${S.q[0]},\\ \\ q_2 = ${S.q[1]}`);
+  flowGrid("fC", (a, b) => Ckj(flow.sys, a, b), (a, b) => { if (flow.busy) return; flow.k = a; flow.j = b; resetBench(); });
+  for (let a = 1; a <= 2; a++) for (let b = 1; b <= 2; b++) {
+    const cell = fCell("fC", a, b), done = flow.built[`${flow.sys}${a}${b}`];
+    cell.classList.toggle("ghost", !done); cell.classList.toggle("built", !!done);
+  }
+  resetBench();
+}
+
+function resetBench() {
+  const S = SYS[flow.sys], { k, j } = flow;
+  flow.steps = makeSteps(k, j); flow.idx = 0; flow.playing = false; $("fplay").textContent = "▶ Play";
+  document.querySelectorAll("#fM .badges").forEach(b => b.innerHTML = "");
+  document.querySelectorAll("#fM .cell").forEach(c => c.classList.remove("src"));
+  document.querySelectorAll("#fC .cell").forEach(c => c.classList.toggle("cur", +c.dataset.a === k && +c.dataset.b === j));
+  tex($("bhead"), `C_{${K(k)}${J(j)}} = \\sum_{${I("i")}=1}^{2} \\tfrac12\\Big(
+      \\frac{\\partial M_{${K(k)}${J(j)}}}{\\partial q_{${I("i")}}} + \\frac{\\partial M_{${K(k)}${I("i")}}}{\\partial q_{${J(j)}}} - \\frac{\\partial M_{${I("i")}${J(j)}}}{\\partial q_{${K(k)}}}\\Big)\\,\\dot q_{${I("i")}}`);
+  const bench = $("bench"); bench.innerHTML = "";
+  for (let i = 1; i <= 2; i++) {
+    const r = document.createElement("div"); r.className = "brow"; r.id = "brow" + i;
+    let h = `<span>${ktex(`${I("i")}=${I(i)}:`)}</span><span class="op">½(</span>`;
+    slotsFor(i, j, k).forEach(([a, b, c], t) => {
+      if (t) h += `<span class="op">${t === 2 ? "−" : "+"}</span>`;
+      const d = roleTex[t];
+      h += `<div class="slot${t === 2 ? " neg" : ""}" id="slot${i}${t}"><span class="lab">${ktex(`\\partial M_{${a}${b}}/\\partial q_{${d(c)}}`)}</span><span class="l1"></span><span class="l2"></span></div>`;
+    });
+    h += `<span class="op">)</span><span class="op">${ktex(`\\times\\,${S.qd[i-1]}`)}</span><span class="op">=</span><div class="res" id="res${i}"></div>`;
+    r.innerHTML = h; bench.appendChild(r);
+  }
+  const sum = document.createElement("div"); sum.id = "bsum";
+  sum.innerHTML = `<span>${ktex(`C_{${K(k)}${J(j)}} =`)}</span><span class="op">(i=1 piece) + (i=2 piece) =</span><div class="res" id="restot"></div>`;
+  bench.appendChild(sum);
+  narrate(`Building $C_{${K(k)}${J(j)}}$: row ${k}, column ${j} of $C$. The row and column are fixed by the entry; $${I("i")}$ is summed over, so there are two pieces ($${I("i")}=1$ and $${I("i")}=2$), each made from three entries of $M$. Press <b>Step</b> to go one move at a time, or <b>Play</b>.`);
+}
+
+function narrate(html) { const n = $("narr"); n.innerHTML = html; renderMathIn(n); }
+
+async function fly(fromEl, toEl, html) {
+  if (REDUCED) return;
+  const f = fromEl.getBoundingClientRect(), t = toEl.getBoundingClientRect();
+  const tok = document.createElement("div"); tok.className = "flytoken"; tok.innerHTML = html;
+  document.body.appendChild(tok);
+  const w = tok.offsetWidth, h = tok.offsetHeight;
+  const x0 = f.left + f.width / 2 - w / 2, y0 = f.top + f.height / 2 - h / 2;
+  const x1 = t.left + t.width / 2 - w / 2, y1 = t.top + t.height / 2 - h / 2;
+  tok.style.left = x0 + "px"; tok.style.top = y0 + "px";
+  await tok.animate([{ transform: "translate(0,0) scale(1)" }, { transform: `translate(${(x1-x0)/2}px,${(y1-y0)/2 - 30}px) scale(1.15)` },
+    { transform: `translate(${x1-x0}px,${y1-y0}px) scale(1)` }], { duration: 750, easing: "ease-in-out" }).finished;
+  tok.remove();
+}
+const popEl = el => { el.classList.remove("pop"); void el.offsetWidth; el.classList.add("pop"); };
+const timesQd = (c, i) => { const S = SYS[flow.sys]; return c === 0 ? "0" : term(c, S.atom) + "\\," + S.qd[i-1]; };
+
+async function runStep() {
+  if (flow.busy || flow.idx >= flow.steps.length) return false;
+  flow.busy = true;
+  const s0 = flow.sys, S = SYS[s0], { k, j } = flow, s = flow.steps[flow.idx];
+  document.querySelectorAll("#bench .brow").forEach(r => r.classList.toggle("active", s.i && r.id === "brow" + s.i));
+  if (s.type === "pick") {
+    const { i, t, a, b, c } = s, d = roleTex[t];
+    const src = fCell("fM", a, b), slot = $(`slot${i}${t}`);
+    document.querySelectorAll("#fM .cell").forEach(x => x.classList.remove("src"));
+    if (t === 0) document.querySelectorAll("#fM .badges").forEach(b => b.innerHTML = "");   // fresh badges per piece i
+    src.classList.add("src"); addBadge(src, t + 1);
+    const which = [`row $${K("k")}=${k}$, column $${J("j")}=${j}$, differentiate by $q_{${I("i")}} = q_${i}$`,
+                   `row $${K("k")}=${k}$, column $${I("i")}=${i}$, differentiate by $q_{${J("j")}} = q_${j}$`,
+                   `row $${I("i")}=${i}$, column $${J("j")}=${j}$, differentiate by $q_{${K("k")}} = q_${k}$`][t];
+    const dv = S.dM[c-1][a-1][b-1];
+    narrate(`<b>Term ${termLabel(t)}, piece $${I("i")}=${i}$.</b> The formula says ${which}. So take $M_{${a}${b}} = ${S.Mcell[a-1][b-1]}$ from row ${a}, column ${b} of $M$ ...`);
+    await fly(src, slot, ktex(S.Mcell[a-1][b-1]));
+    if (flow.sys !== s0) { flow.busy = false; return false; }   // system switched mid-flight
+    slot.classList.add("filled"); slot.querySelector(".l1").innerHTML = ktex(S.Mcell[a-1][b-1]); popEl(slot);
+    await wait(REDUCED ? 0 : 450);
+    slot.querySelector(".l2").innerHTML = ktex(`\\xrightarrow{\\ \\partial/\\partial ${d(S.q[c-1])}\\ }\\ ${term(dv, S.atom)}`);
+    popEl(slot);
+    narrate(`<b>Term ${termLabel(t)}, piece $${I("i")}=${i}$.</b> The formula says ${which}. So take $M_{${a}${b}} = ${S.Mcell[a-1][b-1]}$ and differentiate it by $${S.q[c-1]}$: $\\;\\partial(${S.Mcell[a-1][b-1]})/\\partial ${S.q[c-1]} = ${term(dv, S.atom)}$.` +
+      (dv === 0 ? ` (Nothing in it depends on $${S.q[c-1]}$, so it's $0$.)` : ""));
+  } else if (s.type === "combine") {
+    const i = s.i, t = terms(s0, i, j, k), v = cijk(s0, i, j, k), res = $("res" + i);
+    res.innerHTML = ktex(timesQd(v, i)); res.classList.add("filled"); popEl(res);
+    narrate(`<b>Piece $${I("i")}=${i}$:</b> $\\tfrac12\\big(${term(t[0], S.atom)} + ${paren(t[1], S.atom)} - ${paren(t[2], S.atom)}\\big) = ${term(v, S.atom)}$. That number is $${c3(i, j, k)}$. Times $${S.qd[i-1]}$ gives $${timesQd(v, i)}$.`);
+  } else {
+    const tot = $("restot"), dest = fCell("fC", k, j), val = Ckj(s0, k, j);
+    tot.innerHTML = ktex(val); tot.classList.add("filled"); popEl(tot);
+    const c2 = cijk(s0, 2, j, k);
+    narrate(`<b>Add the two pieces:</b> $C_{${K(k)}${J(j)}} = ${timesQd(cijk(s0, 1, j, k), 1)} + ${c2 < 0 ? "\\big(" + timesQd(c2, 2) + "\\big)" : timesQd(c2, 2)} = ${val}$. It goes into row ${k}, column ${j} of $C$.`);
+    await wait(REDUCED ? 0 : 300);
+    await fly(tot, dest, ktex(val));
+    if (flow.sys !== s0) { flow.busy = false; return false; }
+    flow.built[`${s0}${k}${j}`] = true;
+    dest.classList.remove("ghost"); dest.classList.add("built"); popEl(dest);
+    const left = [[1,1],[1,2],[2,1],[2,2]].filter(([a, b]) => !flow.built[`${s0}${a}${b}`]);
+    $("narr").innerHTML += left.length ? `<br>Next: click another faded entry of $C$ under <b>Target</b>.` : `<br><b>All four entries built.</b> That's the whole $C$ matrix.`;
+    renderMathIn($("narr"));
+    if (!left.length) steps.nudge();
+  }
+  flow.idx++; flow.busy = false;
+  return flow.idx < flow.steps.length;
+}
+async function play() {
+  if (flow.playing) { flow.playing = false; $("fplay").textContent = "▶ Play"; return; }
+  flow.playing = true; $("fplay").textContent = "❚❚ Pause";
+  while (flow.playing && await runStep()) await wait(900);
+  flow.playing = false; $("fplay").textContent = "▶ Play";
+}
+$("fplay").onclick = play;
+$("fstep").onclick = () => { if (!flow.playing) runStep(); };
+$("freset").onclick = () => { flow.playing = false; if (!flow.busy) resetBench(); };
+
+const steps = stepper(STEPS, s => {
+  flow.playing = false; flow.busy = false;
+  flow.sys = s.sys; flow.k = s.fk; flow.j = s.fj;
+  renderSystem($("sysline"), s.sys);
+  renderFlow();
+});
+document.querySelectorAll("h2, .flab").forEach(renderMathIn);
+steps.go(0);
+</script>
+<script src="/demos/_shared/demo-chrome.js" defer></script>
+</body>
+</html>

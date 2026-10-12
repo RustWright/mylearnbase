@@ -1,0 +1,91 @@
+/* Shared look for the three Christoffel demos (build/, predict/, check/).
+ *
+ * The index colours carry meaning across every demo: i blue, j amber, k green,
+ * the same in the formula, the cube's badges and the workbench. A reader who
+ * moves from one demo to the next should never have to relearn them.
+ *
+ * Theme: follows prefers-color-scheme, and a data-theme attribute on <html>
+ * overrides it in either direction.
+ */
+:root{
+  --bg:#f6f5f0; --panel:#ffffff; --ink:#1c2230; --mute:#687083; --line:#dcd8cc; --cell:#f1efe7;
+  --i:#1f6fd1; --j:#b86e00; --k:#0f8a57; --neg:#c2410c; --ok:#0f8a57; --bad:#c2410c; --hl:#fff1b8;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0e1117; --panel:#161a22; --ink:#e7e5de; --mute:#9aa1ae; --line:#2a303c; --cell:#1e232d;
+    --i:#5aa7ff; --j:#ffb547; --k:#47dc98; --neg:#ff7a59; --ok:#47dc98; --bad:#ff7a59; --hl:#3b3420;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0e1117; --panel:#161a22; --ink:#e7e5de; --mute:#9aa1ae; --line:#2a303c; --cell:#1e232d;
+  --i:#5aa7ff; --j:#ffb547; --k:#47dc98; --neg:#ff7a59; --ok:#47dc98; --bad:#ff7a59; --hl:#3b3420;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:1200px;margin:0 auto;padding:18px 16px 40px}
+h2{font-size:1rem;margin:0 0 .6rem;color:var(--mute);font-weight:600}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin-bottom:14px;min-width:0}
+.cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px}
+@media (max-width:860px){.cols{grid-template-columns:minmax(0,1fr)}}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.hidden{display:none !important}
+.enter{animation:enter .55s ease both}
+@keyframes enter{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.enter,.pulse,.pop{animation:none !important}}
+button{font:inherit;color:inherit;background:var(--cell);border:1px solid var(--line);border-radius:8px;padding:5px 11px;cursor:pointer}
+button:hover{border-color:var(--mute)}
+button:disabled{opacity:.45;cursor:default}
+button.on{outline:2px solid currentColor;outline-offset:-2px;font-weight:600}
+button.ready{border-color:var(--k);color:var(--k);font-weight:600;animation:nudge 1.4s ease 2}
+@keyframes nudge{0%,100%{transform:none}50%{transform:translateX(4px)}}
+.xi{color:var(--i)} .xj{color:var(--j)} .xk{color:var(--k)}
+.okc{color:var(--ok);font-weight:600} .badc{color:var(--bad);font-weight:600}
+.note{font-size:.86rem;color:var(--mute)}
+
+/* ── The objective: the ONE place a demo says what it is and what to do ──── */
+#objective{border-left:4px solid var(--k)}
+#objective .head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px 12px}
+#objective .otitle{font-weight:700}
+#objective .otext{margin:.45rem 0 0;overflow-wrap:anywhere}
+.dots{display:flex;gap:5px}
+.dots span{width:8px;height:8px;border-radius:50%;background:var(--line)}
+.dots span.cur{background:var(--k)}
+.dots span.done{background:var(--mute)}
+#prompt{margin-top:.55rem;padding:.45rem .7rem;border-radius:8px;background:var(--cell);font-weight:500}
+#prompt:empty{display:none}
+#prompt.ok{color:var(--ok)} #prompt.bad{color:var(--bad)}
+
+/* ── System card: name, M(q) and the two equations of motion ────────────── */
+.sysline{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center;margin-top:.5rem;padding-top:.5rem;border-top:1px dashed var(--line);color:var(--mute);font-size:.92rem;min-width:0}
+.sysline .katex{color:var(--ink)}
+.sysline .mtex,.sysline .eomwrap{max-width:100%;overflow-x:auto;overflow-y:hidden}
+.sysline .eomwrap{flex-basis:100%}
+.cterm{background:var(--hl);border-radius:4px;padding:0 2px}
+
+/* ── 2x2 grids (cube layers, M, C, coefficient grids) ────────────────────── */
+.grid2{display:grid;grid-template-columns:auto minmax(0,1fr) minmax(0,1fr);gap:6px;align-items:stretch}
+.grid2 .hd{color:var(--mute);font-size:.78rem;display:flex;align-items:center;justify-content:center}
+.cell{position:relative;background:var(--cell);border:1px solid var(--line);border-radius:8px;min-height:56px;min-width:0;
+  display:flex;align-items:center;justify-content:center;padding:10px 4px 6px;transition:background .25s,transform .25s}
+/* The padding is for KaTeX accents, not looks: the dot over an italic phi is
+   skewed right with the slant and overhangs its box by ~2px. With overflow-x
+   auto (kept as the safety net for genuinely long entries on tiny screens) that
+   overhang alone drew a scrollbar under -mr phi-dot at every width. Padding is
+   inside the scroll container's client area, so the overhang lands there. */
+.cell > span:first-child{max-width:100%;overflow-x:auto;overflow-y:hidden;padding:0 .25em}
+.cell.zero{color:var(--mute)}
+.cell.pulse{animation:pulse .7s ease}
+@keyframes pulse{0%{transform:scale(1)}40%{transform:scale(1.08);background:var(--hl)}100%{transform:scale(1)}}
+/* Badges sit INSIDE the cell's top edge, not hanging off it: hung outside, they
+   overlapped the neighbouring cell once the grid tightened. */
+.badges{position:absolute;top:-8px;right:4px;display:flex;gap:2px}
+.badge{font-size:.72rem;font-weight:700;border-radius:999px;padding:0 6px;background:var(--panel);border:1.5px solid var(--ink);line-height:1.35}
+.badge.neg{border-color:var(--neg);color:var(--neg)}
+.badge.good{border-color:var(--ok);color:var(--ok)}
+.badge.wrong{border-color:var(--bad);color:var(--bad);text-decoration:line-through}
+
+.fx{overflow-x:auto;overflow-y:hidden;padding:2px 0}
+.fx .katex-display{margin:.45rem 0}
+.pop{animation:pop .5s ease}
+@keyframes pop{0%{transform:scale(1)}50%{transform:scale(1.12)}100%{transform:scale(1)}}

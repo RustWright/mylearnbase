@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Christoffel symbols: which three cells?</title>
+<meta name="description" content="Predict which three partial derivatives of the mass matrix the Christoffel recipe combines into each coefficient of the Coriolis matrix, then build a whole row of C and watch nonzero terms cancel.">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="../christoffel.css">
+<style>
+.chipset{display:inline-flex;gap:4px;align-items:center;margin-right:12px}
+.chipset b{min-width:1.1em;text-align:center;font-size:1.1rem}
+.chipset button{min-width:2.2em}
+.chipset.ci button.on{color:var(--i)} .chipset.cj button.on{color:var(--j)} .chipset.ck button.on{color:var(--k)}
+#question{color:var(--mute);margin:.4rem 0 0}
+details.pattern{margin-top:.6rem;border-top:1px dashed var(--line);padding-top:.5rem}
+details.pattern summary{cursor:pointer;font-weight:600}
+table.slots{border-collapse:collapse;margin:.5rem 0;font-size:.92rem}
+table.slots th,table.slots td{border:1px solid var(--line);padding:3px 12px;text-align:center}
+table.slots th{color:var(--mute);font-weight:500}
+table.slots td.xi,table.slots td.xj,table.slots td.xk{font-weight:700;font-size:1.05rem}
+.meaning{font-size:.9rem;color:var(--mute);margin:.4rem 0 0}
+.meaning strong{color:var(--ink)}
+/* cube */
+.layers{display:flex;gap:18px;flex-wrap:wrap}
+.layer{flex:1 1 220px;min-width:0}
+.layer .lt{text-align:center;margin-bottom:6px}
+.layer.dim .cell{background:transparent}
+.layer.dim .cell > span:first-child{opacity:.4}
+.clickable .cell{cursor:pointer}
+.clickable .cell:hover{border-color:var(--mute)}
+/* coefficient grid */
+.cgrid .cell{min-height:62px;flex-direction:column;gap:2px;cursor:pointer}
+.cgrid .cell.sel{outline:2.5px solid var(--k);outline-offset:-2px}
+.cgrid .cell.seen::after{content:"✓";position:absolute;top:3px;left:6px;font-size:.7rem;color:var(--ok)}
+.cgrid .cell .mono{font-size:.75rem;color:var(--mute)}
+</style>
+</head>
+<body>
+<main>
+  <section class="panel" id="objective">
+    <div class="head">
+      <div class="row"><span class="otitle" id="otitle"></span><span class="dots" id="dots"></span></div>
+      <div class="row"><button id="prev">◀</button><button id="next">next ▶</button></div>
+    </div>
+    <div class="otext" id="otext"></div>
+    <div class="sysline" id="sysline"></div>
+    <div id="prompt"></div>
+  </section>
+
+  <div class="cols">
+    <section class="panel">
+      <h2>The recipe</h2>
+      <div class="row">
+        <span class="chipset ck"><b class="xk">k</b><button data-ix="k" data-v="1">1</button><button data-ix="k" data-v="2">2</button></span>
+        <span class="chipset ci"><b class="xi">i</b><button data-ix="i" data-v="1">1</button><button data-ix="i" data-v="2">2</button></span>
+        <span class="chipset cj"><b class="xj">j</b><button data-ix="j" data-v="1">1</button><button data-ix="j" data-v="2">2</button></span>
+      </div>
+      <div id="question"></div>
+      <div class="fx" id="generic"></div>
+      <div class="fx hidden" id="subst"></div>
+      <details class="pattern hidden" id="pattern">
+        <summary>The pattern behind it</summary>
+        <table class="slots">
+          <tr><th>term</th><th>row of M</th><th>column of M</th><th>differentiate by</th></tr>
+          <tr><td>+1</td><td class="xk">k</td><td class="xj">j</td><td class="xi">i</td></tr>
+          <tr><td>+2</td><td class="xk">k</td><td class="xi">i</td><td class="xj">j</td></tr>
+          <tr><td style="color:var(--neg)">−3</td><td class="xi">i</td><td class="xj">j</td><td class="xk">k</td></tr>
+        </table>
+        <p class="meaning"><strong>Why this shape.</strong> Terms 1 and 2 are $\dot M\dot q$ split into two equal halves (the same sum with $i$ and $j$ swapped): equation $k$'s own row of $M$ changing as the system moves, so <span class="xk"><b>k</b></span> <strong>stays in the row</strong>. Term 3 is $-\partial T/\partial q_k$: how the kinetic energy changes when you nudge coordinate $k$, so <span class="xk"><b>k</b></span> <strong>moves to the bottom</strong> and $i, j$ take the row and column.</p>
+      </details>
+    </section>
+
+    <section class="panel">
+      <h2>The cube: every $\partial M_{ab}/\partial q_c$</h2>
+      <div class="layers" id="cube"></div>
+    </section>
+  </div>
+
+  <section class="panel hidden" id="rowpanel">
+    <h2>Equation <span class="xk" id="kname"></span>: its four coefficients, then its row of $C$</h2>
+    <div class="cols">
+      <div>
+        <div class="grid2 cgrid" id="cgrid"></div>
+        <p class="note">Row <span class="xi">i</span>, column <span class="xj">j</span>: the coefficient on $\dot q_i\dot q_j$. Click a cell to load it.</p>
+      </div>
+      <div>
+        <div class="fx" id="rowC"></div>
+        <div class="fx" id="Cfull"></div>
+      </div>
+    </div>
+  </section>
+
+  <p class="note">Convention: $c_{ijk}$ with $k$ = the equation (row of $C$), as in Spong, Hutchinson and Vidyasagar. Books order the slots differently, so always check which one is the equation. With $n$ coordinates the cube is $n\times n\times n$; the recipe doesn't change.</p>
+</main>
+
+<script src="../christoffel.js"></script>
+<script>
+const INTRO = `The equations of motion stack as $M\\ddot q + C\\dot q + G = \\tau$. $C$ collects every term where two velocities multiply, $\\dot q_{${I("i")}}\\dot q_{${J("j")}}$, and <b>the recipe</b> builds each coefficient $${c3("i","j","k")}$ from three entries of <b>the cube</b>, which holds every partial derivative of $M$. ${"<b class='xk'>k</b>"} is <b>which equation</b> (row of $C$); ${"<b class='xi'>i</b>"}, ${"<b class='xj'>j</b>"} say <b>which two velocities multiply</b>.<br>`;
+const STEPS = [
+  { sys: "polar", k: 1, i: 2, j: 2, predict: true, row: false, title: "Three cells",
+    text: INTRO + `<b>System:</b> a puck sliding freely on a table, in polar coordinates $q = (r, \\varphi)$. Start from a term you can see: the highlighted $-mr\\dot\\varphi^2$ in equation 1. It's in equation $${K("k")}=1$ and multiplies $\\dot\\varphi\\,\\dot\\varphi = \\dot q_2\\dot q_2$, so $${I("i")}=2,\\ ${J("j")}=2$: its coefficient $-mr$ is $${c3(2,2,1)}$.<br><b>Your move:</b> which three cells of the cube does the recipe combine to produce it? Click them in order. ($M$ depends only on $r$, so the $\\partial/\\partial\\varphi$ layer is all zeros.)` },
+  { sys: "polar", k: 2, i: 1, j: 2, predict: true, row: false, title: "The twin",
+    text: `Now the highlighted term in equation 2, $2mr\\,\\dot r\\dot\\varphi$: equation $${K("k")}=2$, and $\\dot r\\dot\\varphi = \\dot q_1\\dot q_2$, so $${I("i")}=1,\\ ${J("j")}=2$. Predict $${c3(1,2,2)}$.<br>But $\\dot q_2\\dot q_1$ is the same product, so $${c3(2,1,2)}$ feeds this term too. Swap ${"<b class='xi'>i</b>"} and ${"<b class='xj'>j</b>"} with the chips and predict it as well. Each gives $mr$; together they make the $2$ in $2mr$.` },
+  { sys: "polar", k: 1, i: 1, j: 1, predict: false, row: true, title: "Build the row",
+    text: `The panel below holds one equation's four coefficients at once. Click all four cells for $${K("k")}=1$, then switch to $${K("k")}=2$. When a grid is full, its row of $C$ assembles: each entry $C_{${K("k")}${J("j")}}$ is column ${"<b class='xj'>j</b>"} of the grid dotted with $\\dot q$. The twin pair is the $2$ in $2mr\\dot r\\dot\\varphi$.` },
+  { sys: "cart", k: 2, i: 1, j: 2, predict: true, row: true, title: "Cancellation",
+    text: `<b>New system:</b> a cart on a horizontal track (position $x$) with a pendulum hanging from it (angle $\\theta$ from vertical). Its $M$ depends only on $\\theta$.<br>Equation 2 (for $\\theta$) has nothing highlighted: <b>no</b> velocity-times-velocity term, so every $c_{${I("i")}${J("j")}${K(2)}}$ must come out $0$. Check the one that looks like it shouldn't: predict $${c3(1,2,2)}$. Two nonzero cells come in, and they cancel. Then fill the rest of equation 2's grid.` },
+];
+
+const st = { sys: "polar", k: 1, i: 2, j: 2, predict: true, step: 3, guesses: [], seen: {}, patternOpen: false };
+
+/* ---------- cube ---------- */
+function renderCube() {
+  const S = SYS[st.sys], cube = $("cube"); cube.innerHTML = "";
+  cube.classList.toggle("clickable", st.predict);
+  for (let c = 0; c < 2; c++) {
+    const L = document.createElement("div");
+    L.className = "layer" + (S.dM[c].flat().every(v => v === 0) ? " dim" : "");
+    const lt = document.createElement("div"); lt.className = "lt";
+    tex(lt, `\\dfrac{\\partial M}{\\partial ${S.q[c]}}\\ \\ (\\text{bottom index } ${c+1})`, false);
+    L.appendChild(lt);
+    const g = document.createElement("div"); g.className = "grid2";
+    g.appendChild(Object.assign(document.createElement("div"), { className: "hd" }));
+    for (let b = 0; b < 2; b++) g.appendChild(Object.assign(document.createElement("div"), { className: "hd", textContent: "col " + (b+1) }));
+    for (let a = 0; a < 2; a++) {
+      g.appendChild(Object.assign(document.createElement("div"), { className: "hd", textContent: "row " + (a+1) }));
+      for (let b = 0; b < 2; b++) {
+        const v = S.dM[c][a][b], cell = document.createElement("div");
+        cell.className = "cell" + (v === 0 ? " zero" : "");
+        cell.dataset.c = c + 1; cell.dataset.a = a + 1; cell.dataset.b = b + 1;
+        const span = document.createElement("span"); tex(span, term(v, S.atom), false); cell.appendChild(span);
+        const bd = document.createElement("div"); bd.className = "badges"; cell.appendChild(bd);
+        cell.onclick = () => cubeClick(c + 1, a + 1, b + 1, cell);
+        g.appendChild(cell);
+      }
+    }
+    L.appendChild(g); cube.appendChild(L);
+  }
+}
+const cellAt = (c, a, b) => document.querySelector(`#cube .cell[data-c="${c}"][data-a="${a}"][data-b="${b}"]`);
+function addBadge(cell, n, cls) {
+  const b = document.createElement("span");
+  b.className = "badge" + (n === 3 ? " neg" : "") + (cls ? " " + cls : "");
+  b.textContent = n === 3 ? "−3" : "+" + n;
+  cell.querySelector(".badges").appendChild(b);
+}
+const clearBadges = () => document.querySelectorAll("#cube .badges").forEach(b => b.innerHTML = "");
+function pulse(cell, delay) { setTimeout(() => { cell.classList.remove("pulse"); void cell.offsetWidth; cell.classList.add("pulse"); }, delay); }
+function showAnswerBadges() {
+  clearBadges();
+  slotsFor(st.i, st.j, st.k).forEach(([a, b, c], n) => { const cell = cellAt(c, a, b); addBadge(cell, n + 1); pulse(cell, n * 320); });
+}
+
+/* ---------- recipe panel ---------- */
+function renderRecipe() {
+  const S = SYS[st.sys], { i, j, k } = st;
+  tex($("question"), `\\text{equation } ${K(k)}\\text{, coefficient on } ${S.qd[i-1]}${S.qd[j-1]}\\ \\Rightarrow\\ ${c3(i, j, k)}`, false);
+  tex($("generic"), RECIPE);
+  // A prediction must not be able to read its own answer: the substituted
+  // formula stays hidden until all three cells have been clicked.
+  const hide = st.predict && st.step < 3;
+  $("subst").classList.toggle("hidden", hide);
+  if (hide) return;
+  const t = terms(st.sys, i, j, k), v = cijk(st.sys, i, j, k);
+  tex($("subst"),
+    `${c3(i, j, k)} = \\tfrac12\\Big(\\frac{\\partial M_{${K(k)}${J(j)}}}{\\partial q_{${I(i)}}} + \\frac{\\partial M_{${K(k)}${I(i)}}}{\\partial q_{${J(j)}}} - \\frac{\\partial M_{${I(i)}${J(j)}}}{\\partial q_{${K(k)}}}\\Big)
+     = \\tfrac12\\big(${term(t[0], S.atom)} + ${paren(t[1], S.atom)} - ${paren(t[2], S.atom)}\\big) = \\boxed{${term(v, S.atom)}}`);
+  enterAnim($("subst"));
+}
+function unlockPattern() {
+  if (st.patternOpen) return;
+  st.patternOpen = true;
+  const d = $("pattern"); d.classList.remove("hidden"); enterAnim(d); d.open = true;
+}
+
+/* ---------- prediction ---------- */
+const fmtIJK = () => `$${I("i")}=${I(st.i)},\\ ${J("j")}=${J(st.j)},\\ ${K("k")}=${K(st.k)}$`;
+function promptStep(prefix) {
+  setPrompt(`${prefix || ""}Term <b>${termLabel(st.step)}</b> is $${termGeneric(st.step)}$. With ${fmtIJK()}, click its cell in the cube.`);
+}
+function cubeClick(c, a, b, cell) {
+  if (!(st.predict && st.step < 3)) return;
+  const n = st.step, [ra, rb, rc] = slotsFor(st.i, st.j, st.k)[n];
+  const exact = a === ra && b === rb && c === rc;
+  const mirror = !exact && a === rb && b === ra && c === rc;
+  let msg;
+  if (exact || mirror) {
+    addBadge(cell, n + 1, "good");
+    msg = mirror ? `✓ Right value (M is symmetric), though the formula's slot is row ${ra}, col ${rb}. ` : "✓ ";
+  } else {
+    addBadge(cell, n + 1, "wrong");
+    const right = cellAt(rc, ra, rb); addBadge(right, n + 1, "good"); pulse(right, 0);
+    msg = `✗ That's row ${a}, col ${b}, bottom ${c}. Term ${termLabel(n)} wants row ${ra}, col ${rb}, bottom ${rc}. `;
+  }
+  st.guesses.push(exact || mirror);
+  st.step++;
+  if (st.step < 3) { promptStep(msg + "<br>"); $("prompt").className = exact || mirror ? "ok" : "bad"; return; }
+  const score = st.guesses.filter(Boolean).length, first = !st.patternOpen;
+  const tally = st.guesses.map((g, n) => `${termLabel(n)} ${g ? "✓" : "✗"}`).join(" &nbsp; ");
+  setPrompt((score === 3 ? "" : msg + "<br>") + `<b>${tally} &nbsp;(${score}/3)</b>. The value is in the recipe panel.` + (first ? " The pattern behind those three cells is now open there too." : ""), score === 3 ? "ok" : "bad");
+  unlockPattern(); markSeen(); renderRecipe(); renderGrid(); renderRowC(); steps.nudge();
+}
+function markSeen() { st.seen[`${st.sys}${st.i}${st.j}${st.k}`] = true; }
+function resetPredict() {
+  st.step = st.predict ? 0 : 3; st.guesses = [];
+  clearBadges();
+  $("cube").classList.toggle("clickable", st.predict);
+  if (st.predict) promptStep();
+  else { setPrompt(""); showAnswerBadges(); markSeen(); }
+  renderRecipe(); renderGrid(); renderRowC();
+}
+
+/* ---------- grid + row of C ---------- */
+function renderGrid() {
+  const S = SYS[st.sys], g = $("cgrid"); g.innerHTML = "";
+  g.appendChild(Object.assign(document.createElement("div"), { className: "hd" }));
+  for (let j = 1; j <= 2; j++) { const h = document.createElement("div"); h.className = "hd"; tex(h, J("j") + "=" + J(j), false); g.appendChild(h); }
+  for (let i = 1; i <= 2; i++) {
+    const h = document.createElement("div"); h.className = "hd"; tex(h, I("i") + "=" + I(i), false); g.appendChild(h);
+    for (let j = 1; j <= 2; j++) {
+      const seen = !!st.seen[`${st.sys}${i}${j}${st.k}`], cell = document.createElement("div");
+      cell.className = "cell" + (i === st.i && j === st.j ? " sel" : "") + (seen ? " seen" : "");
+      const top = document.createElement("span");
+      tex(top, `${c3(i, j, st.k)} = ${seen ? term(cijk(st.sys, i, j, st.k), S.atom) : "\\ ?"}`, false);
+      const mono = document.createElement("span"); mono.className = "mono"; tex(mono, "\\times\\," + S.qd[i-1] + S.qd[j-1], false);
+      cell.append(top, mono);
+      cell.onclick = () => { st.i = i; st.j = j; syncChips(); resetPredict(); };
+      g.appendChild(cell);
+    }
+  }
+  $("kname").textContent = st.k;
+}
+function rowSeen(k) { for (let i = 1; i <= 2; i++) for (let j = 1; j <= 2; j++) if (!st.seen[`${st.sys}${i}${j}${k}`]) return false; return true; }
+function renderRowC() {
+  const k = st.k, s = st.sys;
+  if (!rowSeen(k)) {
+    tex($("rowC"), `\\text{Fill all four cells and row } ${K(k)} \\text{ of } C \\text{ builds here:}\\\\[4pt]
+      C_{${K(k)}${J("j")}} = \\textstyle\\sum_{${I("i")}} c_{${I("i")}${J("j")}${K(k)}}\\,\\dot q_{${I("i")}} \\quad(\\text{column } ${J("j")} \\text{ of the grid}\\cdot\\dot q)`);
+  } else {
+    tex($("rowC"), `\\begin{aligned}
+        C_{${K(k)}1} &= ${c3(1,1,k)}\\dot q_{${I(1)}} + ${c3(2,1,k)}\\dot q_{${I(2)}} = ${Ckj(s, k, 1)}\\\\
+        C_{${K(k)}2} &= ${c3(1,2,k)}\\dot q_{${I(1)}} + ${c3(2,2,k)}\\dot q_{${I(2)}} = ${Ckj(s, k, 2)}\\\\[4pt]
+        (C\\dot q)_{${K(k)}} &= ${Cqk(s, k)}
+      \\end{aligned}`);
+  }
+  const e = (k, j) => rowSeen(k) ? Ckj(s, k, j) : "\\cdot";
+  tex($("Cfull"), `C = \\begin{bmatrix} ${e(1,1)} & ${e(1,2)} \\\\ ${e(2,1)} & ${e(2,2)} \\end{bmatrix}`);
+}
+
+/* ---------- glue ---------- */
+function syncChips() {
+  document.querySelectorAll("[data-ix]").forEach(b => b.classList.toggle("on", +b.dataset.v === st[b.dataset.ix]));
+}
+document.querySelectorAll("[data-ix]").forEach(b => b.onclick = () => { st[b.dataset.ix] = +b.dataset.v; syncChips(); resetPredict(); });
+
+let rowShown = false;
+const steps = stepper(STEPS, s => {
+  Object.assign(st, { sys: s.sys, k: s.k, i: s.i, j: s.j, predict: s.predict });
+  $("rowpanel").classList.toggle("hidden", !s.row);
+  if (s.row && !rowShown) { enterAnim($("rowpanel")); rowShown = true; }
+  if (st.patternOpen) $("pattern").open = false;   // open once at unlock; after that, one click away
+  renderSystem($("sysline"), s.sys);
+  renderCube(); syncChips(); resetPredict();
+});
+document.querySelectorAll(".meaning, .note, h2").forEach(renderMathIn);
+steps.go(0);
+</script>
+<script src="/demos/_shared/demo-chrome.js" defer></script>
+</body>
+</html>
