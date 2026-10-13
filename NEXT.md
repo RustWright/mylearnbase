@@ -1,15 +1,14 @@
 # NEXT — mylearnbase
 
-**Updated:** 2026-10-13 · Playground cut to a toy shelf (opt-in per embed); archive thread open.
+**Updated:** 2026-10-13 · Playground = toy shelf; archived posts marked + out of Related (both committed).
 
 ## Next action
-**Archive posts** (user raised 2026-10-13, undecided): they look identical to current posts, and Related
-recommends them (4 of 48 slots on current posts). Proposed: an "Archived" note on archived posts + current
-posts never recommend archived ones (keep archive in the TF-IDF corpus so weights don't shift). Ask the user.
-Then **plan Cycle 7** (`0017`). Proposed core, user's idea, NOT scoped: map skills to projects so the résumé
+**Plan Cycle 7** (`0017`). Proposed core, user's idea, NOT scoped: map skills to projects so the résumé
 shows which project exercises which skill. Candidate: front-door logbook entry embedding orphan `hero-flock`.
 
 ## Decisions in force
+- **Archived posts** (user 2026-10-13): `post.html` shows an "Archived" callout for `posts/archive/`; current
+  posts never recommend archived ones (one-way; archive stays in the TF-IDF corpus so idf doesn't shift).
 - **Playground = toys only** (user 2026-10-13): a demo is listed only if its embed has `playground=true`
   (`build_groups` filters; flat `demos` list keeps all for back-links/projects). Test: fun having read
   nothing. Today: boids flock, Snake bot, SVG build-your-own. NOT naive-vs-grid, TF-IDF, enso, Christoffel.
@@ -23,8 +22,7 @@ shows which project exercises which skill. Candidate: front-door logbook entry e
 - **QR codes from `scripts/build-qr.py`**, encoding `print_url`, decode-verified, NO quiet zone in the files:
   `site-qr.svg` (domain UPPERCASED → v1) on the résumé masthead → homepage; `resume-qr.svg` (`/resume/`, v3)
   on the card back → résumé.
-- **Business card** `print/business-card/card.html` → `scripts/build-card-pdf.sh` → PDF (not deployed).
-  3.5×2 + 0.125in bleed. Front: name, full degree + UW, envelope/globe icons, OFFICIAL LinkedIn bug.
+- **Business card** `print/business-card/card.html` → `scripts/build-card-pdf.sh` → PDF; 3.5×2 + 0.125in bleed.
 - **Christoffel post**: three standalone demos, shared `christoffel.{js,css}`, no WASM. Facts verified
   against the user's Spong PDF (2004 PRE-PRINT of 1st ed.): cite without section numbers; book writes D(q).
 - ⚠️ Résumé page 1 is FULL (`.rs-entry` is `break-inside: avoid`). Never phone/address.
@@ -33,8 +31,7 @@ shows which project exercises which skill. Candidate: front-door logbook entry e
 
 ## Do NOT re-survey
 - Lighthouse on a post page (2026-09-20): a11y 100, BP 100, perf 98, CLS 0. Cache/giallo warnings = harness.
-- `tag1`/`tag2`/`""` in the tag-inventory grep are example front matter INSIDE post bodies, not real tags.
-- Zola minifies HTML: attribute quotes are stripped, so grep built pages without assuming `="`.
+- `tag1`/`tag2`/`""` in the tag grep = example front matter in post bodies. Zola strips attribute quotes.
 - Pagefind "has no <html> element" on old `/posts/<slug>/` URLs = alias redirect pages, expected.
 
 ## Open threads
