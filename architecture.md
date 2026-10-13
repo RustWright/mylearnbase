@@ -37,7 +37,7 @@ Personal website for documenting learning journeys, showcasing projects, and hos
 content/
 ├── _index.md                 # homepage: doors, dated Now line (see § Homepage and header)
 ├── projects/                 # /projects/ hub + one page per project (see § Projects below)
-├── playground/_index.md      # /playground/ gallery of every demo (see § Interactive Demos)
+├── playground/_index.md      # /playground/ shelf of standalone toys (see § Interactive Demos)
 ├── resume/_index.md          # /resume/, canonical résumé; the PDF is generated from it
 ├── colophon/_index.md        # how the site is built
 └── posts/
@@ -252,7 +252,7 @@ The same `index.html` is served two ways: iframed into its post, and on its own 
 
 ### The Playground
 
-`/playground/` (`content/playground/_index.md` + `templates/playground.html`) is the gallery of every reader-facing demo, rendered from `demos.json`. The path is not `/demos/`: Zola copies `static/demos/` verbatim into `public/demos/`, so a section there would emit an `index.html` into a directory the static copier owns. The demo *files* stay at `/demos/…`, so no published post link changed.
+`/playground/` (`content/playground/_index.md` + `templates/playground.html`) is a shelf of the demos that are fun with no post around them, rendered from `demos.json`. The path is not `/demos/`: Zola copies `static/demos/` verbatim into `public/demos/`, so a section there would emit an `index.html` into a directory the static copier owns. The demo *files* stay at `/demos/…`, so no published post link changed.
 
 **Light demos preview live; heavy demos show a captured still.** The ready-made `boids_*.gif` files the plan proposed as posters are 393-695KB each, *heavier than the 533KB WASM bundle they would have stood in for*, so they were never an option. A live preview cannot go stale and costs 9-26KB for each of the nine light demos. The three heavy ones (588-610KB) get a poster, because an empty card is the wrong reward for finding the best demos on the site.
 
@@ -270,9 +270,11 @@ The preview is rendered at ~2.4× the tile's width and scaled down (`width: calc
 
 **Sizes are stated on downloads, never on page links.** A heavy tile does not say "601 KB". "Heavy" exists to protect the *gallery's* weight — no 600KB demo loads on scroll — and once a visitor clicks, it is an ordinary page load, which nobody thinks of in bytes. The flock post itself loads 2.2MB of GIFs unlabelled, so a label on the tile would have warned about the cheaper route to the same demo. Downloads are the exception, because someone saving a file does think about what they are getting: the résumé's button reads "Download PDF (65 KB)". Zola has no template function that reads a file size, so `build.sh` measures every `static/**/*.pdf` into a gitignored `download-sizes.json` keyed by site URL — measured from the file being deployed, so it cannot disagree with what ships, and absent under a bare `zola serve`, where the button falls back to plain "Download PDF".
 
-**Grouped by parent post, because the collection is lopsided.** Two posts own three demos each and five own one, so a flat grid opens with three near-identical SVG tiles and then three near-identical TF-IDF tiles. Grouping reads as one idea explored from several angles — and single-demo groups get a horizontal tile so they fill their row instead of leaving two dead cells under a heading.
+**A toy shelf, not an index: membership is opt-in per embed.** A demo appears only when its `demo()` call carries `playground=true`; `build_groups` in `build-demo-index.py` filters on it, while the flat `demos` list keeps every demo for the back-link bar and project pages. Deriving the gallery from *all* embeds made it list explanation aids (the Christoffel steps, "SVG: read the path") that only make sense beside their prose, and the page read as overwhelming rather than playful. Whether a demo stands alone is a judgment no script can make, so the author makes it once, at the embed. The test: is it fun to play with having read nothing? Today that is the flock, the Snake bot and the SVG editor.
 
-**Known gap, pre-existing:** demos follow `prefers-color-scheme` while the site has its own theme toggle, so a visitor who toggles the site away from their OS setting sees light demos on a dark page. This already affects demos embedded in posts; the Playground only makes it visible eight tiles at once. Fixing it means teaching nine demo stylesheets a theme attribute, since a media query cannot be overridden from the host page.
+**Grouped by parent post**, so each tile sits under the write-up it came from; a single-demo group gets a horizontal tile that fills its row instead of leaving two dead cells under a heading.
+
+**Known gap, pre-existing:** demos follow `prefers-color-scheme` while the site has its own theme toggle, so a visitor who toggles the site away from their OS setting sees light demos on a dark page. This already affects demos embedded in posts; the Playground only makes it visible several tiles at once. Fixing it means teaching nine demo stylesheets a theme attribute, since a media query cannot be overridden from the host page.
 
 ### The homepage hero flock
 

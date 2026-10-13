@@ -12,6 +12,10 @@
     wide     — optional (bool). When true the demo breaks out wider than the
                reading column (.demo--wide; see sass/css/custom.scss) — for
                comparative/spatial interactives that need the room.
+    playground — optional (bool). When true the demo is listed on /playground/.
+               Not read here: scripts/build-demo-index.py reads it from the call.
+               Reserve it for toys, demos that are fun with no post around them;
+               a demo that only makes sense beside its prose stays off.
 -#}
 {%- set demo_url = "/demos/" ~ name ~ "/" -%}
 {%- set h = height | default(value=480) -%}

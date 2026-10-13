@@ -81,7 +81,7 @@ smiley, a boat, a heart), and the last one needs the very curves you just pulled
 apart. There's a quick reference if the vocabulary slips, and an example solution
 for each when you're done (or stuck; there's never just one right answer).
 
-{{ demo(name="concepts/how-svgs-work/build", height=820, wide=true, caption="A live SVG editor. Pick a challenge, type shapes, watch them render. Reveal an example when you're done or stuck. Nothing leaves your browser. Works best on a wider screen.") }}
+{{ demo(name="concepts/how-svgs-work/build", height=820, wide=true, playground=true, caption="A live SVG editor. Pick a challenge, type shapes, watch them render. Reveal an example when you're done or stuck. Nothing leaves your browser. Works best on a wider screen.") }}
 
 By the time you're drawing the heart, you're writing `C` commands by hand,
 placing control points on purpose, which is exactly what you were dragging around

@@ -1,4 +1,7 @@
-{#- Playground — the gallery of every reader-facing demo on the site.
+{#- Playground — a shelf of the demos that are fun on their own, with no post
+    around them. Not an index of every demo: a demo appears here only when its
+    embed carries playground=true (see build_groups in build-demo-index.py for
+    why). Everything else lives only inside its post.
 
     Path is /playground/, not /demos/. Zola copies static/demos/ verbatim into
     public/demos/, so a section at /demos/ would emit an index.html into a
@@ -49,9 +52,9 @@
 
     {%- if data and data.groups %}
     {%- for group in data.groups %}
-    {#- Five of the seven groups own a single demo, which in a 3-up grid would
-        leave two empty cells under each heading. A lone demo gets a horizontal
-        tile instead, filling its row and reading as deliberate. -#}
+    {#- Most groups own a single demo, which in a 3-up grid would leave two
+        empty cells under each heading. A lone demo gets a horizontal tile
+        instead, filling its row and reading as deliberate. -#}
     <section class="pg-group{% if group.demos | length == 1 %} pg-group--single{% endif %}">
       <h2 class="pg-group-title">
         {%- if group.url %}<a href="{{ group.url }}">{{ group.title }}</a>

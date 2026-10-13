@@ -175,6 +175,7 @@ def collect_posts() -> tuple[list[dict], list[str]]:
                 "caption": args.get("caption", ""),
                 "height": args.get("height", 480),
                 "wide": bool(args.get("wide", False)),
+                "playground": args.get("playground") is True,
                 "post_url": post_url(md, slug_m.group(1)),
                 "post_title": title_m.group(1) if title_m else slug_m.group(1),
                 "post_date": (date_m.group(1) if date_m else ""),
@@ -271,6 +272,7 @@ def generate() -> int:
             "poster": (f"/img/demos/{poster_name(name, meta['hash'])}"
                        if (POSTERS / poster_name(name, meta["hash"])).exists() else None),
             "listed": meta["listed"],
+            "playground": call["playground"] if call else False,
             "position": call["position"] if call else 0,
             "post": None,
         }
@@ -308,8 +310,10 @@ def generate() -> int:
     heavy = sum(1 for e in entries if e["heavy"])
     unlisted = sum(1 for e in entries if not e["listed"])
     postered = sum(1 for e in entries if e["poster"])
+    toys = sum(1 for e in entries if e["listed"] and e["playground"])
     print(f"Demo index: {len(entries)} demos on disk, {linked} linked to a published post, "
-          f"{heavy} heavy ({postered} with a current poster), {unlisted} unlisted.")
+          f"{heavy} heavy ({postered} with a current poster), {unlisted} unlisted, "
+          f"{toys} on the Playground.")
 
     # A heavy demo with no current poster still renders — it falls back to the
     # drawn card — so this has to be said out loud or it is invisible.
@@ -356,11 +360,18 @@ def build_groups(entries: list[dict]) -> list[dict]:
 
     Unlisted demos are dropped here rather than filtered in the template, so
     "noindex" means one thing in one place.
+
+    So are demos without `playground=true` on their embed. The gallery is a
+    shelf of toys, not an index of every demo: deriving it from all embeds made
+    it list explanation aids (the three Christoffel steps, "SVG: read the path")
+    that only make sense beside their prose. Whether a demo stands alone is a
+    judgment, so the author makes it once, on the embed, and this reads it.
+    The flat `demos` list keeps every demo, for the back-link bar and projects.
     """
     order: list[str] = []
     groups: dict[str, dict] = {}
     for e in entries:
-        if not e["listed"]:
+        if not (e["listed"] and e["playground"]):
             continue
         key = e["post"]["url"] if e["post"] else ""
         if key not in groups:

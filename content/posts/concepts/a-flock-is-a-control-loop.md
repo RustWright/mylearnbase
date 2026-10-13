@@ -14,7 +14,7 @@ math = true
 
 <a id="demo"></a>
 
-{{ demo(name="concepts/a-flock-is-a-control-loop/flock", wide=true, height=820, caption="The finished flock, all three rules live.") }}
+{{ demo(name="concepts/a-flock-is-a-control-loop/flock", wide=true, height=820, playground=true, caption="The finished flock, all three rules live.") }}
 
 Watching emergent group behaviour after defining simple rules on the individual level brings a genuine smile to my face. After working on this project I've caught myself just staring at the boids as they move around the screen, because of how satisfying it looks.[^build]
 
