@@ -50,6 +50,13 @@ MIN_SCORE = 0.03       # drop neighbours at or below this cosine score
 STEM_PLURALS = True    # collapse simple trailing-'s' plurals (tools -> tool)
 TERMS_PER_PAIR = 4     # shared terms recorded per neighbour (interpretability)
 
+# Archived posts predate the site's forms and read rougher than current work, so
+# a current post never recommends one. One-way on purpose: an archived post may
+# still recommend current posts, which moves its reader toward newer writing.
+# Archived posts stay IN the corpus, so idf weights (and every current post's
+# other neighbours) are the same as if this rule did not exist.
+ARCHIVE_PREFIX = "posts/archive/"
+
 STOPWORDS = {
     "a", "about", "above", "after", "again", "all", "also", "am", "an", "and",
     "any", "are", "as", "at", "be", "because", "been", "before", "being",
@@ -188,9 +195,12 @@ def build_vectors(docs: dict[str, Counter]) -> tuple[dict[str, dict[str, float]]
 
 def neighbours(key: str, vectors: dict[str, dict[str, float]], titles: dict[str, str]):
     base = vectors[key]
+    current = not key.startswith(ARCHIVE_PREFIX)
     scored = []
     for other, ovec in vectors.items():
         if other == key:
+            continue
+        if current and other.startswith(ARCHIVE_PREFIX):
             continue
         # cosine == dot product (vectors are already L2-normalized)
         small, large = (base, ovec) if len(base) <= len(ovec) else (ovec, base)

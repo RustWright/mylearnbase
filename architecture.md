@@ -49,7 +49,8 @@ content/
     ├── workflows/            # repeatable how-to writeups
     ├── opinions/             # short argued positions
     ├── resources/            # curated resource collections
-    └── archive/              # historical / pre-system content
+    └── archive/              # pre-system content: post.html adds an "Archived" callout;
+                              #   current posts never recommend it (compute-related.py)
 ```
 
 **Taxonomies:** `tags` and `series` only. `categories` was removed in Cycle 3. Series powers the multi-part "Building My LearnBase" arc via the custom `templates/series/` templates (the theme ships none).
