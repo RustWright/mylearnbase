@@ -13,7 +13,7 @@ tags = ["simulation", "algorithms", "reinforcement-learning"]
 
 <a id="demo"></a>
 
-{{ demo(name="concepts/the-checkpoint-lottery/checkpoints", wide=true, height=910, caption="One training run, measured every 500 episodes. Drag the slider to stop training at that point, and the snake plays with the table you would have saved. The live average builds up over repeated games, because a single game proves nothing either way.") }}
+{{ demo(name="concepts/the-checkpoint-lottery/checkpoints", wide=true, height=945, caption="One training run, measured every 500 episodes. Drag the slider to stop training at that point, and the snake plays with the table you would have saved. The live average builds up over repeated games, because a single game proves nothing either way.") }}
 
 <!-- DRAFT. The demo above is finished; the prose is not written.
 
