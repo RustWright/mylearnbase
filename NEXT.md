@@ -3,8 +3,9 @@
 **Updated:** 2026-10-16 · Shipped `everything-is-optimization` + `control-theory-refresher`; checkpoint demo dropped.
 
 ## Next action
-**Plan Cycle 7** (`0017`). Proposed core, user's idea, NOT scoped: map skills to projects so the résumé
-shows which project exercises which skill. Candidate: front-door logbook entry embedding orphan `hero-flock`.
+**Plan Cycle 7** (`0017`), NOT scoped. User 2026-10-16: *collaborative* cycle fed by a logbook push from
+omni-me + ~/life; core concern = route each visitor (esp. recruiters) to what interests them, surface skills
+and projects for target jobs; user flows are unplanned. Candidates: skills-to-projects map, `hero-flock` entry.
 
 ## Decisions in force
 - **Archived posts** (user 2026-10-13): `post.html` shows an "Archived" callout for `posts/archive/`; current
@@ -14,7 +15,7 @@ shows which project exercises which skill. Candidate: front-door logbook entry e
   nothing. Today: boids flock, Snake bot, SVG build-your-own. NOT naive-vs-grid, TF-IDF, enso, Christoffel.
 - **`build.sh` sizes every local `<img>`** (`scripts/size-images.py`): author plain Markdown images, never
   hand-add dimensions. PDF/poster scripts refuse a busy port.
-- ⚠️ **Never "Engineer" as the user's title** (Ontario PEO; unlicensed, MB EIT lapsing, user 2026-10-12).
+- ⚠️ **Never "Engineer" as the user's title** (protected title in Canada, user 2026-10-12).
   Degree wording only: résumé subtitle, JSON-LD jobTitle, card. `build-card-pdf.sh` blocks the word.
 - **efeerhie.com = 301** to mylearnbase.com (`http*://*efeerhie.com/*` → `https://mylearnbase.com/${3}`,
   proxied `AAAA 100::` at @ and www). The dashboard's "may not proxy `http`" warning is a FALSE alarm.
@@ -33,8 +34,8 @@ shows which project exercises which skill. Candidate: front-door logbook entry e
 - Lighthouse on a post page (2026-09-20): a11y 100, BP 100, perf 98, CLS 0. Cache/giallo warnings = harness.
 - `tag1`/`tag2`/`""` in the tag grep = example front matter in post bodies. Zola strips attribute quotes.
 - Pagefind "has no <html> element" on old `/posts/<slug>/` URLs = alias redirect pages, expected.
+- Repo is PUBLIC. Old `.log/` transcripts (Gmail) stay in history: user 2026-10-16, a purge dangles 48 parent gitlinks.
 
 ## Open threads
-- Playground page copy (description/subtitle) was LLM-drafted 2026-10-13; user to edit.
-- ACM link in `tf-idf.md` 403s to curl (unverified, left). `0013` résumé polish open.
-- The user orders the card at W Print themselves (double-sided, 3.5×2in); a reprint follows any URL change.
+- Playground copy LLM-drafted 2026-10-13, user to edit. `tf-idf.md` ACM 403s to curl. `0013` open. User
+  orders the card at W Print (double-sided, 3.5×2in); a reprint follows any URL change.
