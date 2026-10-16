@@ -3,9 +3,10 @@
 **Updated:** 2026-10-16 · Shipped `everything-is-optimization` + `control-theory-refresher`; checkpoint demo dropped.
 
 ## Next action
-**Plan Cycle 7** (`0017`), NOT scoped. User 2026-10-16: *collaborative* cycle fed by a logbook push from
-omni-me + ~/life; core concern = route each visitor (esp. recruiters) to what interests them, surface skills
-and projects for target jobs; user flows are unplanned. Candidates: skills-to-projects map, `hero-flock` entry.
+**Plan Cycle 7** (`0017`). User 2026-10-16: DEADLINE = January co-op search. *Collaborative* cycle fed by a
+logbook push from omni-me + ~/life; core = route each visitor (esp. recruiters) to what interests them, surface
+skills/projects for target jobs. Flows unplanned. Source: `~/life/.../career/job_market/my_skills.csv` (75 skills
++ evidence; publish a curated subset, never gaps or denylisted data). Candidates: skills-to-projects map, `hero-flock`.
 
 ## Decisions in force
 - **Archived posts** (user 2026-10-13): `post.html` shows an "Archived" callout for `posts/archive/`; current
@@ -26,8 +27,7 @@ and projects for target jobs; user flows are unplanned. Candidates: skills-to-pr
 - **Christoffel post**: three standalone demos, shared `christoffel.{js,css}`, no WASM. Facts verified
   against the user's Spong PDF (2004 PRE-PRINT of 1st ed.): cite without section numbers; book writes D(q).
 - ⚠️ Résumé page 1 is FULL (`.rs-entry` is `break-inside: avoid`). Never phone/address.
-- `custom.css` is `sass/css/custom.scss`; `zola check` NOT in `build.sh`; theme v5.6.1. A deploy can take
-  ~4 min or fail transiently after `build.sh` succeeds: Retry the same commit before debugging.
+- `custom.css` = `sass/css/custom.scss`; `zola check` NOT in `build.sh`; theme v5.6.1. Deploy ~4 min, flaky: retry first.
 
 ## Do NOT re-survey
 - Lighthouse on a post page (2026-09-20): a11y 100, BP 100, perf 98, CLS 0. Cache/giallo warnings = harness.
