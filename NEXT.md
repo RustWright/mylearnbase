@@ -32,8 +32,7 @@ and projects for target jobs; user flows are unplanned. Candidates: skills-to-pr
 
 ## Do NOT re-survey
 - Lighthouse on a post page (2026-09-20): a11y 100, BP 100, perf 98, CLS 0. Cache/giallo warnings = harness.
-- `tag1`/`tag2`/`""` in the tag grep = example front matter in post bodies. Zola strips attribute quotes.
-- Pagefind "has no <html> element" on old `/posts/<slug>/` URLs = alias redirect pages, expected.
+- Expected noise: `tag1`/`tag2`/`""` in tag grep (example front matter); Pagefind "no <html>" (alias redirects).
 - Repo is PUBLIC. Old `.log/` transcripts (Gmail) stay in history: user 2026-10-16, a purge dangles 48 parent gitlinks.
 
 ## Open threads
