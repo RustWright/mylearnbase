@@ -20,9 +20,8 @@ and projects for target jobs; user flows are unplanned. Candidates: skills-to-pr
 - **efeerhie.com = 301** to mylearnbase.com (`http*://*efeerhie.com/*` → `https://mylearnbase.com/${3}`,
   proxied `AAAA 100::` at @ and www). The dashboard's "may not proxy `http`" warning is a FALSE alarm.
   Email Routing `efe@` → personal inbox, receive-only; the résumé PDF build fails on any other address.
-- **QR codes from `scripts/build-qr.py`**, encoding `print_url`, decode-verified, NO quiet zone in the files:
-  `site-qr.svg` (domain UPPERCASED → v1) on the résumé masthead → homepage; `resume-qr.svg` (`/resume/`, v3)
-  on the card back → résumé.
+- **QR codes from `scripts/build-qr.py`** (`print_url`, decode-verified, no quiet zone): `site-qr.svg` (domain
+  UPPERCASED → v1) on résumé masthead → homepage; `resume-qr.svg` (`/resume/`, v3) on card back → résumé.
 - **Business card** `print/business-card/card.html` → `scripts/build-card-pdf.sh` → PDF; 3.5×2 + 0.125in bleed.
 - **Christoffel post**: three standalone demos, shared `christoffel.{js,css}`, no WASM. Facts verified
   against the user's Spong PDF (2004 PRE-PRINT of 1st ed.): cite without section numbers; book writes D(q).
@@ -33,7 +32,8 @@ and projects for target jobs; user flows are unplanned. Candidates: skills-to-pr
 ## Do NOT re-survey
 - Lighthouse on a post page (2026-09-20): a11y 100, BP 100, perf 98, CLS 0. Cache/giallo warnings = harness.
 - Expected noise: `tag1`/`tag2`/`""` in tag grep (example front matter); Pagefind "no <html>" (alias redirects).
-- Repo is PUBLIC. Old `.log/` transcripts (Gmail) stay in history: user 2026-10-16, a purge dangles 48 parent gitlinks.
+- Repo is PUBLIC. Old `.log/` transcripts (Gmail) stay in history (user 2026-10-16; purge dangles 48 gitlinks).
+  Privacy guard runs in `.githooks/pre-commit` (`docs/.../local-development.md`). ⚠️ OTHER DEVICE: run its installer.
 
 ## Open threads
 - Playground copy LLM-drafted 2026-10-13, user to edit. `tf-idf.md` ACM 403s to curl. `0013` open. User
