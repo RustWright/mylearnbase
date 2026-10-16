@@ -3,10 +3,10 @@
 **Updated:** 2026-10-16 · Shipped `everything-is-optimization` + `control-theory-refresher`; checkpoint demo dropped.
 
 ## Next action
-**Plan Cycle 7** (`0017`). User 2026-10-16: DEADLINE = January co-op search. *Collaborative* cycle fed by a
-logbook push from omni-me + ~/life; core = route each visitor (esp. recruiters) to what interests them, surface
-skills/projects for target jobs. Flows unplanned. Source: `~/life/.../career/job_market/my_skills.csv` (75 skills
-+ evidence; publish a curated subset, never gaps or denylisted data). Candidates: skills-to-projects map, `hero-flock`.
+**Plan Cycle 7** (`0017`) once the user brings a batch of co-op postings (2026-10-16: collecting into the job-scan
+inbox; `--level coop` was n=1, too thin to pick a lead role). DEADLINE = January co-op search. Collaborative cycle
+fed by an omni-me + ~/life logbook push; core = route each visitor (esp. recruiters) to what fits, surface skills.
+Source: `~/life/.../job_market/my_skills.csv`, curated subset only (never gaps or denylisted data).
 
 ## Decisions in force
 - **Archived posts** (user 2026-10-13): `post.html` shows an "Archived" callout for `posts/archive/`; current
