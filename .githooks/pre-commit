@@ -53,3 +53,10 @@ for file in "${modified_posts[@]}"; do
 
     git add "$file"
 done
+
+# Privacy guard, LAST, so it also scans the `updated` lines staged above. This repo
+# is public; the guard and its install live in ~/.dotfiles/scripts (privacy-guard*.sh).
+# Fails closed: a commit that cannot be checked is refused, not waved through.
+guard="$HOME/.dotfiles/scripts/privacy-guard.sh"
+[ -x "$guard" ] || { echo "pre-commit: $guard missing; commit refused." >&2; exit 1; }
+exec "$guard"

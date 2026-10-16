@@ -53,6 +53,9 @@ editorial/_feedback/
 
 # Curiosity captures (concepts-post trigger pipeline) — gitignored, parent-synced
 .curiosities/
+# Privacy-guard denylist: the terms themselves are sensitive. Canonical copy is in
+# the private parent repo; installed per device by privacy-guard-install.sh.
+.private-identity-denylist
 
 # In-progress post drafts held back from a PUBLIC repo.
 #

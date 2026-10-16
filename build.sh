@@ -58,6 +58,8 @@ python3 scripts/build-og-card.py --check
 # Homepage "Now" line freshness. It states what is happening at present, and a
 # static page keeps stating it long after it stops being true. Warn, never
 # fail, for the same reason as above; the homepage prints the date regardless.
+# 45 days, not 90: the heading shows only the month, so a visitor reads a previous
+# month as stale within weeks, long before the claim itself goes untrue.
 python3 - <<'PY'
 import datetime, re
 from pathlib import Path
@@ -65,7 +67,7 @@ from pathlib import Path
 m = re.search(r'^now_updated\s*=\s*"(\d{4}-\d{2}-\d{2})"', Path("content/_index.md").read_text(), re.M)
 if m:
     age = (datetime.date.today() - datetime.date.fromisoformat(m.group(1))).days
-    if age > 90:
+    if age > 45:
         print(f"WARNING: the homepage Now line is {age} days old (now_updated = {m.group(1)}).")
         print("         Rewrite the body of content/_index.md and bump now_updated.")
 PY

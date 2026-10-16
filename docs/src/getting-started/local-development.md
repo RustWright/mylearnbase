@@ -25,13 +25,15 @@ The repo includes a pre-commit hook at `.githooks/pre-commit` that automatically
 
 The template already handles the display — if `updated` exists and differs from `date`, it renders "Updated on [date]" next to the publish date.
 
-To enable the hook, configure git to use the tracked `.githooks/` directory:
+After that, the hook runs a privacy guard (`privacy-guard.sh`, shared across public repos in the dotfiles). It refuses a commit whose added lines contain a credential shape or a term from the repo's gitignored `.private-identity-denylist`. Bypass a false positive with `git commit --no-verify`.
+
+To enable both, run the installer once per clone. It sets `core.hooksPath` to `.githooks`, installs the denylist from its private canonical copy, and self-tests that the guard blocks:
 
 ```bash
-git config core.hooksPath .githooks
+~/.dotfiles/scripts/privacy-guard-install.sh projects/mylearnbase setup_files/privacy/mylearnbase.denylist
 ```
 
-This only needs to be run once per clone.
+Run it from the workspace root. Without it, git ignores `.githooks/` entirely: hooks and `core.hooksPath` are never cloned.
 
 ## Run the Dev Server
 

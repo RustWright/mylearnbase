@@ -30,8 +30,8 @@ doors = [
 
 # The "Now" line is the body of this file, below. It is a claim about the
 # present, so it is dated: the reader can judge its freshness, and build.sh
-# warns once this date is 90 days old. Update both together.
-now_updated = "2026-09-16"
+# warns once this date is 45 days old. Update both together.
+now_updated = "2026-10-16"
 +++
 
 Studying for an MEng in Mechanical & Mechatronics Engineering at Waterloo, and building [omni-me](@/projects/omni-me.md), an offline-first personal app in Rust.
