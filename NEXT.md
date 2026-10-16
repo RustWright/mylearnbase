@@ -1,7 +1,6 @@
 # NEXT — mylearnbase
 
-**Updated:** 2026-10-16 · Published two posts (opinions `everything-is-optimization`, resources
-`control-theory-refresher`). Checkpoint-lottery demo dropped (thesis withdrawn). Cycle 7 still unplanned.
+**Updated:** 2026-10-16 · Shipped `everything-is-optimization` + `control-theory-refresher`; checkpoint demo dropped.
 
 ## Next action
 **Plan Cycle 7** (`0017`). Proposed core, user's idea, NOT scoped: map skills to projects so the résumé
