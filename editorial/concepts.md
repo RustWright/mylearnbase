@@ -197,6 +197,17 @@ Two cross-form notes:
   "predict first" mode must hide whatever the prediction is testing.
   That first build displayed the substituted formula during the
   prediction, which gave the answer away.
+- **A demo that moves waits for the reader** (author, 2026-10-17, Snake
+  features demo). A demo below the intro is often reached long after the
+  page loads, or after the reader has walked away; one that plays on load
+  can be finished, or dead, before anyone sees it. Anything that animates on
+  its own starts paused behind one obvious control that says what it will do
+  ("▶ Watch the table bot play"), pauses itself when scrolled out of view, and
+  resumes when it comes back, unless the reader paused it. Once the reader
+  has started it, moving between missions may play straight away. Mechanism:
+  an `IntersectionObserver` on the canvas with no root measures against the
+  top-level viewport even from inside the demo's iframe
+  (`02_snake/demo/snake-features/src/main.rs`, `watch_visibility`).
 
 ## The curiosity log mechanism
 
