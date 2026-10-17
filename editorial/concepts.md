@@ -94,7 +94,7 @@ begun pressure-testing them (see the *(first post)* notes):
 |---|---|---|
 | 1 | Title (+ optional stake) | The concept; optionally one personal line on why it was worth a demo |
 | 2 | The curiosity moment | Where the question came from; link the logbook entry or project context if applicable |
-| 3 | The demo | Interactive, front and center, with a line of setup before and a "what to notice" after |
+| 3 | The demo | Interactive and central to the post, with a line of setup before and a "what to notice" after |
 | 4 | What clicked *(optional)* | What you understood after building it. Include only if something genuinely did; cut it rather than force a takeaway |
 | 5 | Where this shows up *(optional)* | Cross-refs: related logbook entries, other concepts posts, external resources |
 
@@ -102,6 +102,12 @@ The spine is the title, the curiosity moment, and the demo. The
 stake, "what clicked," and "where this shows up" are all optional.
 There is no "anti-patterns" or "when this breaks down" section;
 concepts posts are educational, not prescriptive.
+
+**Central does not mean first** (author, 2026-10-17). Do not open a post on
+the demo by default. Landing on a page full of moving objects with no idea
+what they are is jarring; a short intro that says what the post is about,
+then the demo, guides the reader in. Put the demo first only when it explains
+itself at a glance.
 
 *(first post)* The first post shipped without a stake line and
 without "what clicked." Its honest answer to "what clicked" was *not
