@@ -119,6 +119,12 @@ author hadn't made and a punctuation habit (heavy em-dashes) the
 author wouldn't use. Watch for both: better a plain honest sentence
 than a borrowed one.
 
+**Link technical terms to a reference** (author's rule, 2026-10-17). The
+first use of each technical term a cold reader may not know (Q-table, DQN,
+backpropagation) links to its Wikipedia article, or to the canonical docs when
+no article fits. First use only, and skip terms the post itself explains, so
+the prose does not turn into a wall of links.
+
 **The frontmatter `description` is descriptive prose too**, so the LLM
 drafts it and the author approves. Keep it to one sentence of about 160
 characters at most. It is the post's search snippet and link-preview
