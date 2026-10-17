@@ -201,13 +201,18 @@ Two cross-form notes:
   features demo). A demo below the intro is often reached long after the
   page loads, or after the reader has walked away; one that plays on load
   can be finished, or dead, before anyone sees it. Anything that animates on
-  its own starts paused behind one obvious control that says what it will do
-  ("▶ Watch the table bot play"), pauses itself when scrolled out of view, and
-  resumes when it comes back, unless the reader paused it. Once the reader
-  has started it, moving between missions may play straight away. Mechanism:
-  an `IntersectionObserver` on the canvas with no root measures against the
-  top-level viewport even from inside the demo's iframe
-  (`02_snake/demo/snake-features/src/main.rs`, `watch_visibility`).
+  its own, **when embedded in a post**, starts paused behind one obvious
+  control that says what it will do ("▶ Watch the table bot play"), pauses
+  itself when scrolled out of view, and resumes when it comes back, unless the
+  reader paused it. Once the reader has started it, moving between missions
+  may play straight away. **Opened directly it plays at once**: there it is
+  the whole page, the Playground tile links straight to it (a second ▶ would
+  be a redundant click), and the poster capture loads it that way.
+  Mechanism, in `02_snake/demo/snake-features/src/main.rs`: `embedded()` reads
+  `window.frameElement` (null when top-level; comparing `window.top` to
+  `window` from Rust gave the wrong answer), and `watch_visibility` puts an
+  `IntersectionObserver` with no root on the canvas, which measures against
+  the top-level viewport even from inside the iframe.
 
 ## The curiosity log mechanism
 
