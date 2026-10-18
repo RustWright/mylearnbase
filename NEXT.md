@@ -1,6 +1,6 @@
 # NEXT — mylearnbase
 
-**Updated:** 2026-10-16 · Shipped `everything-is-optimization` + `control-theory-refresher`; checkpoint demo dropped.
+**Updated:** 2026-10-18 · Shipped `what-the-snake-bot-was-missing` + `projects/snake.md` (repo `snake-dqn`).
 
 ## Next action
 **Plan Cycle 7** (`0017`) once the user brings a batch of co-op postings (2026-10-16: collecting into the job-scan
