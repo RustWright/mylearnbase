@@ -3,6 +3,7 @@ title = "Choosing what a Snake bot sees"
 description = "A hand-written Snake bot decides every move from five numbers. Watch the three cells it inspects, read its state vector as it plays, then take the controls yourself."
 slug = "choosing-what-a-snake-bot-sees"
 date = 2026-10-13
+updated = 2026-10-18
 draft = false
 
 [taxonomies]
@@ -40,3 +41,6 @@ is blind to is visible as everything that stays unmarked.
 The counter reading "states seen" is the other half of the picture. Five
 features in this encoding combine into exactly 64 distinct situations, and a
 single game walks through a surprisingly small fraction of them.
+
+Which of the missing pieces a learning bot needed most, and how its deaths
+pointed to them, is the subject of [What the Snake bot was missing](@/posts/concepts/what-the-snake-bot-was-missing.md).
