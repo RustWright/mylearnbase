@@ -32,8 +32,8 @@ Source: `~/life/.../job_market/my_skills.csv`, curated subset only, no gaps. Ide
 - `custom.css` = `sass/css/custom.scss`; `zola check` NOT in `build.sh`; theme v5.6.1. Deploy ~4 min, flaky: retry first.
 
 ## Do NOT re-survey
-- Lighthouse on a post page (2026-09-20): a11y 100, BP 100, perf 98, CLS 0. Cache/giallo warnings = harness.
-- Expected noise: `tag1`/`tag2`/`""` in tag grep (example front matter); Pagefind "no <html>" (alias redirects).
+- Lighthouse (2026-09-20): a11y/BP 100, perf 98, CLS 0. Noise: cache/giallo warnings, `tag1`/`tag2`/`""` in
+  tag grep (example front matter), Pagefind "no <html>" (alias redirects).
 - Repo is PUBLIC. Old `.log/` transcripts (Gmail) stay in history (user 2026-10-16; purge dangles 48 gitlinks).
   Privacy guard runs in `.githooks/pre-commit` (`docs/.../local-development.md`). ⚠️ OTHER DEVICE: run its installer.
 
