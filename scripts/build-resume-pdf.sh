@@ -90,17 +90,45 @@ echo "Printing /resume/ with $CHROME…"
 # verification below exists rather than a comment hoping someone notices.
 #
 # --no-pdf-header-footer drops Chrome's own page URL/date furniture.
-"$CHROME" \
-  --headless=old \
-  --disable-gpu \
-  --no-sandbox \
-  --no-pdf-header-footer \
-  --print-to-pdf="$OUT" \
-  "http://127.0.0.1:$PORT/resume/?print" >/dev/null 2>&1
+print_pdf() {  # print_pdf <query> <out>
+  "$CHROME" \
+    --headless=old \
+    --disable-gpu \
+    --no-sandbox \
+    --no-pdf-header-footer \
+    --print-to-pdf="$2" \
+    "http://127.0.0.1:$PORT/resume/?$1" >/dev/null 2>&1
+  if [ ! -s "$2" ]; then
+    echo "error: no PDF produced at $2" >&2
+    exit 1
+  fi
+}
+pages() { pdfinfo "$1" | awk '/^Pages:/ {print $2}'; }
 
-if [ ! -s "$OUT" ]; then
-  echo "error: no PDF produced at $OUT" >&2
+if ! command -v pdfinfo >/dev/null 2>&1; then
+  echo "error: pdfinfo (poppler-utils) not on PATH — needed to count pages." >&2
   exit 1
+fi
+
+# Page budget. Records marked `optional` in the source exist to fill a page 2
+# that other content already forces, never to CREATE one. So: the full print if
+# it fits one page; else the compact print (?compact hides optional records) if
+# THAT fits; else the full print after all, since page 2 exists regardless and
+# the optional records are what keep it from sitting nearly empty.
+print_pdf "print" "$OUT"
+FULL_PAGES="$(pages "$OUT")"
+if [ "$FULL_PAGES" -gt 1 ]; then
+  COMPACT="$BUILD_DIR/compact.pdf"
+  print_pdf "print&compact" "$COMPACT"
+  COMPACT_PAGES="$(pages "$COMPACT")"
+  if [ "$COMPACT_PAGES" -eq 1 ]; then
+    mv "$COMPACT" "$OUT"
+    echo "Page budget: full print is $FULL_PAGES pages; compact fits 1, so optional records are dropped."
+  else
+    echo "Page budget: compact is still $COMPACT_PAGES pages, so the full print keeps its optional records."
+  fi
+else
+  echo "Page budget: full print fits 1 page."
 fi
 
 # Verify the print stylesheet actually took, instead of trusting the exit code.

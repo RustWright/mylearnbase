@@ -1,6 +1,6 @@
 # NEXT — mylearnbase
 
-**Updated:** 2026-10-19 · Dropped Selected Projects from the résumé (for a Westmag send).
+**Updated:** 2026-10-19 · Résumé trimmed to one page with a re-expanding page budget (for a Westmag send).
 
 ## Next action
 **Plan Cycle 7** (`0017`) once the user brings a batch of co-op postings (2026-10-16: collecting into the job-scan
@@ -26,8 +26,9 @@ Source: `~/life/.../job_market/my_skills.csv`, curated subset only, no gaps. Ide
 - **Business card** `print/business-card/card.html` → `scripts/build-card-pdf.sh` → PDF; 3.5×2 + 0.125in bleed.
 - **Christoffel post**: three standalone demos, shared `christoffel.{js,css}`, no WASM. Facts verified
   against the user's Spong PDF (2004 PRE-PRINT of 1st ed.): cite without section numbers; book writes D(q).
-- ⚠️ Résumé: page 1 FULL (`break-inside: avoid`); never phone/address; NO Selected Projects (user 2026-10-19,
-  any fixed pick misfits some reader; site carries them; tagged pool + per-target PDFs rejected).
+- ⚠️ Résumé PDF = ONE page, zero slack (user 2026-10-19): `optional = true` records drop in `?compact` print
+  only when that makes it fit, and return once page 2 exists anyway (build script decides). Subtitle ≤ ~82
+  chars or it wraps past the QR. NO Selected Projects (any fixed pick misfits someone). Never phone/address.
 - `custom.css` = `sass/css/custom.scss`; `zola check` NOT in `build.sh`; theme v5.6.1. Deploy ~4 min, flaky: retry first.
 
 ## Do NOT re-survey

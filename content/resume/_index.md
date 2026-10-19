@@ -16,7 +16,7 @@ aliases = ["/cv/"]
 
 [extra]
 title = "Efe-Oghene Erhie"
-subtitle = "MEng candidate at Waterloo, expanding mechanical engineering background to include robotics software and controls."
+subtitle = "MEng candidate at Waterloo, expanding into robotics software and controls."
 pdf = "/resume/efe-oghene-erhie-resume.pdf"
 
 [[extra.education]]
@@ -104,22 +104,31 @@ items = "SolidWorks, AutoCAD, Fusion 360, GD&T, automated test equipment, calibr
 [[extra.awards]]
 name = "Best Graduating Student, Department of Mechanical Engineering"
 dates = "2022"
+# Optional because Education already states it under the BSc.
+optional = true
 
 [[extra.awards]]
 name = "Dean's Honour List, Faculty of Engineering"
 dates = "2018 – 2022"
+optional = true
 
+# `optional = true`: the PDF drops these when that is what holds it to one
+# page, and keeps them once other content spills onto page 2 anyway (decided by
+# scripts/build-resume-pdf.sh). The web page always shows them.
 [[extra.awards]]
 name = "UMSU Scholarship"
 dates = "2019 – 2021"
+optional = true
 
 [[extra.awards]]
 name = "International Undergraduate Student Scholarship"
 dates = "2019 – 2021"
+optional = true
 
 [[extra.awards]]
 name = "Grettir Eggertson Memorial Scholarship"
 dates = "2019 – 2021"
+optional = true
 
 # One line, deliberately. This section says who the person is away from the
 # work, and it stops paying the moment it competes for space with the sections

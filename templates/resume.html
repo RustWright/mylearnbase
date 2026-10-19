@@ -33,6 +33,10 @@
   if (location.search.indexOf('print') !== -1) {
     document.currentScript.previousElementSibling.media = 'all';
   }
+  // ?compact hides `optional` records; build-resume-pdf.sh decides when.
+  if (location.search.indexOf('compact') !== -1) {
+    document.documentElement.classList.add('rs-compact');
+  }
 </script>
 
 <script type="application/ld+json">
@@ -207,11 +211,15 @@
       {%- endif %}
 
       {%- if r.awards %}
-      <section class="rs-section">
+      {#- A section whose every record is optional goes with them, heading included. -#}
+      {%- set optional_awards = r.awards | filter(attribute="optional", value=true) %}
+      <section class="rs-section{% if optional_awards | length == r.awards | length %} rs-optional{% endif %}">
         <h2>Awards</h2>
         <ul class="rs-awards">
+          {#- `optional` marks what the PDF may drop to hold one page. The web
+              page has no page budget and always shows every record. -#}
           {%- for a in r.awards %}
-          <li class="rs-line"><span>{{ a.name }}</span><span class="rs-dates">{{ a.dates }}</span></li>
+          <li class="rs-line{% if a.optional %} rs-optional{% endif %}"><span>{{ a.name }}</span><span class="rs-dates">{{ a.dates }}</span></li>
           {%- endfor %}
         </ul>
       </section>

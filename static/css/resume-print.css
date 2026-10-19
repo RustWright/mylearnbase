@@ -107,6 +107,9 @@ body.resume .section-title p {
   font-size: 10.5pt;
   color: var(--rs-muted) !important;
   margin: 0;
+  /* Stop short of the absolutely positioned QR block (below), which takes no
+     space in flow: a long subtitle otherwise runs under its caption. */
+  max-width: calc(100% - 2in);
 }
 
 /* QR code in the masthead's empty right corner. Absolutely positioned so it adds
@@ -248,6 +251,16 @@ body.resume .rs-skills dt { font-weight: 600; }
 body.resume .rs-skills dd { margin: 0; }
 
 body.resume .rs-awards li { margin: 0 0 2pt; }
+
+/* Compact print (?compact, chosen by build-resume-pdf.sh only when it is what
+   holds the document to one page): records marked `optional` drop out and the
+   vertical rhythm tightens. The full print keeps its looser spacing, because
+   it is only chosen when page 2 exists anyway. */
+html.rs-compact body.resume .rs-optional { display: none !important; }
+html.rs-compact body.resume { line-height: 1.25; }
+html.rs-compact body.resume .resume-body .rs-section { margin-top: 9pt; }
+html.rs-compact body.resume .resume-body .rs-section:first-child { margin-top: 0; }
+html.rs-compact body.resume .rs-entry { margin-bottom: 5pt; }
 
 body.resume .rs-interests { margin: 0; font-size: 9.75pt; }
 body.resume .rs-interests-context { color: var(--rs-muted) !important; }
