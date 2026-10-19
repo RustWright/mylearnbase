@@ -26,9 +26,8 @@ Source: `~/life/.../job_market/my_skills.csv`, curated subset only, no gaps. Ide
 - **Business card** `print/business-card/card.html` → `scripts/build-card-pdf.sh` → PDF; 3.5×2 + 0.125in bleed.
 - **Christoffel post**: three standalone demos, shared `christoffel.{js,css}`, no WASM. Facts verified
   against the user's Spong PDF (2004 PRE-PRINT of 1st ed.): cite without section numbers; book writes D(q).
-- ⚠️ Résumé PDF = ONE page, zero slack (user 2026-10-19): `optional = true` records drop in `?compact` print
-  only when that makes it fit, and return once page 2 exists anyway (build script decides). Subtitle ≤ ~82
-  chars or it wraps past the QR. NO Selected Projects (any fixed pick misfits someone). Never phone/address.
+- ⚠️ Résumé PDF 1 page, 0 slack (user 2026-10-19): `optional` records drop only if that fits it (build decides).
+  Subtitle ≤ ~82 chars (QR). NO Selected Projects (any pick misfits someone). Never phone/address.
 - `custom.css` = `sass/css/custom.scss`; `zola check` NOT in `build.sh`; theme v5.6.1. Deploy ~4 min, flaky: retry first.
 
 ## Do NOT re-survey
