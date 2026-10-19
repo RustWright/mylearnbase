@@ -95,24 +95,11 @@ items = "Rust/WebAssembly toolchain, Tauri, event-sourced data models, static-si
 label = "Engineering"
 items = "SolidWorks, AutoCAD, Fusion 360, GD&T, automated test equipment, calibration procedure authorship, NVLAP-compliant documentation, ERP systems (IFS Cloud)"
 
-[[extra.projects]]
-name = "Boids flocking simulation"
-stack = "Python · NumPy · Rust · WebAssembly"
-page = "projects/boids.md"
-summary = "A flocking model built three times over to study the same system from different angles: a scalar Python reference, a vectorised NumPy rewrite, and a Rust core compiled to WebAssembly. Covers control-loop stability under changing gains, and the move from an O(n²) neighbour scan to a spatial grid."
-
-[[extra.projects]]
-name = "omni-me"
-stack = "Rust · Tauri · Dioxus"
-page = "projects/omni-me.md"
-summary = "A cross-platform personal-data application. Event-sourced transaction model with multi-source reconciliation, recurring-transaction detection, and multi-currency account handling."
-
-[[extra.projects]]
-name = "mylearnbase"
-stack = "Zola · Tera · JavaScript"
-page = "projects/mylearnbase.md"
-# Named, never "this site": the same text is printed, and a PDF has no "here".
-summary = "A static portfolio and learning journal at mylearnbase.com. Build-time TF-IDF for content-based related posts, in-browser search over a pre-built index, and self-contained interactive demos embedded in articles."
+# No Selected Projects section, deliberately (user, 2026-10-19). Any fixed
+# selection is irrelevant to some reader (software projects in front of a motor
+# and actuator maker), and that tension never resolves on a one-size document.
+# Project work lives on the site, which the masthead QR and contact links reach.
+# templates/resume.html still renders an `[[extra.projects]]` list if one returns.
 
 [[extra.awards]]
 name = "Best Graduating Student, Department of Mechanical Engineering"

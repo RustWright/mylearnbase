@@ -1,6 +1,6 @@
 # NEXT — mylearnbase
 
-**Updated:** 2026-10-18 · Shipped `what-the-snake-bot-was-missing` + `projects/snake.md` (repo `snake-dqn`).
+**Updated:** 2026-10-19 · Dropped Selected Projects from the résumé (for a Westmag send).
 
 ## Next action
 **Plan Cycle 7** (`0017`) once the user brings a batch of co-op postings (2026-10-16: collecting into the job-scan
@@ -27,6 +27,8 @@ Source: `~/life/.../job_market/my_skills.csv`, curated subset only, no gaps. Ide
 - **Christoffel post**: three standalone demos, shared `christoffel.{js,css}`, no WASM. Facts verified
   against the user's Spong PDF (2004 PRE-PRINT of 1st ed.): cite without section numbers; book writes D(q).
 - ⚠️ Résumé page 1 is FULL (`.rs-entry` is `break-inside: avoid`). Never phone/address.
+- **Résumé has NO Selected Projects** (user 2026-10-19): any fixed pick misfits some reader; the site
+  carries projects. Rejected: tagged pool + per-target PDFs. Template still renders the list if one returns.
 - `custom.css` = `sass/css/custom.scss`; `zola check` NOT in `build.sh`; theme v5.6.1. Deploy ~4 min, flaky: retry first.
 
 ## Do NOT re-survey
