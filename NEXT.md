@@ -37,5 +37,4 @@ Source: `~/life/.../job_market/my_skills.csv`, curated subset only, no gaps. Ide
   Privacy guard runs in `.githooks/pre-commit` (`docs/.../local-development.md`). ⚠️ OTHER DEVICE: run its installer.
 
 ## Open threads
-- Playground copy LLM-drafted 2026-10-13, user to edit. `tf-idf.md` ACM 403s to curl. `0013` open. User
-  orders the card at W Print (double-sided, 3.5×2in); a reprint follows any URL change.
+- Playground copy LLM-drafted 2026-10-13, user to edit. `tf-idf.md` ACM 403s. `0013` open. Card: W Print, 3.5×2in.
