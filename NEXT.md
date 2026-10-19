@@ -26,9 +26,8 @@ Source: `~/life/.../job_market/my_skills.csv`, curated subset only, no gaps. Ide
 - **Business card** `print/business-card/card.html` → `scripts/build-card-pdf.sh` → PDF; 3.5×2 + 0.125in bleed.
 - **Christoffel post**: three standalone demos, shared `christoffel.{js,css}`, no WASM. Facts verified
   against the user's Spong PDF (2004 PRE-PRINT of 1st ed.): cite without section numbers; book writes D(q).
-- ⚠️ Résumé page 1 is FULL (`.rs-entry` is `break-inside: avoid`). Never phone/address.
-- **Résumé has NO Selected Projects** (user 2026-10-19): any fixed pick misfits some reader; the site
-  carries projects. Rejected: tagged pool + per-target PDFs. Template still renders the list if one returns.
+- ⚠️ Résumé: page 1 FULL (`break-inside: avoid`); never phone/address; NO Selected Projects (user 2026-10-19,
+  any fixed pick misfits some reader; site carries them; tagged pool + per-target PDFs rejected).
 - `custom.css` = `sass/css/custom.scss`; `zola check` NOT in `build.sh`; theme v5.6.1. Deploy ~4 min, flaky: retry first.
 
 ## Do NOT re-survey
