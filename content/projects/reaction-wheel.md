@@ -2,7 +2,6 @@
 title = "Reaction-wheel pendulum"
 description = "A pendulum that balances itself upright by spinning a wheel, taken from derived equations of motion and a Python model to C++ firmware on a Raspberry Pi Pico."
 weight = 12
-draft = true
 
 [extra]
 # active | complete. Anything else fails the build (templates/project.html).

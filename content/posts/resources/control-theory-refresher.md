@@ -3,6 +3,7 @@ title = "Getting back up to speed for control theory"
 description = "The playlists and courses I used to rebuild the linear algebra, calculus and control theory a grad course in adaptive control assumed I still had."
 slug = "control-theory-refresher"
 date = 2026-10-16
+updated = 2026-10-25
 draft = false
 
 [taxonomies]
@@ -29,6 +30,8 @@ a concept faster than when I'm reading a textbook.
 The resources are listed in an order you can follow, though when I actually used
 them I tended to interleave them. I'm still early in my degree as of writing this,
 so I expect to keep adding to this list as I discover and use more.
+
+I'm now putting this to work on a [reaction-wheel pendulum](@/posts/logbook/reaction-wheel/pendulum-model/index.md).
 
 ## Math
 

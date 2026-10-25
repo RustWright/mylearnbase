@@ -3,7 +3,7 @@ title = "Reaction-wheel pendulum model"
 description = "A non-linear model of a reaction-wheel pendulum, checked against its own linearization, with a demo where you try to balance it yourself."
 slug = "pendulum-model"
 date = 2026-10-25
-draft = true
+draft = false
 
 [taxonomies]
 tags = ["control-systems", "simulation", "python", "robotics", "adaptive-control"]
