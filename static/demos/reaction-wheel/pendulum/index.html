@@ -505,7 +505,14 @@ $('testBottom').addEventListener('click', () => {
   setMode('free'); release([Math.PI - amp, 0, 0]);
 });
 
-setMode('balance');
+// Embedded in the post, it opens on the evidence the post points at; opened directly (the
+// Playground tile, the poster capture) it opens on the game.
+if (window.self !== window.top) {
+  setMode('free');
+  $('linear').open = true;
+} else {
+  setMode('balance');
+}
 requestAnimationFrame(frame);
 </script>
 <script src="/demos/_shared/demo-chrome.js" defer></script>

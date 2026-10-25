@@ -316,10 +316,11 @@ The publish-time boundary. Five steps in order:
    - **First publish** (no existing post at the destination):
      `date = today`, `draft = true`, no `updated`.
    - **Republish** (post already at the destination, `--force` given):
-     preserves `date`, `draft` and `description` from the existing post
-     (so a manual `draft = false` flip survives, and the original ship
-     date doesn't bump just because the tool was rerun); sets
-     `updated = today` to mark the touch. A republish that would leave a
+     preserves `date`, `draft`, `description` and `extra.math` from the
+     existing post (so a manual `draft = false` flip or `math = true`
+     survives, and the original ship date doesn't bump just because the
+     tool was rerun); sets `updated = today` to mark the touch, unless the
+     post is still a draft. A republish that would leave a
      published post with no description is refused before anything is
      written.
 6. **Validate cross-post links.** `@/posts/...` references in the body

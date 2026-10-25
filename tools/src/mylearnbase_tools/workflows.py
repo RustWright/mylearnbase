@@ -25,7 +25,7 @@ from . import _frontmatter, _shared
 
 # Keys written on the post rather than derived from the source doc. The
 # frontmatter is rebuilt on every publish, so anything missing here is dropped.
-_PRESERVED_KEYS = ("date", "draft", "description", "taxonomies.tags", "extra.outdate_alert_days")
+_PRESERVED_KEYS = ("date", "draft", "description", "taxonomies.tags", "extra.outdate_alert_days", "extra.math")
 
 
 def _slugify(title: str) -> str:
@@ -83,8 +83,13 @@ def _build_fields(
             fields["description"] = description
         if "taxonomies.tags" in preserved:
             fields["taxonomies"] = {"tags": preserved["taxonomies.tags"]}
+        extra: dict[str, object] = {}
         if "extra.outdate_alert_days" in preserved:
-            fields["extra"] = {"outdate_alert_days": preserved["extra.outdate_alert_days"]}
+            extra["outdate_alert_days"] = preserved["extra.outdate_alert_days"]
+        if preserved.get("extra.math"):
+            extra["math"] = True
+        if extra:
+            fields["extra"] = extra
         return fields
     fields = {
         "title": title,

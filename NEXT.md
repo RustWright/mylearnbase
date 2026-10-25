@@ -29,7 +29,7 @@ Source: `~/life/.../job_market/my_skills.csv`, curated subset only, no gaps. Ide
 - **Christoffel post**: facts verified against the user's Spong PDF (2004 pre-print, 1st ed.); no section numbers.
 - ⚠️ Résumé PDF 1 page, 0 slack (user 2026-10-19): `optional` records drop only if that fits it (build decides).
   Subtitle ≤ ~82 chars (QR). NO Selected Projects (any pick misfits someone). Never phone/address.
-- `custom.css` = `sass/css/custom.scss`; `zola check` NOT in `build.sh`; theme v5.6.1. Deploy ~4 min, flaky: retry first.
+- `custom.css` = `sass/css/custom.scss`; `zola check` NOT in `build.sh`; theme v5.6.1. Deploy under 4 min (user), flaky: retry first.
 
 ## Do NOT re-survey
 - Lighthouse (09-20): a11y/BP 100, perf 98, CLS 0. Noise: giallo warnings, `tag1`/`tag2` in tag grep, Pagefind "no <html>".

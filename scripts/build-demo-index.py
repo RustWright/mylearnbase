@@ -177,7 +177,9 @@ def collect_posts() -> tuple[list[dict], list[str]]:
                 continue
             calls.append({
                 "name": args["name"].strip("/"),
-                "caption": args.get("caption", ""),
+                # The gallery's text; an embed whose demo opens differently standalone
+                # gives the tile its own caption (see templates/shortcodes/demo.html).
+                "caption": args.get("playground_caption", args.get("caption", "")),
                 "height": args.get("height", 480),
                 "wide": bool(args.get("wide", False)),
                 "playground": args.get("playground") is True,

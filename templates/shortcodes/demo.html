@@ -16,6 +16,9 @@
                Not read here: scripts/build-demo-index.py reads it from the call.
                Reserve it for toys, demos that are fun with no post around them;
                a demo that only makes sense beside its prose stays off.
+    playground_caption — optional. The Playground tile's text, when the demo opens
+               differently embedded than standalone and the post caption would
+               describe the wrong screen. Not read here either; defaults to caption.
 -#}
 {%- set demo_url = "/demos/" ~ name ~ "/" -%}
 {%- set h = height | default(value=480) -%}

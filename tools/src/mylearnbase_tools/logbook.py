@@ -461,7 +461,7 @@ def cmd_publish(args: argparse.Namespace) -> int:
     is_republish = dest.exists()
     preserved: dict[str, object] = {}
     if is_republish:
-        preserved = _frontmatter.read_keys(dest, ("date", "draft", "description"))
+        preserved = _frontmatter.read_keys(dest, ("date", "draft", "description", "extra.math"))
 
     # The description is written on the post, not in the capture, so a republish
     # must carry it forward or the rebuilt frontmatter silently drops it.
@@ -488,10 +488,15 @@ def cmd_publish(args: argparse.Namespace) -> int:
     }
     if description:
         fields["description"] = description
-    if is_republish:
+    # A draft has never shipped, so there is nothing for `updated` to be later than.
+    if is_republish and not draft:
         fields["updated"] = today
     if tags:
         fields["taxonomies"] = {"tags": tags}
+    # `math = true` (KaTeX) is set by hand on the post, like the description, so
+    # a republish must carry it or the post's equations revert to raw `$...$`.
+    if preserved.get("extra.math"):
+        fields["extra"] = {"math": True}
 
     slug_dir.mkdir(parents=True, exist_ok=True)
     body_with_images, images_copied = _shared.copy_and_rewrite_referenced_images(
