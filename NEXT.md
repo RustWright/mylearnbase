@@ -1,6 +1,6 @@
 # NEXT — mylearnbase
 
-**Updated:** 2026-10-19 · Résumé trimmed to one page with a re-expanding page budget (for a Westmag send).
+**Updated:** 2026-10-25 · Playground reworked to action-first toys (committed, NOT pushed: user reviews first).
 
 ## Next action
 **Plan Cycle 7** (`0017`) once the user brings a batch of co-op postings (2026-10-16: collecting into the job-scan
@@ -15,8 +15,7 @@ Source: `~/life/.../job_market/my_skills.csv`, curated subset only, no gaps. Ide
   caption = the instruction; passive watching never qualifies. Independent of posts: a `toy()` call in
   `content/playground/_index.md` lists a demo no post embeds (names its post; validated like embeds), or an
   embed's `playground=true`. Today: Snake vs DQN, Boids herding, SVG build. Pendulum balance once its post ships.
-- **Preview the Playground** = `python3 scripts/build-demo-index.py` then `zola serve --drafts` (serve alone
-  never rebuilds `demos.json`). New heavy demo → `scripts/capture-demo-posters.py --prune`.
+- **Preview Playground**: `scripts/build-demo-index.py`, then `zola serve --drafts`; new heavy demo → posters `--prune`.
 - **`build.sh` sizes every local `<img>`** (`scripts/size-images.py`): author plain Markdown images, never
   hand-add dimensions. PDF/poster scripts refuse a busy port.
 - ⚠️ **Never "Engineer" as the user's title** (protected title in Canada, user 2026-10-12).
@@ -27,8 +26,7 @@ Source: `~/life/.../job_market/my_skills.csv`, curated subset only, no gaps. Ide
 - **QR codes from `scripts/build-qr.py`** (`print_url`, decode-verified, no quiet zone): `site-qr.svg` (domain
   UPPERCASED → v1) on résumé masthead → homepage; `resume-qr.svg` (`/resume/`, v3) on card back → résumé.
 - **Business card** `print/business-card/card.html` → `scripts/build-card-pdf.sh` → PDF; 3.5×2 + 0.125in bleed.
-- **Christoffel post**: three standalone demos, shared `christoffel.{js,css}`, no WASM. Facts verified
-  against the user's Spong PDF (2004 PRE-PRINT of 1st ed.): cite without section numbers; book writes D(q).
+- **Christoffel post**: facts verified against the user's Spong PDF (2004 pre-print, 1st ed.); no section numbers.
 - ⚠️ Résumé PDF 1 page, 0 slack (user 2026-10-19): `optional` records drop only if that fits it (build decides).
   Subtitle ≤ ~82 chars (QR). NO Selected Projects (any pick misfits someone). Never phone/address.
 - `custom.css` = `sass/css/custom.scss`; `zola check` NOT in `build.sh`; theme v5.6.1. Deploy ~4 min, flaky: retry first.
