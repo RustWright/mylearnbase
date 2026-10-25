@@ -2,7 +2,9 @@
 """Derive the demo -> parent-post mapping and write static/demos/_shared/demos.json.
 
 Every demo under static/demos/ is embedded by exactly one post, through an
-existing `demo(name=..., caption=..., height=...)` shortcode call. That call
+existing `demo(name=..., caption=..., height=...)` shortcode call, or is a
+Playground toy declared by a `toy(name=..., post=..., caption=...)` call on the
+Playground page, which names the post it belongs to. Either call
 already carries everything a gallery or a back-link needs: which post owns the
 demo, a hand-written caption that reads as "what you can do here", and the
 height the author judged the demo needs. So the mapping is DERIVED from the
@@ -50,6 +52,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent          # scripts/ -> repo root
 CONTENT = ROOT / "content" / "posts"
+PLAYGROUND = ROOT / "content" / "playground" / "_index.md"
 DEMOS = ROOT / "static" / "demos"
 OUT = DEMOS / "_shared" / "demos.json"
 POSTERS = ROOT / "static" / "img" / "demos"
@@ -96,6 +99,8 @@ DRAFT_RE = re.compile(r"^\s*draft\s*=\s*true\b", re.M)
 # "{{" this pattern requires optional whitespace then "demo", and the escape
 # puts "/*" there instead.
 CALL_RE = re.compile(r"\{\{-?\s*demo\((.*)\)\s*-?\}\}")
+# Same shape for toy(), the Playground-only declaration (templates/shortcodes/toy.html).
+TOY_RE = re.compile(r"\{\{-?\s*toy\((.*)\)\s*-?\}\}")
 
 # Splits a shortcode argument list on top-level commas only, so a comma inside
 # a quoted caption does not split the arguments.
@@ -186,6 +191,53 @@ def collect_posts() -> tuple[list[dict], list[str]]:
     return calls, problems
 
 
+def collect_toys() -> tuple[list[dict], list[str]]:
+    """Every toy() call on the Playground page, resolved to the post it names.
+
+    A toy is a demo built for the Playground rather than for a post, so no post
+    embeds it. It still belongs to a write-up, and the call names that post by
+    content path; the post is read here exactly as collect_posts() reads an
+    embedding post, so a toy's gallery row and back-link match an embed's.
+    """
+    calls, problems = [], []
+    if not PLAYGROUND.exists():
+        return calls, problems
+    text = PLAYGROUND.read_text(encoding="utf-8")
+    fm = FRONTMATTER_RE.match(text)
+    body = text[fm.end():] if fm else text
+    for arglist in TOY_RE.findall(body):
+        args = parse_args(arglist)
+        missing = [k for k in ("name", "post", "caption") if not args.get(k)]
+        if missing:
+            problems.append(f"toy() call missing {', '.join(missing)}: {arglist[:60]}")
+            continue
+        md = ROOT / "content" / args["post"]
+        post = md.read_text(encoding="utf-8") if md.is_file() else ""
+        head_m = FRONTMATTER_RE.match(post)
+        slug_m = SLUG_RE.search(head_m.group(1)) if head_m else None
+        if not slug_m:
+            problems.append(f"toy {args['name']}: post {args['post']} not found or has no slug =")
+            continue
+        head = head_m.group(1)
+        title_m, date_m = TITLE_RE.search(head), DATE_RE.search(head)
+        calls.append({
+            "name": args["name"].strip("/"),
+            "caption": args["caption"],
+            "height": args.get("height", 480),
+            "wide": bool(args.get("wide", False)),
+            "playground": True,
+            "post_url": post_url(md, slug_m.group(1)),
+            "post_title": title_m.group(1) if title_m else slug_m.group(1),
+            "post_date": (date_m.group(1) if date_m else ""),
+            "post_draft": bool(DRAFT_RE.search(head)),
+            "source": PLAYGROUND.relative_to(ROOT).as_posix(),
+            # After the post's own embeds, so a toy never displaces the post's lead
+            # demo on its project page.
+            "position": 1000,
+        })
+    return calls, problems
+
+
 def collect_demos() -> dict[str, dict]:
     """Demo directories on disk -> title, byte weight, and listed/heavy flags."""
     out = {}
@@ -239,6 +291,9 @@ def poster_name(name: str, digest: str) -> str:
 
 def generate() -> int:
     calls, problems = collect_posts()
+    toys, toy_problems = collect_toys()
+    calls += toys
+    problems += toy_problems
     on_disk = collect_demos()
 
     by_name: dict[str, dict] = {}

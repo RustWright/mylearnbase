@@ -3,7 +3,7 @@ title = "Choosing what a Snake bot sees"
 description = "A hand-written Snake bot decides every move from five numbers. Watch the three cells it inspects, read its state vector as it plays, then take the controls yourself."
 slug = "choosing-what-a-snake-bot-sees"
 date = 2026-10-13
-updated = 2026-10-18
+updated = 2026-10-25
 draft = false
 
 [taxonomies]
@@ -12,7 +12,7 @@ tags = ["simulation", "algorithms", "state-representation", "feature-engineering
 
 <a id="demo"></a>
 
-{{ demo(name="concepts/choosing-what-a-snake-bot-sees/snake", wide=true, height=1270, playground=true, caption="Watch the rule bot play, with the three cells it inspects drawn on the board and its five-number state vector live underneath. Switch tabs to watch the trained agent read the same five numbers, or to take the arrow keys yourself.") }}
+{{ demo(name="concepts/choosing-what-a-snake-bot-sees/snake", wide=true, height=1270, caption="Watch the rule bot play, with the three cells it inspects drawn on the board and its five-number state vector live underneath. Switch tabs to watch the trained agent read the same five numbers, or to take the arrow keys yourself.") }}
 
 
 ## The curiosity moment

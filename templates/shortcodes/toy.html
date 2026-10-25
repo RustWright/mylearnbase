@@ -1,0 +1,16 @@
+{#-
+  Toy shortcode: declares a Playground-only toy, a demo that no post embeds.
+  Used only in content/playground/_index.md, and renders nothing: the gallery is
+  built from static/demos/_shared/demos.json, which scripts/build-demo-index.py
+  derives from these calls exactly as it does from demo() embeds.
+
+  Usage:
+    {{ toy(name="snake/versus", post="posts/concepts/what-the-snake-bot-was-missing.md", caption="...") }}
+
+  Args:
+    name    — required. Path under /demos/.
+    post    — required. Content path of the write-up the toy belongs to; its title
+              heads the toy's gallery row and its URL is the back-link. A bad path
+              fails the index build.
+    caption — required. What to do, and the goal. It is the tile's only text.
+-#}

@@ -11,9 +11,12 @@ Source: `~/life/.../job_market/my_skills.csv`, curated subset only, no gaps. Ide
 ## Decisions in force
 - **Archived posts** (user 2026-10-13): `post.html` shows an "Archived" callout for `posts/archive/`; current
   posts never recommend archived ones (one-way; archive stays in the TF-IDF corpus so idf doesn't shift).
-- **Playground = toys only** (user 2026-10-13): a demo is listed only if its embed has `playground=true`
-  (`build_groups` filters; flat `demos` list keeps all for back-links/projects). Test: fun having read
-  nothing. Today: boids flock, Snake bot, SVG build-your-own. NOT naive-vs-grid, TF-IDF, enso, Christoffel.
+- **Playground = action-first toys** (user 2026-10-13, tightened 2026-10-25): lands on a task with a goal,
+  caption = the instruction; passive watching never qualifies. Independent of posts: a `toy()` call in
+  `content/playground/_index.md` lists a demo no post embeds (names its post; validated like embeds), or an
+  embed's `playground=true`. Today: Snake vs DQN, Boids herding, SVG build. Pendulum balance once its post ships.
+- **Preview the Playground** = `python3 scripts/build-demo-index.py` then `zola serve --drafts` (serve alone
+  never rebuilds `demos.json`). New heavy demo → `scripts/capture-demo-posters.py --prune`.
 - **`build.sh` sizes every local `<img>`** (`scripts/size-images.py`): author plain Markdown images, never
   hand-add dimensions. PDF/poster scripts refuse a busy port.
 - ⚠️ **Never "Engineer" as the user's title** (protected title in Canada, user 2026-10-12).

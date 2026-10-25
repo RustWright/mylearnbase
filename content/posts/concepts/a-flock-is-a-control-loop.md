@@ -3,6 +3,7 @@ title = "A Flock Is a Control Loop"
 description = "The three boids flocking rules, read as feedback controllers. Tune each gain in a live simulation and see how pushing one too far destabilises the flock."
 slug = "a-flock-is-a-control-loop"
 date = 2026-08-03
+updated = 2026-10-25
 draft = false
 
 [taxonomies]
@@ -14,7 +15,7 @@ math = true
 
 <a id="demo"></a>
 
-{{ demo(name="concepts/a-flock-is-a-control-loop/flock", wide=true, height=820, playground=true, caption="The finished flock, all three rules live.") }}
+{{ demo(name="concepts/a-flock-is-a-control-loop/flock", wide=true, height=820, caption="The finished flock, all three rules live.") }}
 
 Watching emergent group behaviour after defining simple rules on the individual level brings a genuine smile to my face. After working on this project I've caught myself just staring at the boids as they move around the screen, because of how satisfying it looks.[^build]
 
