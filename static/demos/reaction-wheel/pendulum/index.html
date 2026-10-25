@@ -1,0 +1,513 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Balance the reaction-wheel pendulum</title>
+<meta name="description" content="Be the controller: spin the wheel to keep a simulated reaction-wheel pendulum upright. Then drag it freely, switch solvers, and check the linear model's predictions.">
+<style>
+/* Theme: follows prefers-color-scheme; a data-theme attribute on <html> overrides it either way. */
+:root{
+  --bg:#f6f5f0; --panel:#ffffff; --ink:#1c2230; --mute:#687083; --line:#dcd8cc; --cell:#f1efe7;
+  --arm:#1c2230; --wheel:#1f6fd1; --accent:#0f8a57; --warn:#c2410c; --pred:#b86e00;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0e1117; --panel:#161a22; --ink:#e7e5de; --mute:#9aa1ae; --line:#2a303c; --cell:#1e232d;
+    --arm:#e7e5de; --wheel:#5aa7ff; --accent:#47dc98; --warn:#ff7a59; --pred:#ffb547;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0e1117; --panel:#161a22; --ink:#e7e5de; --mute:#9aa1ae; --line:#2a303c; --cell:#1e232d;
+  --arm:#e7e5de; --wheel:#5aa7ff; --accent:#47dc98; --warn:#ff7a59; --pred:#ffb547;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:1100px;margin:0 auto;padding:16px 16px 32px}
+.cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;align-items:start}
+@media (max-width:820px){.cols{grid-template-columns:minmax(0,1fr)}}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:14px;min-width:0}
+#objective{border-left:4px solid var(--accent)}
+#objective p{margin:.3rem 0 0}
+.row{display:flex;flex-wrap:wrap;gap:8px 10px;align-items:center}
+button,select{font:inherit;color:inherit;background:var(--cell);border:1px solid var(--line);border-radius:8px;padding:5px 11px;cursor:pointer}
+button:hover,select:hover{border-color:var(--mute)}
+button.on{outline:2px solid currentColor;outline-offset:-2px;font-weight:600}
+#stage{display:block;width:100%;max-width:520px;aspect-ratio:1;margin:0 auto;touch-action:none;cursor:ew-resize;outline:none}
+#stage.free{cursor:grab}
+#stage:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:8px}
+.readout{font-variant-numeric:tabular-nums;color:var(--mute);font-size:.92rem}
+.readout strong{color:var(--ink);font-weight:600}
+.gauges{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 10px;align-items:center;font-size:.85rem;color:var(--mute);margin-top:8px}
+.bar{position:relative;height:10px;background:var(--cell);border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.bar span{position:absolute;top:0;bottom:0;left:50%;background:var(--wheel)}
+.bar::after{content:"";position:absolute;left:50%;top:0;bottom:0;border-left:1px solid var(--mute)}
+.bar.hot span{background:var(--warn)}
+details{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 16px;margin-bottom:10px}
+details[open]{padding-bottom:14px}
+summary{cursor:pointer;font-weight:600}
+details p{margin:.5rem 0}
+.note{font-size:.88rem;color:var(--mute)}
+.chart{display:block;width:100%;height:170px;margin-top:.5rem}
+.legend{font-size:.82rem;color:var(--mute)}
+.legend i{display:inline-block;width:18px;height:0;border-top:2px solid var(--wheel);vertical-align:middle;margin-right:4px}
+.legend i.dash{border-top:2px dashed var(--pred)}
+table{border-collapse:collapse;font-size:.9rem;font-variant-numeric:tabular-nums}
+td,th{padding:2px 10px 2px 0;text-align:left}
+th{color:var(--mute);font-weight:500}
+.good{color:var(--accent);font-weight:600}
+.bad{color:var(--warn);font-weight:600}
+</style>
+</head>
+<body>
+<main>
+  <section class="panel" id="objective">
+    <div id="goal"></div>
+    <p class="note" id="hint"></p>
+  </section>
+
+  <div class="cols">
+    <section class="panel">
+      <canvas id="stage" width="520" height="520" tabindex="0" aria-label="Reaction-wheel pendulum"></canvas>
+      <div class="row" style="justify-content:space-between;margin-top:8px">
+        <span class="readout" id="readout"></span>
+        <span class="row" id="modes">
+          <button data-mode="balance" class="on">Balance it</button>
+          <button data-mode="free">Free swing</button>
+        </span>
+      </div>
+      <div class="gauges" id="gauges">
+        <span>push on arm</span><div class="bar" id="torqueBar"><span></span></div>
+        <span>wheel speed</span><div class="bar" id="speedBar"><span></span></div>
+      </div>
+    </section>
+
+    <div>
+      <details id="how">
+        <summary>Why is this so hard?</summary>
+        <p class="note">Upright is unstable: left alone, a small tilt multiplies by e (about 2.7) every
+          0.11 s. Time here runs at an eighth of real speed, so it is humanly possible. The real one needs
+          a controller deciding every millisecond.</p>
+        <p class="note">Spinning the wheel one way pushes the arm the other. But the motor can only give
+          0.15 N·m, and its torque fades as the wheel nears top speed (about 1,400 rpm). Hold the arm
+          tilted and the wheel keeps speeding up until it can't push any more. To last, you have to bring
+          the wheel back down, and the only way is to lean the arm the other way for a moment.</p>
+        <label class="note">speed
+          <select id="slowdown">
+            <option value="0.0625">1/16 real time (easier)</option>
+            <option value="0.125" selected>⅛ real time</option>
+            <option value="0.25">¼ real time (hard)</option>
+          </select>
+        </label>
+      </details>
+
+      <details id="integrator">
+        <summary>Does the solver matter?</summary>
+        <p class="note">A frictionless pendulum keeps its energy forever. The simulation can only
+          approximate that, one time step at a time, and the method it steps with decides how well.
+          Opens the free swing.</p>
+        <div class="row">
+          <span id="methods" class="row">
+            <button data-m="euler">Euler</button>
+            <button data-m="midpoint">Midpoint</button>
+            <button data-m="rk4" class="on">RK4</button>
+          </span>
+          <label class="note">step
+            <select id="dt">
+              <option value="0.001" selected>1 ms</option>
+              <option value="0.005">5 ms</option>
+              <option value="0.01">10 ms</option>
+            </select>
+          </label>
+        </div>
+        <p class="readout" id="energy"></p>
+        <p class="note">Try Euler at 10 ms from a swing near the bottom, then switch to RK4.</p>
+      </details>
+
+      <details id="linear">
+        <summary>What the linear model predicts</summary>
+        <p class="note">Linearized about each rest position, the model gives eigenvalues that predict
+          the motion near it. Each test runs the full nonlinear simulation (RK4, 1 ms) and compares.</p>
+        <table id="eigs"></table>
+        <div class="row" style="margin-top:.6rem">
+          <button id="testTop">Test the top</button>
+          <button id="testBottom">Test the bottom</button>
+        </div>
+        <canvas class="chart" id="chart" width="480" height="170" hidden></canvas>
+        <p class="legend" id="legend" hidden><i></i>nonlinear simulation &nbsp; <i class="dash"></i>linear prediction</p>
+        <p class="readout" id="result"></p>
+      </details>
+
+      <details>
+        <summary>Parameters</summary>
+        <table id="params"></table>
+        <p class="note">Placeholders sized to the real motor, until the printed parts are weighed and
+          the built pendulum is measured. The fading motor torque is a straight-line approximation;
+          the model itself has no motor in it.</p>
+      </details>
+    </div>
+  </div>
+</main>
+
+<script>
+'use strict';
+
+// ── The model: a JavaScript port of the Python model (model.py) ──────────────
+// State x = [theta, theta_dot, phi_dot]. theta = 0 is upright; phi is the wheel angle
+// relative to the arm. u is the motor torque on the wheel.
+const P = { m: 0.28, l_com: 0.07, l: 0.10, m_w: 0.15, I_arm: 1.0e-3, I_w: 3.0e-4, g: 9.81, tau_max: 0.15 };
+P.I_0 = P.I_arm + P.m_w * P.l ** 2;
+const RATE = Math.sqrt(P.m * P.g * P.l_com / P.I_0);   // √a, the linear rates are ±√a
+const W_MAX = 117 * 12 * 2 * Math.PI / 60;              // no-load wheel speed at 12 V, rad/s
+
+function f(x, u) {
+  const thetaDdot = (P.m * P.g * P.l_com * Math.sin(x[0]) - u) / P.I_0;
+  return [x[1], thetaDdot, u / P.I_w - thetaDdot];
+}
+const add = (x, k, h) => x.map((xi, i) => xi + h * k[i]);
+const STEPPERS = {
+  euler: (x, u, dt) => add(x, f(x, u), dt),
+  midpoint: (x, u, dt) => add(x, f(add(x, f(x, u), dt / 2), u), dt),
+  rk4: (x, u, dt) => {
+    const k1 = f(x, u), k2 = f(add(x, k1, dt / 2), u), k3 = f(add(x, k2, dt / 2), u), k4 = f(add(x, k3, dt), u);
+    return x.map((xi, i) => xi + dt / 6 * (k1[i] + 2 * k2[i] + 2 * k3[i] + k4[i]));
+  },
+};
+// Energy above the hanging position, so it is never negative and a % change reads cleanly.
+const energy = x => 0.5 * P.I_0 * x[1] ** 2 + P.m * P.g * P.l_com * (1 + Math.cos(x[0]));
+
+// The game's motor: torque fades linearly to zero at top speed when it would speed the wheel up
+// further. Braking always gets full torque. Not part of the model in this write-up.
+function motor(cmd, wheelSpeed) {
+  const u = cmd * P.tau_max;
+  if (Math.sign(u) !== Math.sign(wheelSpeed)) return u;
+  return u * Math.max(0, 1 - Math.abs(wheelSpeed) / W_MAX);
+}
+
+// ── Live state ───────────────────────────────────────────────────────────────
+const FALL = 30 * Math.PI / 180;
+let mode = 'balance';
+let game = 'ready';            // ready → running → fallen
+let x = [0, 0, 0], u = 0, wheel = 0, t = 0;
+let cmd = 0, keyCmd = 0, pointerCmd = null, keys = { left: false, right: false };
+let best = 0, fellAt = 0;
+let method = 'rk4', dt = 0.001, slow = 0.125;
+let dragging = false, e0 = 0, peak = null, prevThetaDot = 0;
+try { best = Number(localStorage.getItem('rw-best')) || 0; } catch (_) { /* storage blocked */ }
+
+const $ = id => document.getElementById(id);
+const stage = $('stage'), ctx = stage.getContext('2d');
+const SIZE = 520;   // drawing units; the backing store is scaled for sharp lines on high-DPI screens
+stage.width = stage.height = SIZE * devicePixelRatio;
+ctx.scale(devicePixelRatio, devicePixelRatio);
+const css = name => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+const wrapDeg = th => { let d = (th * 180 / Math.PI) % 360; if (d > 180) d -= 360; if (d <= -180) d += 360; return d; };
+const touchFirst = matchMedia('(pointer:coarse)').matches;
+
+function setGoal() {
+  if (mode === 'balance') {
+    $('goal').innerHTML = '<b>Keep it upright by spinning the wheel.</b> ' +
+      (touchFirst ? 'Hold a finger on the picture and slide left or right.' : 'Move the mouse left or right over the picture, or hold ← →.') +
+      ' Pushing right shoves the arm right.';
+    $('hint').textContent = best > 0 ? `Your best: ${best.toFixed(1)} s. The trick is in "Why is this so hard?"` :
+      'Time runs at an eighth of real speed.';
+  } else {
+    $('goal').innerHTML = '<b>Drag the arm anywhere and let go.</b> No motor torque and no friction: it falls off the top, then swings around the bottom.';
+    $('hint').textContent = 'The panels on the right work on this free swing.';
+  }
+}
+
+function resetBalance() {
+  game = 'ready'; t = 0; u = 0; cmd = 0;
+  x = [(Math.random() < 0.5 ? -1 : 1) * 2 * Math.PI / 180, 0, 0];
+}
+function release(state) {
+  x = state.slice(); t = 0; e0 = energy(x); peak = null; prevThetaDot = 0;
+}
+function setMode(m) {
+  mode = m;
+  for (const b of $('modes').children) b.classList.toggle('on', b.dataset.mode === m);
+  stage.classList.toggle('free', m === 'free');
+  $('gauges').hidden = m !== 'balance';
+  if (m === 'balance') resetBalance(); else release([Math.PI - 30 * Math.PI / 180, 0, 0]);
+  setGoal();
+}
+
+function advance(seconds) {
+  const n = Math.min(Math.round(seconds / dt), 4000);
+  for (let k = 0; k < n; k++) {
+    if (mode === 'balance') {
+      // The arm feels the wheel torque reversed, so a positive (rightward) command spins the wheel negative.
+      u = motor(-cmd, x[2]);
+      x = STEPPERS.rk4(x, u, dt);
+      if (Math.abs(x[0]) > FALL) {
+        game = 'fallen'; fellAt = performance.now();
+        if (t > best) { best = t; try { localStorage.setItem('rw-best', String(best)); } catch (_) { /* fine */ } }
+        setGoal();
+        return;
+      }
+    } else {
+      x = STEPPERS[method](x, 0, dt);
+      if (prevThetaDot !== 0 && Math.sign(x[1]) !== Math.sign(prevThetaDot)) peak = 180 - Math.abs(wrapDeg(x[0]));
+      prevThetaDot = x[1];
+    }
+    wheel += (x[1] + x[2]) * dt;
+    t += dt;
+  }
+}
+
+// ── Drawing ──────────────────────────────────────────────────────────────────
+function bar(id, v) {
+  const el = $(id), s = el.firstElementChild, w = Math.min(Math.abs(v), 1) * 50;
+  s.style.width = w + '%'; s.style.left = (v >= 0 ? 50 : 50 - w) + '%';
+  el.classList.toggle('hot', Math.abs(v) > 0.8);
+}
+
+function draw() {
+  const W = SIZE, c = W / 2, L = W * 0.3;
+  const sx = c + L * Math.sin(x[0]), sy = c - L * Math.cos(x[0]);
+  ctx.clearRect(0, 0, W, W);
+
+  ctx.strokeStyle = css('--line'); ctx.lineWidth = 1; ctx.setLineDash([4, 6]);
+  ctx.beginPath(); ctx.arc(c, c, L, 0, 2 * Math.PI); ctx.stroke(); ctx.setLineDash([]);
+  if (mode === 'balance') {   // the fall line, ±30°
+    ctx.strokeStyle = css('--warn'); ctx.globalAlpha = 0.5; ctx.lineWidth = 2;
+    for (const s of [-1, 1]) {
+      ctx.beginPath(); ctx.moveTo(c, c);
+      ctx.lineTo(c + 1.6 * L * Math.sin(s * FALL), c - 1.6 * L * Math.cos(s * FALL)); ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  // The stand sits behind the swing plane, so the wheel passes in front of it.
+  ctx.fillStyle = css('--line');
+  ctx.fillRect(c - 9, c, 18, W - 18 - c);
+  ctx.fillRect(c - 70, W - 26, 140, 10);
+
+  ctx.strokeStyle = css('--arm'); ctx.lineWidth = 10; ctx.lineCap = 'round';
+  ctx.beginPath(); ctx.moveTo(c - 0.15 * (sx - c), c - 0.15 * (sy - c)); ctx.lineTo(sx, sy); ctx.stroke();
+
+  const R = L * 0.5;
+  ctx.lineWidth = 5; ctx.strokeStyle = css('--wheel');
+  ctx.beginPath(); ctx.arc(sx, sy, R, 0, 2 * Math.PI); ctx.stroke();
+  ctx.lineWidth = 3;
+  for (let s = 0; s < 3; s++) {
+    const a = wheel + s * 2 * Math.PI / 3;
+    ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(sx + R * Math.sin(a), sy - R * Math.cos(a)); ctx.stroke();
+  }
+  ctx.fillStyle = css('--arm');
+  ctx.beginPath(); ctx.arc(sx, sy, 8, 0, 2 * Math.PI); ctx.fill();
+  ctx.fillStyle = css('--panel'); ctx.strokeStyle = css('--arm'); ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.arc(c, c, 7, 0, 2 * Math.PI); ctx.fill(); ctx.stroke();
+
+  if (mode === 'balance' && Math.abs(u) > 1e-4) {   // the push on the arm, tangent to its swing
+    const k = (-u / P.tau_max) * 60, tx = Math.cos(x[0]), ty = Math.sin(x[0]);
+    ctx.strokeStyle = css('--accent'); ctx.fillStyle = css('--accent'); ctx.lineWidth = 4;
+    const ex = sx + k * tx, ey = sy + k * ty;
+    ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(ex, ey); ctx.stroke();
+    const h = Math.sign(k) * 10;
+    ctx.beginPath(); ctx.moveTo(ex + h * tx, ey + h * ty);
+    ctx.lineTo(ex - h * ty * 0.7, ey + h * tx * 0.7); ctx.lineTo(ex + h * ty * 0.7, ey - h * tx * 0.7); ctx.fill();
+  }
+
+  if (mode === 'balance' && game !== 'running') {
+    // Low in the frame, where the wheel never reaches while the run is live. Sized for a phone,
+    // where the 520-unit canvas renders at about 340 px.
+    const lines = game === 'ready'
+      ? [touchFirst ? 'Touch and slide to start' : 'Move or press ← → to start']
+      : [`Fell after ${t.toFixed(1)} s`, 'Tap, click or press space to retry'];
+    ctx.textAlign = 'center';
+    ctx.fillStyle = css('--panel'); ctx.globalAlpha = 0.9;
+    ctx.fillRect(c - 200, W - 128, 400, lines.length * 32 + 14);
+    ctx.globalAlpha = 1;
+    lines.forEach((s, i) => {
+      ctx.font = i === 0 ? '600 26px system-ui,sans-serif' : '20px system-ui,sans-serif';
+      ctx.fillStyle = css(i === 0 ? '--ink' : '--mute');
+      ctx.fillText(s, c, W - 100 + i * 32);
+    });
+  }
+
+  if (mode === 'balance') {
+    $('readout').innerHTML = `balanced <strong>${t.toFixed(1)} s</strong> · best ${best.toFixed(1)} s`;
+    bar('torqueBar', -u / P.tau_max);   // shown as the push on the arm, so right means right
+    bar('speedBar', x[2] / W_MAX);
+  } else {
+    $('readout').innerHTML = `θ <strong>${wrapDeg(x[0]).toFixed(1)}°</strong> from upright · t ${t.toFixed(2)} s`;
+  }
+  if (mode === 'free' && $('integrator').open) {
+    let de = e0 > 1e-9 ? (energy(x) - e0) / e0 : 0;
+    if (Math.abs(de) < 5e-6) de = 0;   // below the 3 decimals shown; avoids a "-0.000%"
+    const cls = Math.abs(de) < 1e-3 ? 'good' : 'bad';
+    $('energy').innerHTML = `Energy since release: <span class="${cls}">${de >= 0 ? '+' : ''}${(100 * de).toFixed(3)}%</span>` +
+      (peak !== null ? ` · last swing peak <strong>${peak.toFixed(1)}°</strong> from the bottom` : '');
+  }
+}
+
+let last = null;
+function frame(now) {
+  const elapsed = last === null ? 0 : Math.min((now - last) / 1000, 0.05);
+  last = now;
+  if (mode === 'balance') {
+    // Keys ramp the command so a tap gives a nudge, not full torque.
+    const target = keys.right && !keys.left ? 1 : keys.left && !keys.right ? -1 : 0;
+    keyCmd += Math.sign(target - keyCmd) * Math.min(Math.abs(target - keyCmd), 3 * elapsed);
+    cmd = pointerCmd !== null ? pointerCmd : keyCmd;
+    if (game === 'running') advance(elapsed * slow);
+  } else if (!dragging) {
+    advance(elapsed);
+  }
+  draw();
+  requestAnimationFrame(frame);
+}
+
+// ── Interaction ──────────────────────────────────────────────────────────────
+function startIfReady() { if (mode === 'balance' && game === 'ready') game = 'running'; }
+function retryIfFallen() {
+  if (mode === 'balance' && game === 'fallen' && performance.now() - fellAt > 500) { resetBalance(); return true; }
+  return false;
+}
+function fracX(ev) { const r = stage.getBoundingClientRect(); return (ev.clientX - r.left) / r.width; }
+function angleAt(ev) {
+  const r = stage.getBoundingClientRect();
+  const px = (ev.clientX - r.left) / r.width - 0.5, py = (ev.clientY - r.top) / r.height - 0.5;
+  return Math.atan2(px, -py);
+}
+let lastPointerX = null;
+stage.addEventListener('pointerdown', ev => {
+  stage.focus();
+  if (mode === 'free') {
+    dragging = true; stage.setPointerCapture(ev.pointerId); x = [angleAt(ev), 0, 0];
+    return;
+  }
+  if (retryIfFallen()) return;
+  stage.setPointerCapture(ev.pointerId);
+  lastPointerX = fracX(ev);
+  pointerCmd = Math.max(-1, Math.min(1, (lastPointerX - 0.5) / 0.35));
+});
+stage.addEventListener('pointermove', ev => {
+  if (mode === 'free') { if (dragging) x = [angleAt(ev), 0, 0]; return; }
+  if (ev.pointerType !== 'mouse' && !stage.hasPointerCapture(ev.pointerId)) return;
+  const fx = fracX(ev);
+  // Starting needs real movement, so the pointer merely resting on the picture doesn't start a run.
+  if (game === 'ready' && lastPointerX !== null && Math.abs(fx - lastPointerX) > 0.02) startIfReady();
+  if (lastPointerX === null) lastPointerX = fx;
+  if (game !== 'ready') lastPointerX = fx;
+  pointerCmd = Math.max(-1, Math.min(1, (fx - 0.5) / 0.35));
+});
+stage.addEventListener('pointerleave', ev => { if (ev.pointerType === 'mouse') { pointerCmd = null; lastPointerX = null; } });
+const drop = ev => {
+  if (mode === 'free' && dragging) { dragging = false; release(x); return; }
+  if (ev.pointerType !== 'mouse') { pointerCmd = null; lastPointerX = null; }
+};
+stage.addEventListener('pointerup', drop);
+stage.addEventListener('pointercancel', drop);
+
+const KEYS = { ArrowLeft: 'left', ArrowRight: 'right', a: 'left', d: 'right' };
+addEventListener('keydown', ev => {
+  if (mode !== 'balance') return;
+  if (ev.key === ' ') { if (retryIfFallen()) ev.preventDefault(); return; }
+  const k = KEYS[ev.key]; if (!k) return;
+  ev.preventDefault(); keys[k] = true; pointerCmd = null; startIfReady();
+});
+addEventListener('keyup', ev => { const k = KEYS[ev.key]; if (k) keys[k] = false; });
+
+$('modes').addEventListener('click', ev => { const m = ev.target.dataset && ev.target.dataset.mode; if (m) setMode(m); });
+$('slowdown').addEventListener('change', ev => { slow = Number(ev.target.value); if (mode === 'balance') resetBalance(); });
+$('methods').addEventListener('click', ev => {
+  const m = ev.target.dataset && ev.target.dataset.m; if (!m) return;
+  method = m;
+  for (const b of $('methods').children) b.classList.toggle('on', b.dataset.m === m);
+  if (mode !== 'free') setMode('free'); else release(x);
+});
+$('dt').addEventListener('change', ev => { dt = Number(ev.target.value); if (mode !== 'free') setMode('free'); else release(x); });
+$('integrator').addEventListener('toggle', () => { if ($('integrator').open && mode !== 'free') setMode('free'); });
+
+// ── The linear model's predictions, checked against the nonlinear sim ────────
+$('eigs').innerHTML =
+  `<tr><th>at</th><th>eigenvalues</th><th>meaning</th></tr>` +
+  `<tr><td>upright</td><td>0, ±${RATE.toFixed(2)}</td><td>a tilt grows like e<sup>${RATE.toFixed(2)}t</sup></td></tr>` +
+  `<tr><td>hanging</td><td>0, ±${RATE.toFixed(2)}j</td><td>swings with period ${(2 * Math.PI / RATE).toFixed(3)} s</td></tr>`;
+$('params').innerHTML = [
+  ['m', 'pendulum mass', P.m, 'kg'], ['l_com', 'pivot to centre of mass', P.l_com, 'm'],
+  ['l', 'pivot to wheel axis', P.l, 'm'], ['m_w', 'wheel and rotor mass', P.m_w, 'kg'],
+  ['I_arm', 'arm inertia about the pivot', P.I_arm, 'kg·m²'], ['I_w', 'wheel inertia', P.I_w, 'kg·m²'],
+  ['τ_max', 'motor stall torque at 12 V', P.tau_max, 'N·m'],
+].map(([s, d, v, un]) => `<tr><td>${s}</td><td>${v} ${un}</td><td class="note">${d}</td></tr>`).join('');
+
+function runOffline(x0, seconds) {
+  const DT = 0.001, n = Math.round(seconds / DT), ts = [0], xs = [x0.slice()];
+  let s = x0.slice();
+  for (let k = 1; k <= n; k++) { s = STEPPERS.rk4(s, 0, DT); ts.push(k * DT); xs.push(s); }
+  return { ts, xs };
+}
+
+function plot(series, yLabel) {
+  const cv = $('chart'), g = cv.getContext('2d'), d = devicePixelRatio;
+  cv.hidden = false; $('legend').hidden = false;
+  const W = cv.width = cv.clientWidth * d, H = cv.height = 170 * d, pad = 34 * d;
+  const all = series.flatMap(s => s.pts);
+  const x1 = Math.max(...all.map(p => p[0]));
+  const y0 = Math.min(...all.map(p => p[1])), y1 = Math.max(...all.map(p => p[1]));
+  // The top band holds the axis label, so the plot area starts below it and no curve can cross it.
+  const top = 22 * d;
+  const X = v => pad + v / x1 * (W - pad - 8), Y = v => H - pad + (y0 - v) / (y1 - y0) * (H - pad - top);
+  g.clearRect(0, 0, W, H);
+  g.strokeStyle = css('--line'); g.lineWidth = d;
+  g.beginPath(); g.moveTo(pad, top); g.lineTo(pad, H - pad); g.lineTo(W - 4, H - pad); g.stroke();
+  g.fillStyle = css('--mute'); g.font = `${11 * d}px system-ui,sans-serif`;
+  const fmt = v => (Math.abs(v) < 10 ? v.toFixed(1) : v.toFixed(0));
+  g.textAlign = 'right';
+  g.fillText(fmt(y1), pad - 4, top + 4 * d);
+  g.fillText(fmt(y0), pad - 4, H - pad);
+  g.fillText(`${x1.toFixed(1)} s`, W - 4, H - pad + 14 * d);
+  g.textAlign = 'left';
+  g.fillText('0', pad, H - pad + 14 * d);
+  g.fillText(yLabel, pad + 6, 12 * d);
+  for (const s of series) {
+    g.strokeStyle = css(s.color); g.lineWidth = 2 * d; g.setLineDash(s.dash ? [6 * d, 5 * d] : []);
+    g.beginPath();
+    s.pts.forEach(([a, b], i) => (i ? g.lineTo(X(a), Y(b)) : g.moveTo(X(a), Y(b))));
+    g.stroke();
+  }
+  g.setLineDash([]);
+}
+
+$('testTop').addEventListener('click', () => {
+  const th0 = 1e-4, run = runOffline([th0, 0, 0], 1.6);
+  const keep = run.ts.map((tt, i) => [tt, Math.abs(run.xs[i][0])]).filter(([, th]) => th < Math.PI / 2);
+  // Fit log|θ| between 10× the start (the decaying mode has died) and 3° (sin θ ≈ θ still holds).
+  const fitPts = keep.filter(([, th]) => th > 10 * th0 && th < 3 * Math.PI / 180);
+  const n = fitPts.length, mx = fitPts.reduce((s, p) => s + p[0], 0) / n, my = fitPts.reduce((s, p) => s + Math.log(p[1]), 0) / n;
+  const slope = fitPts.reduce((s, p) => s + (p[0] - mx) * (Math.log(p[1]) - my), 0) / fitPts.reduce((s, p) => s + (p[0] - mx) ** 2, 0);
+  plot([
+    { pts: keep.map(([tt, th]) => [tt, Math.log10(th * 180 / Math.PI)]), color: '--wheel' },
+    { pts: keep.map(([tt]) => [tt, Math.log10(th0 * Math.cosh(RATE * tt) * 180 / Math.PI)]), color: '--pred', dash: true },
+  ], 'tilt, log₁₀(degrees)');
+  $('result').innerHTML = `Measured growth rate <strong>${slope.toFixed(3)}</strong>/s, predicted <strong>${RATE.toFixed(3)}</strong>/s ` +
+    `(<span class="good">${(100 * Math.abs(slope - RATE) / RATE).toFixed(2)}% apart</span>). On a log scale, exponential growth is a straight line, and its slope is the rate.`;
+  setMode('free'); release([th0, 0, 0]);
+});
+
+$('testBottom').addEventListener('click', () => {
+  const amp = 2 * Math.PI / 180, run = runOffline([Math.PI - amp, 0, 0], 5);
+  const off = run.xs.map(s => s[0] - Math.PI), cross = [];
+  for (let i = 0; i + 1 < off.length; i++) {
+    if (off[i] < 0 && off[i + 1] >= 0) cross.push(run.ts[i] - off[i] * 0.001 / (off[i + 1] - off[i]));
+  }
+  const period = (cross[cross.length - 1] - cross[0]) / (cross.length - 1), pred = 2 * Math.PI / RATE;
+  const shown = run.ts.map((tt, i) => [tt, off[i] * 180 / Math.PI]).filter(([tt]) => tt <= 3);
+  plot([
+    { pts: shown, color: '--wheel' },
+    { pts: shown.map(([tt]) => [tt, -2 * Math.cos(RATE * tt)]), color: '--pred', dash: true },
+  ], 'angle from the bottom (degrees)');
+  $('result').innerHTML = `Measured period <strong>${period.toFixed(4)}</strong> s, predicted <strong>${pred.toFixed(4)}</strong> s ` +
+    `(<span class="good">${(100 * Math.abs(period - pred) / pred).toFixed(2)}% apart</span>, over ${cross.length - 1} swings).`;
+  setMode('free'); release([Math.PI - amp, 0, 0]);
+});
+
+setMode('balance');
+requestAnimationFrame(frame);
+</script>
+<script src="/demos/_shared/demo-chrome.js" defer></script>
+</body>
+</html>
