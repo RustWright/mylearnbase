@@ -722,6 +722,17 @@ only learns where the code lives, the section is a tour of source
 code, not evidence — and the section isn't doing its job, even if
 `logbook publish` accepts it.
 
+**When the code is private.** Terminal output is only evidence when the
+reader can see what produced it. With a private repo they can't: eleven
+`PASSED` lines are a claim, not a proof, and `cite` has nothing public to
+link. So lead with evidence the reader can reproduce in the page, such as
+a demo that reruns the check and shows the number, and state the measured
+results in prose. Describe what the tests check as *method*, in a
+sentence, rather than pasting their output. Exec blocks become optional.
+If the demo is a port of the real code, say so, since it verifies the
+model and not the file. When the repo goes public, add the cites; don't
+replace the in-page evidence.
+
 ### §7 — What's worth remembering or doing next?
 
 **✓ Good:**
