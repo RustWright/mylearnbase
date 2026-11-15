@@ -857,6 +857,19 @@ in early May"* instead of *"Cycle 2."* *"After switching to Zola
 from Dioxus"* instead of *"Phase 4."* Time anchors and event anchors
 survive process changes; jargon doesn't.
 
+### Deployment detail throughout
+
+**Signal.** The entry names the host's cores, which model file loads,
+config keys, defaults and test-set sizes. It reads as a description of
+one installation rather than of the feature.
+
+**Why it fails.** The reader came for the design and what was learned
+building it. Hosting detail dates fast and buries the transferable part
+(author, 2026-11-15).
+
+**Corrective.** Keep the design, the reasoning and the measured
+findings. Drop where and how this copy runs; the repo holds that.
+
 ## A worked example end-to-end
 
 OAuth login via Google, captured in `omni-me/` and published to
