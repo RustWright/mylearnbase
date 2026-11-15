@@ -95,6 +95,10 @@ proposed first.
 - No colons standing in for a banned em dash ("setup: payoff", "claim:
   elaboration"). Split into two sentences. Colons only for genuine lists or
   definitions.
+- Plain over compressed. Name things directly ("the document and its metadata fields", not
+  "whatever has been worked out about it"), put people or code as the subject rather than
+  an abstraction ("text answers ..."), one idea per sentence. Explain or drop internal
+  terms like "fold" (author, 2026-11-15).
 - Preserve the author's deliberate flourishes *(CP-4: "no matter what, every,
   single, time.")*.
 - Preserve technical precision the author wrote (shape annotations, exact terms).
